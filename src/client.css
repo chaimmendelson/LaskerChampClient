@@ -1,0 +1,68 @@
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+button{
+    width:fit-content;
+}
+button:hover{
+    cursor:grab;
+}
+button:active{
+    cursor: grabbing;
+}
+#buttons{
+    margin-top:5px;
+    width: fit-content;
+}
+#myBoard{
+    background-color: darkslateblue;
+    border-top:3px darkslateblue solid;
+    border-left:3px darkslateblue solid;
+    border-bottom:3px darkslateblue solid;
+}
+#pgnText{
+    width:25%;
+    padding:6px;
+    position: absolute;
+    right:30px;
+    top:5px;
+    border:5px mediumblue solid;
+    padding:6px;
+    position: absolute;
+    right:30px;
+    top:5px;
+    height:25%;
+    overflow-y:auto;
+    background-color: black;
+    color:lime;
+    font-family: 'Courier New', Courier, monospace;
+}
+#StatusDisplay{
+    width:25%;
+    padding:6px;
+    position:absolute;
+    right:30px;
+    top:30%;
+    border:5px black solid;
+    font-size: small;
+    font-family: 'Courier New', Courier, monospace;
+}
+#fenDisplay{
+    width:25%;
+    overflow-x: scroll;
+    height:30px;
+    padding:6px;
+    position:absolute;
+    right:30px;
+    top:36%;
+    border:5px black solid;
+    font-size: xx-small;
+    font-family: 'Courier New', Courier, monospace;
+}
+#copy_fen{
+    position: absolute;
+    right:15px;
+    top:45%;
+}
