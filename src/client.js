@@ -1,6 +1,4 @@
-  
-
-      document.getElementById("startBtn").addEventListener("click", function() {
+ document.getElementById("startBtn").addEventListener("click", function() {
         document.getElementById("startBtn").disabled = true;
         board = ChessBoard('myBoard', config)
         game = new Chess()
@@ -20,7 +18,6 @@
             updateStatus()
         }
       });
-
       let board = ChessBoard('myBoard', 'start')
       let game = null
       let $status = $('#status')
@@ -76,14 +73,23 @@
 
         // checkmate?
         if (game.isCheckmate()) {
+            let the_winning_color;
+          const createImage = document.createElement('img')
+          if (moveColor == "White") { createImage.src = '/Users/martinerdfarb/Documents/GitHub/LaskerChampClient/src/chessboardjs-1.0.0/img/chesspieces/wikipedia/bK.png';  the_winning_color = "Black"}
+          else if (moveColor == "Black") { createImage.src= '/Users/martinerdfarb/Documents/GitHub/LaskerChampClient/src/chessboardjs-1.0.0/img/chesspieces/wikipedia/wK.png'; the_winning_color = "White"}
+          createImage.style.border = '4px gold solid'
+          document.body.appendChild(createImage)
           status = 'Game over, ' + moveColor + ' is in checkmate.'
           document.getElementById("startBtn").disabled = false;
+          document.getElementById("game_over").innerText = "Game Over!!! Player " + the_winning_color + " Has Won The Game!";
         }
 
         // draw?
         else if (game.isDraw()) {
           status = 'Game over, drawn position'
           document.getElementById("startBtn").disabled = false;
+          document.getElementById("game_over").innerText = "Game Over! Both Players Win (Or in Reality Lose)!";
+          
         }
 
         // game still on

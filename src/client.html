@@ -10,7 +10,13 @@
     <script src="https://unpkg.com/chess.js"></script>
   </head>
   <body>
-    <div id="myBoard" style="width: 400px" class="center"></div>
+    <!-- Name of the variable below needs work, I'll admit that... -->
+    <div id="box">
+      <b>LaskerChamp Chess!</b><br>
+      The #1 chess site in the world and in the universe!
+    </div>
+    <span id="back_top_line"></span>
+    <div id="myBoard" style="width:400px;height:auto;" class="center"></div>
     <div id="buttons" class="center">
         <button id="startBtn">Start</button>
         <button id="quitBtn">Quit</button>
@@ -30,6 +36,8 @@
             <span id="pgn"></span>
         </span>
     </div>
+    <div id="game_over">game is in progress...</div>
+
     <script src="client.js"></script>
   </body>
 </html>

@@ -66,3 +66,25 @@ button:active{
     right:15px;
     top:45%;
 }
+#box{
+    position: absolute;
+    top:5px;
+    left:5px;
+    width:20%;
+    height:10%;
+    text-align: center;
+    border:1px black solid;
+    background-color: white;
+}
+#back_top_line{
+    position: absolute;
+    height:15%;
+    width:100%;
+    background-image:linear-gradient(35deg, red, yellow, lime, blue, cyan, magenta);
+    z-index:-3;
+}
+
+#game_over{
+        -ms-transform: rotate(20deg); /* IE 9 */
+        transform: rotate(20deg);
+}
