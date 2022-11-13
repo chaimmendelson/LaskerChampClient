@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chess</title>
+    <link rel="stylesheet" href="chessboardjs-1.0.0/css/chessboard-1.0.0.min.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="chessboardjs-1.0.0/js/chessboard-1.0.0.min.js"></script>
+    <script>var exports = {};</script>
+    <script src="https://unpkg.com/chess.js"></script>
+  </head>
+  <body>
+    <div id="myBoard" style="width: 400px"></div>
+    <label>Status:</label>
+    <div id="status"></div>
+    <label>FEN:</label>
+    <div id="fen"></div>
+    <label>PGN:</label>
+    <div id="pgn"></div>
+    <button id="startBtn">Start</button>
+    <script>
+      
+      // add messages for win screen, stylize page, stylize move log, etc.
+      document.getElementById("startBtn").addEventListener("click", function() {
+        document.getElementById("startBtn").disabled = true;
+        board = ChessBoard('myBoard', config)
+        game = new Chess()
+        updateStatus()
+      });
+
+      let board = ChessBoard('myBoard', 'start')
+      let game = null
+      let $status = $('#status')
+      let $fen = $('#fen')
+      let $pgn = $('#pgn')
+
+      function onDragStart (source, piece, position, orientation) {
+        // do not pick up pieces if the game is over
+        if (game.isCheckmate() || game.isDraw()) return false
+
+        // only pick up pieces for the side to move
+        if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
+            (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+          return false
+        }
+      }
+
+      function onDrop (source, target) {
+        // see if the move is legal
+        var piece = game.get(source).type
+        if ((piece === 'p' && target[1] === '8') || (piece === 'P' && target[1] === '1')) {
+          var promotion = window.prompt('Promote to: (q, r, b, n)')
+          var move = game.move({
+          from: source,
+          to: target,
+          promotion: promotion
+        })
+        }
+        else{
+          var move = game.move({
+            from: source,
+            to: target
+          })
+        }
+        // illegal move
+        if (move === null) return 'snapback'
+        updateStatus()
+      }
+
+      // update the board position after the piece snap
+      // for castling, en passant, pawn promotion
+      function onSnapEnd () {
+        board.position(game.fen())
+      }
+
+      function updateStatus () {
+        var status = ''
+
+        var moveColor = 'White'
+        if (game.turn() === 'b') {
+          moveColor = 'Black'
+        }
+
+        // checkmate?
+        if (game.isCheckmate()) {
+          status = 'Game over, ' + moveColor + ' is in checkmate.'
+          document.getElementById("startBtn").disabled = false;
+        }
+
+        // draw?
+        else if (game.isDraw()) {
+          status = 'Game over, drawn position'
+          document.getElementById("startBtn").disabled = false;
+        }
+
+        // game still on
+        else {
+          status = moveColor + ' to move'
+
+          // check?
+          if (game.isCheck()) {
+            status += ', ' + moveColor + ' is in check'
+          }
+        }
+
+        $status.html(status)
+        $fen.html(game.fen())
+        $pgn.html(game.pgn())
+      }
+
+      var config = {
+        draggable: true,
+        position: 'start',
+        onDragStart: onDragStart,
+        onDrop: onDrop,
+        onSnapEnd: onSnapEnd
+      }
+    </script>
+  </body>
+</html>
