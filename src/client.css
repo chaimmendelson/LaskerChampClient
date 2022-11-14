@@ -78,13 +78,51 @@ button:active{
 }
 #back_top_line{
     position: absolute;
+    top:0;
+    left:-3px;
     height:15%;
-    width:100%;
-    background-image:linear-gradient(35deg, red, yellow, lime, blue, cyan, magenta);
+    width:105%;
+    /* animation: spinTopLine 3s infinite alternate; */
+    background-color: snow;
     z-index:-3;
+}
+@keyframes spinTopLine {
+    0%{background-image:linear-gradient(7deg, crimson, khaki, palegreen, powderblue pink);}
+    20%{background-image:linear-gradient(7deg, khaki, palegreen, powderblue, pink,  crimson);}
+    40%{background-image:linear-gradient(7deg, palegreen, powderblue, pink, crimson, khaki);}
+    60%{background-image:linear-gradient(7deg, powderblue, pink, crimson, khaki, palegreen);}
+    80%{background-image:linear-gradient(7deg, pink, crimson, khaki, palegreen, powderblue);}
+    100%{background-image:linear-gradient(7deg, crimson, khaki, palegreen, powderblue, pink);}
 }
 
 #game_over{
         -ms-transform: rotate(20deg); /* IE 9 */
         transform: rotate(20deg);
+}
+
+#chess_game{
+    display: none;
+}
+
+body{
+    overflow: hidden;
+}
+#switch_to_game{
+    width:10%;
+    position: absolute;
+    top:50%;
+    left:50%;
+    transform: translate(-50%, -50%);
+}
+@-moz-keyframes spin { 
+    100% { -moz-transform: rotate(360deg); } 
+}
+@-webkit-keyframes spin { 
+    100% { -webkit-transform: rotate(360deg); } 
+}
+@keyframes spin { 
+    100% { 
+        -webkit-transform: rotate(360deg); 
+        transform:rotate(360deg); 
+    } 
 }

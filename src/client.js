@@ -1,30 +1,87 @@
- document.getElementById("startBtn").addEventListener("click", function() {
+ const black_pieces = ['chessboardjs-1.0.0/img/chesspieces/wikipedia/bB.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/bK.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/bN.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/bP.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/bQ.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/bR.png']
+ const white_pieces = ['chessboardjs-1.0.0/img/chesspieces/wikipedia/wB.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/wK.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/wN.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/wP.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/wQ.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/wR.png']
+ let whatPageWeOn = 0;
+ function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}
+ function rotatingImage(source, posX, posY, Width, speedMode){
+    let rotationSpeed = 4;
+    if (speedMode == 1) rotationSpeed = getRandomInt(5)
+    if (rotationSpeed == 0) rotationSpeed = 4
+    const Image = document.createElement('img');
+    Image.src = source;
+    Image.style.cssText = `
+        position: absolute;
+        top: `+posY+`px;
+        left: `+posX+`px;
+        width:`+Width+`px;
+        height: auto;
+        margin:-60px 0 0 -60px;
+        -webkit-animation:spin `+rotationSpeed+`s linear infinite;
+        -moz-animation:spin `+rotationSpeed+`s linear infinite;
+        animation:spin `+rotationSpeed+`s linear infinite;
+    `;
+    document.body.appendChild(Image)
+ }
+
+
+
+
+ let log_in_info_user = ['test', 'username'];
+ let log_in_info_pass = ['test', 'password'];
+
+ document.getElementById('submit').addEventListener("click", function() {
+    let user_txt = document.getElementById('username').value;
+    let pass_txt = document.getElementById('username').value;
+    console.log(user_txt)
+    // doesn't work, for some reason always returns 'success' in the console
+    if (log_in_info_user.indexOf(user_txt) == log_in_info_user.indexOf(pass_txt)) console.log('success')
+ });
+ 
+/* Add the spinning images, because...
+for (i=1;i<15;i++){
+    if (whatPageWeOn == 0){
+     rotatingImage(black_pieces[getRandomInt(6)], i*100, 100, 100, 1)
+     rotatingImage(white_pieces[getRandomInt(6)], i*100, 200, 100, 1)
+    }
+}
+if (whatPageWeOn == 0){
+    rotatingImage(black_pieces[getRandomInt(6)], 0, 0, 100, 1)
+    rotatingImage(white_pieces[getRandomInt(6)], document.body.clientWidth-100, 0, 100, 1)
+}
+*/
+    document.getElementById("startBtn").addEventListener("click", function() {
         document.getElementById("startBtn").disabled = true;
         board = ChessBoard('myBoard', config)
         game = new Chess()
         updateStatus()
-      });
-      document.getElementById("quitBtn").addEventListener("click", function() {
+    });
+    document.getElementById("quitBtn").addEventListener("click", function() {
         if (confirm("Quit?")){
             document.getElementById("startBtn").disabled = false;
             board = ChessBoard('myBoard', 'start');
         }
-      });
-      document.getElementById("restartBtn").addEventListener("click", function() {
+    });
+    document.getElementById("restartBtn").addEventListener("click", function() {
         if (confirm("Restart?")){
             document.getElementById("startBtn").disabled = true;
             board = ChessBoard('myBoard', config)
             game = new Chess()
             updateStatus()
         }
-      });
-      let board = ChessBoard('myBoard', 'start')
-      let game = null
-      let $status = $('#status')
-      let $fen = $('#fen')
-      let $pgn = $('#pgn')
+    });
+    document.getElementById('switch_to_game').addEventListener("click", function() {
+        document.getElementById('chess_game').style.display = 'block';
+        document.getElementById('main_page').style.display = 'none';
+        whatPageWeOn = 1;
+    });
+    let board = ChessBoard('myBoard', 'start')
+    let game = null
+    let $status = $('#status')
+    let $fen = $('#fen')
+    let $pgn = $('#pgn')
 
-      function onDragStart (source, piece, position, orientation) {
+    function onDragStart (source, piece, position, orientation) {
         // do not pick up pieces if the game is over
         if (game.isCheckmate() || game.isDraw()) return false
 
@@ -33,35 +90,36 @@
             (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
           return false
         }
-      }
+    }
 
-      function onDrop (source, target) {
+
+    function onDrop (source, target) {
         // see if the move is legal
         var piece = game.get(source).type
         if ((piece === 'p' && target[1] === '8') || (piece === 'P' && target[1] === '1')) {
-          var promotion = window.prompt('Promote to: (q, r, b, n)')
-          var move = game.move({
-          from: source,
-          to: target,
-          promotion: promotion
-        })
+            var promotion = window.prompt('Promote to: (q, r, b, n)')
+            var move = game.move({
+                from: source,
+                to: target,
+                promotion: promotion
+            })
         }
         else{
-          var move = game.move({
-            from: source,
-            to: target
-          })
+            var move = game.move({
+                from: source,
+                to: target
+            })
         }
         // illegal move
         if (move === null) return 'snapback'
         updateStatus()
-      }
+    }
 
       // update the board position after the piece snap
       // for castling, en passant, pawn promotion
-      function onSnapEnd () {
-        board.position(game.fen())
-      }
+        function onSnapEnd () {
+            board.position(game.fen())
+        }
 
       function updateStatus () {
         var status = ''
@@ -75,10 +133,7 @@
         if (game.isCheckmate()) {
             let the_winning_color;
           const createImage = document.createElement('img')
-          if (moveColor == "White") { createImage.src = '/Users/martinerdfarb/Documents/GitHub/LaskerChampClient/src/chessboardjs-1.0.0/img/chesspieces/wikipedia/bK.png';  the_winning_color = "Black"}
-          else if (moveColor == "Black") { createImage.src= '/Users/martinerdfarb/Documents/GitHub/LaskerChampClient/src/chessboardjs-1.0.0/img/chesspieces/wikipedia/wK.png'; the_winning_color = "White"}
-          createImage.style.border = '4px gold solid'
-          document.body.appendChild(createImage)
+            document.body.appendChild(createImage)
           status = 'Game over, ' + moveColor + ' is in checkmate.'
           document.getElementById("startBtn").disabled = false;
           document.getElementById("game_over").innerText = "Game Over!!! Player " + the_winning_color + " Has Won The Game!";
