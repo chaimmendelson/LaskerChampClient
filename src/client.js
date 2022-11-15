@@ -135,86 +135,83 @@ if (whatPageWeOn == 0){
         updateStatus()
     }
 
-      // update the board position after the piece snap
-      // for castling, en passant, pawn promotion
-        function onSnapEnd () {
-            board.position(game.fen())
+    // update the board position after the piece snap
+    // for castling, en passant, pawn promotion
+    function onSnapEnd () {
+        board.position(game.fen())
+    }
+
+    function updateStatus () {
+    let status = ''
+
+    let moveColor = 'White'
+    if (game.turn() === 'b') {
+        moveColor = 'Black'
+    }
+
+    // checkmate?
+    if (game.isCheckmate()) {
+        let the_winning_color;
+        const createImage = document.createElement('img')
+        document.body.appendChild(createImage)
+        status = 'Game over, ' + moveColor + ' is in checkmate.'
+        document.getElementById("startBtn").disabled = false;
+    }
+
+    // draw?
+    else if (game.isDraw()) {
+        status = 'Game over, drawn position'
+        document.getElementById("startBtn").disabled = false;
+    }
+
+    // game still on
+    else {
+        status = moveColor + ' to move'
+
+        // check?
+        if (game.isCheck()) {
+        status += ', ' + moveColor + ' is in check'
         }
+    }
 
-      function updateStatus () {
-        let status = ''
+    $status.html(status)
+    $fen.html(game.fen())
+    $pgn.html(game.pgn())
+    }
 
-        let moveColor = 'White'
-        if (game.turn() === 'b') {
-          moveColor = 'Black'
-        }
-
-        // checkmate?
-        if (game.isCheckmate()) {
-            let the_winning_color;
-          const createImage = document.createElement('img')
-            document.body.appendChild(createImage)
-          status = 'Game over, ' + moveColor + ' is in checkmate.'
-          document.getElementById("startBtn").disabled = false;
-          document.getElementById("game_over").innerText = "Game Over!!! Player " + the_winning_color + " Has Won The Game!";
-        }
-
-        // draw?
-        else if (game.isDraw()) {
-          status = 'Game over, drawn position'
-          document.getElementById("startBtn").disabled = false;
-          document.getElementById("game_over").innerText = "Game Over! Both Players Win (Or in Reality Lose)!";
-          
-        }
-
-        // game still on
-        else {
-          status = moveColor + ' to move'
-
-          // check?
-          if (game.isCheck()) {
-            status += ', ' + moveColor + ' is in check'
-          }
-        }
-
-        $status.html(status)
-        $fen.html(game.fen())
-        $pgn.html(game.pgn())
-      }
-
-      function onMouseoverSquare (square, piece) {
-        // get list of possible moves for this square
-        let moves = game.moves({
-          square: square,
-          verbose: true
-        })
-      
-        // exit if there are no moves available for this square
-        if (moves.length === 0) return
-      
-        // highlight the square they moused over
-        greySquare(square)
-      
-        // highlight the possible squares for this piece
-        for (let i = 0; i < moves.length; i++) {
-          greySquare(moves[i].to)
-        }
-      }
-      
-      function onMouseoutSquare (square, piece) {
-        removeGreySquares()
-      }
+    function onMouseoverSquare (square, piece) {
+    // get list of possible moves for this square
+    let moves = game.moves({
+        square: square,
+        verbose: true
+    })
+    
+    // exit if there are no moves available for this square
+    if (moves.length === 0) return
+    
+    // highlight the square they moused over
+    greySquare(square)
+    
+    // highlight the possible squares for this piece
+    for (let i = 0; i < moves.length; i++) {
+        greySquare(moves[i].to)
+    }
+    }
+    
+    function onMouseoutSquare (square, piece) {
+    removeGreySquares()
+    }
 
 
-      let config = {
-        draggable: true,
-        position: 'start',
-        onDragStart: onDragStart,
-        onDrop: onDrop,
-        onMouseoutSquare: onMouseoutSquare,
-        onMouseoverSquare: onMouseoverSquare,
-        onSnapEnd: onSnapEnd
-      }
+    let config = {
+    draggable: true,
+    position: 'start',
+    onDragStart: onDragStart,
+    onDrop: onDrop,
+    onMouseoutSquare: onMouseoutSquare,
+    onMouseoverSquare: onMouseoverSquare,
+    onSnapEnd: onSnapEnd
+    }
 
 
 
