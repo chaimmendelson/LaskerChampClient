@@ -80,6 +80,24 @@ if (whatPageWeOn == 0){
     let $status = $('#status')
     let $fen = $('#fen')
     let $pgn = $('#pgn')
+    let whiteSquareGrey = '#d9d95b'
+    let blackSquareGrey = '#a6a629'
+
+    function removeGreySquares () {
+        $('#myBoard .square-55d63').css('background', '')
+    }
+
+    function greySquare (square) {
+    let $square = $('#myBoard .square-' + square)
+
+    let background = whiteSquareGrey
+    if ($square.hasClass('black-3c85d')) {
+        background = blackSquareGrey
+    }
+
+    $square.css('background', background)
+    }
+
 
     function onDragStart (source, piece, position, orientation) {
         // do not pick up pieces if the game is over
@@ -95,17 +113,19 @@ if (whatPageWeOn == 0){
 
     function onDrop (source, target) {
         // see if the move is legal
-        var piece = game.get(source).type
+        removeGreySquares()
+        let piece = game.get(source).type
+        let move = null;
         if ((piece === 'p' && target[1] === '8') || (piece === 'P' && target[1] === '1')) {
-            var promotion = window.prompt('Promote to: (q, r, b, n)')
-            var move = game.move({
+            let promotion = window.prompt('Promote to: (q, r, b, n)')
+            move = game.move({
                 from: source,
                 to: target,
                 promotion: promotion
             })
         }
         else{
-            var move = game.move({
+            move = game.move({
                 from: source,
                 to: target
             })
@@ -122,9 +142,9 @@ if (whatPageWeOn == 0){
         }
 
       function updateStatus () {
-        var status = ''
+        let status = ''
 
-        var moveColor = 'White'
+        let moveColor = 'White'
         if (game.turn() === 'b') {
           moveColor = 'Black'
         }
@@ -162,17 +182,52 @@ if (whatPageWeOn == 0){
         $pgn.html(game.pgn())
       }
 
-      var config = {
+      function onMouseoverSquare (square, piece) {
+        // get list of possible moves for this square
+        let moves = game.moves({
+          square: square,
+          verbose: true
+        })
+      
+        // exit if there are no moves available for this square
+        if (moves.length === 0) return
+      
+        // highlight the square they moused over
+        greySquare(square)
+      
+        // highlight the possible squares for this piece
+        for (let i = 0; i < moves.length; i++) {
+          greySquare(moves[i].to)
+        }
+      }
+      
+      function onMouseoutSquare (square, piece) {
+        removeGreySquares()
+      }
+
+
+      let config = {
         draggable: true,
         position: 'start',
         onDragStart: onDragStart,
         onDrop: onDrop,
+        onMouseoutSquare: onMouseoutSquare,
+        onMouseoverSquare: onMouseoverSquare,
         onSnapEnd: onSnapEnd
       }
 
 
 
     document.getElementById("copy_fen").addEventListener("click", function() {
-        navigator.clipboard.writeText(board.fen())
-        console.log(board.fen())
+        if (game){
+            navigator.clipboard.writeText(game.fen())
+            console.log(game.fen())
+        }
+    });
+
+    document.getElementById("copy_pgn").addEventListener("click", function() {
+        if (game){
+            navigator.clipboard.writeText(game.pgn())
+            console.log(game.pgn())
+        }
     });

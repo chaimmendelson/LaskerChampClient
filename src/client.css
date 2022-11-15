@@ -3,8 +3,10 @@
     margin-left: auto;
     margin-right: auto;
 }
+
 button{
     width:fit-content;
+    background-color: gold;
 }
 button:hover{
     cursor:grab;
@@ -12,66 +14,62 @@ button:hover{
 button:active{
     cursor: grabbing;
 }
+.clearfix {
+    clear: both;
+}
+
+.chess_control{
+    margin: 10px;
+}
 #buttons{
-    margin-top:5px;
+    padding: 6px;
+    margin: 50px;
     width: fit-content;
+    float: left;
 }
 #myBoard{
     background-color: darkslateblue;
     border-top:3px darkslateblue solid;
     border-left:3px darkslateblue solid;
     border-bottom:3px darkslateblue solid;
+    float: left;
 }
+
+#data_box{
+    width: 25%;
+    padding: 10px;
+    float: left;
+    margin-right: 10%;
+}
+
 #pgnText{
-    width:25%;
-    padding:6px;
-    position: absolute;
-    right:30px;
-    top:5px;
+    height: 100px;
     border:5px mediumblue solid;
-    padding:6px;
-    position: absolute;
-    right:30px;
-    top:5px;
-    height:25%;
     overflow-y:auto;
     background-color: black;
     color:lime;
     font-family: 'Courier New', Courier, monospace;
 }
 #StatusDisplay{
-    width:25%;
     padding:6px;
-    position:absolute;
-    right:30px;
-    top:30%;
     border:5px black solid;
     font-size: small;
     font-family: 'Courier New', Courier, monospace;
+    background-color: wheat;
 }
 #fenDisplay{
-    width:25%;
-    overflow-x: scroll;
-    height:30px;
-    padding:6px;
-    position:absolute;
-    right:30px;
-    top:36%;
+    overflow-x: auto;
     border:5px black solid;
     font-size: xx-small;
     font-family: 'Courier New', Courier, monospace;
+    background-color: wheat;
 }
-#copy_fen{
-    position: absolute;
-    right:15px;
-    top:45%;
+.copy_btn{
+    margin: 10px;
+    float: left;
 }
+
 #box{
-    position: absolute;
-    top:5px;
-    left:5px;
-    width:20%;
-    height:10%;
     text-align: center;
     border:1px black solid;
     background-color: white;
@@ -106,6 +104,7 @@ button:active{
 
 body{
     overflow: hidden;
+    background-color: aquamarine;
 }
 #switch_to_game{
     width:10%;

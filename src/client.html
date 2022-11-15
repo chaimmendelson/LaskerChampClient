@@ -20,32 +20,35 @@
     </div>
     <div id="chess_game">
       <!-- Name of the variable below needs work, I'll admit that... -->
-      <div id="box">
-        <b>LaskerChamp Chess!</b><br>
-        The #1 chess site in the world and in the universe!
+      <!-- <div id="back_top_line"></div> -->
+      <div id="data_box">
+        <div id="box">
+          <b>LaskerChamp Chess!</b><br>
+          The #1 chess site in the world and in the universe!
+        </div>
+        <div id="pgnText">
+          PGN: <span id="pgn"></span>
+        </div>
+        <br>
+        <div id="StatusDisplay">
+            STATUS: <span id="status"></span>
+        </div>
+        <br>
+        <div id="fenDisplay">
+            FEN: <span id="fen"></span>
+        </div>
+        <br>
+        <button id = "copy_fen" class="copy_btn">Copy FEN to clipboard</button>
+        <button id = "copy_pgn" class="copy_btn">Copy PGN to clipboard</button>
       </div>
-      <span id="back_top_line"></span>
-      <div id="myBoard" style="width:400px;height:auto;" class="center"></div>
-      <div id="buttons" class="center">
-          <button id="startBtn">Start</button>
-          <button id="quitBtn">Quit</button>
-          <button id="restartBtn">Restart</button>
+      <div id="myBoard" style="width:400px;"></div>
+      <div id="buttons">
+          <button id="startBtn" class="chess_control">Start</button>
+          <br>
+          <button id="quitBtn" class="chess_control">Quit</button>
+          <br>
+          <button id="restartBtn" class="chess_control">Restart</button>
       </div>
-      <div>
-          <span id="StatusDisplay">
-              STATUS: <span id="status"></span>
-          </span>
-          <span id="fenDisplay">
-              FEN: <span id="fen"></span>
-          </span>
-          <button id="copy_fen">Copy FEN to clipboard</button>
-          <span id="pgnText">
-              <span>PGN:</span>
-                  <br>
-              <span id="pgn"></span>
-          </span>
-      </div>
-      <div id="game_over">game is in progress...</div>
     </div>
     <script src="client.js"></script>
   </body>
