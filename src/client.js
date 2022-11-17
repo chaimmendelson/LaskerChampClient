@@ -36,6 +36,9 @@
     console.log(user_txt)
     // doesn't work, for some reason always returns 'success' in the console
     if (log_in_info_user.indexOf(user_txt) == log_in_info_user.indexOf(pass_txt)) console.log('success')
+    document.getElementById('chess_game').style.display = 'block';
+        document.getElementById('main_page').style.display = 'none';
+        whatPageWeOn = 1;
  });
  
 /* Add the spinning images, because...
@@ -70,18 +73,13 @@ if (whatPageWeOn == 0){
             updateStatus()
         }
     });
-    document.getElementById('switch_to_game').addEventListener("click", function() {
-        document.getElementById('chess_game').style.display = 'block';
-        document.getElementById('main_page').style.display = 'none';
-        whatPageWeOn = 1;
-    });
     let board = ChessBoard('myBoard', 'start')
     let game = null
     let $status = $('#status')
     let $fen = $('#fen')
     let $pgn = $('#pgn')
-    let whiteSquareGrey = '#d9d95b'
-    let blackSquareGrey = '#a6a629'
+    let whiteSquareGrey = 'silver'
+    let blackSquareGrey = 'darkgrey'
 
     function removeGreySquares () {
         $('#myBoard .square-55d63').css('background', '')

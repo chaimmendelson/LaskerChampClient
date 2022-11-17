@@ -10,6 +10,10 @@
     margin-left: auto;
     margin-right: auto;
 }
+
+#login{
+    width: fit-content;
+}
 #LaskerChamp_txt{
     background: linear-gradient(30deg, silver, gold, white, black, );
      background-size: cover;
@@ -212,8 +216,6 @@ body{
     background-color: aquamarine;
 }
 #switch_to_game{
-    width:10%;
-    position: relative;
     transform: translate(-50%, -50%);
 }
 @-moz-keyframes spin { 

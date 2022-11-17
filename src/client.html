@@ -12,14 +12,17 @@
   <body>
     <div id="main_page">
       <!-- Doesn't work, for some reason it will always print success in the console -->
-      <form onsubmit="return false">
-        <input type="text" id="username" placeholder="username">
-        <input type="text" id="password" placeholder="password">
-        <button id="submit">Submit</button>
-      </form>
       <h1 id="LaskerChamp_txt">LaskerChamp</h1>
-      <br>
-      <button id="switch_to_game" class="center">click me</button>
+      <div id="login" class="center">
+        <form onsubmit="return false">
+          <input type="text" id="username" placeholder="username">
+          <br>
+          <input type="text" id="password" placeholder="password">
+          <br>
+          <button id="submit" class="center">Submit</button>
+        </form>
+      </div>
+      <!-- <button id="switch_to_game" class="center">click me</button> -->
       <div id="chess_game_txt">The Chess Site!</div>
     </div>
     <div id="chess_game">
