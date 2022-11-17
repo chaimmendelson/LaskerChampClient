@@ -121,7 +121,7 @@ if (whatPageWeOn == 0){
         removeGreySquares()
         let piece = game.get(source).type
         let move = null;
-        if ((piece === 'p' && target[1] === '8') || (piece === 'P' && target[1] === '1')) {
+        if (piece === 'p' && (target[1] === '1' || target[1] === '8')){
             let promotion = window.prompt('Promote to: (q, r, b, n)')
             move = game.move({
                 from: source,
