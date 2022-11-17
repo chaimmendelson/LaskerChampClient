@@ -31,16 +31,23 @@
  let log_in_info_pass = ['test', 'password'];
 
  document.getElementById('submit').addEventListener("click", function() {
+    let user_in_list = false;
+    let pass_in_list = false
     let user_txt = document.getElementById('username').value;
-    let pass_txt = document.getElementById('username').value;
-    console.log(user_txt)
+    let pass_txt = document.getElementById('password').value;
+    if (log_in_info_user.includes(user_txt)) user_in_list = true
+    if (log_in_info_pass.includes(pass_txt)) pass_in_list = true
+    console.log(user_txt, {user_in_list}, {pass_in_list})
     // doesn't work, for some reason always returns 'success' in the console
-    if (log_in_info_user.indexOf(user_txt) == log_in_info_user.indexOf(pass_txt)) console.log('success')
-    document.getElementById('chess_game').style.display = 'block';
+    if (user_in_list && pass_in_list && log_in_info_user.indexOf(user_txt) == log_in_info_pass.indexOf(pass_txt)) {
+        console.log('success')
+        document.getElementById('chess_game').style.display = 'block';
         document.getElementById('main_page').style.display = 'none';
         whatPageWeOn = 1;
+        document.getElementById('username_value').innerText = user_txt;
+    }
  });
- 
+
 /* Add the spinning images, because...
 for (i=1;i<15;i++){
     if (whatPageWeOn == 0){
@@ -107,7 +114,7 @@ if (whatPageWeOn == 0){
           return false
         }
     }
-
+    
 
     function onDrop (source, target) {
         // see if the move is legal
@@ -200,6 +207,41 @@ if (whatPageWeOn == 0){
     removeGreySquares()
     }
 
+    let ChessStyleMode = 0;
+    document.getElementById('customizeBtn').addEventListener("click", function(){
+       if (ChessStyleMode == 3) ChessStyleMode = 0;
+       else ChessStyleMode++;
+       const white_squares = document.querySelectorAll('.white-1e1d7');
+       white_squares.forEach(squareW => {
+           if (ChessStyleMode == 0) {
+               squareW.style.background = 'azure';
+           }
+           else if (ChessStyleMode == 1) {
+               squareW.style.background = '#f0d9b5';
+           }
+           else if (ChessStyleMode == 2) {
+               squareW.style.backgroundImage = 'linear-gradient(90deg, red, gold, yellow, lawngreen, aqua, deepskyblue, violet, pink, white, lightgray, chocolate)';
+           }
+           else{
+               squareW.style.background = 'mintcream';
+           }
+       });
+       const black_squares = document.querySelectorAll('.black-3c85d');
+       black_squares.forEach(squareB => {
+           if (ChessStyleMode == 0) {
+               squareB.style.background = 'lightskyblue';
+           }
+           else if (ChessStyleMode == 1) {
+               squareB.style.background = '#b58863';
+           }
+           else if (ChessStyleMode == 2) {
+               squareB.style.background = 'linear-gradient(90deg, darkred, orange, khaki, green, teal, blue, purple, deeppink, black, dimgray, saddlebrown)';
+           }
+           else {
+               squareB.style.background = 'limegreen';
+           }
+       })
+    });
 
     let config = {
     draggable: true,

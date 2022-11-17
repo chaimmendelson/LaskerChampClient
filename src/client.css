@@ -3,7 +3,11 @@
 
 }
 
-
+#user_log_info{
+    font-family: 'Courier New', Courier, monospace;
+    float:right;
+    background-color: aquamarine;
+}
 
 .center {
     display: block;
