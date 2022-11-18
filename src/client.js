@@ -27,26 +27,23 @@
 
 
 
- let log_in_info_user = ['test', 'username'];
- let log_in_info_pass = ['test', 'password'];
+ let log_in_info = {'test': 'test'}
 
  document.getElementById('submit').addEventListener("click", function() {
-    let user_in_list = false;
-    let pass_in_list = false
-    let user_txt = document.getElementById('username').value;
-    let pass_txt = document.getElementById('password').value;
-    if (log_in_info_user.includes(user_txt)) user_in_list = true
-    if (log_in_info_pass.includes(pass_txt)) pass_in_list = true
-    console.log(user_txt, {user_in_list}, {pass_in_list})
-    // doesn't work, for some reason always returns 'success' in the console
-    if (user_in_list && pass_in_list && log_in_info_user.indexOf(user_txt) == log_in_info_pass.indexOf(pass_txt)) {
-        console.log('success')
-        document.getElementById('chess_game').style.display = 'block';
-        document.getElementById('main_page').style.display = 'none';
-        whatPageWeOn = 1;
-        document.getElementById('username_value').innerText = user_txt;
+    let username = document.getElementById('username').value;
+    let password = document.getElementById('password').value;
+    if (username in log_in_info){
+        if (log_in_info[username] == password){
+            console.log('success')
+            document.getElementById('chess_game').style.display = 'block';
+            document.getElementById('main_page').style.display = 'none';
+            whatPageWeOn = 1;
+            document.getElementById('username_value').innerText = username;
+        }
+        else console.log('incorrect password');
     }
- });
+    else console.log('incorrect username');
+});
 
 /* Add the spinning images, because...
 for (i=1;i<15;i++){
