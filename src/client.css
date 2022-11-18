@@ -7,6 +7,15 @@
     font-family: 'Courier New', Courier, monospace;
     float:right;
     background-color: aquamarine;
+    /* border: 1px black solid; */
+    /* background-image: linear-gradient(35deg, darkred, orange, darkkhaki, green, blue, teal, purple); */
+    /* animation: spinningBackgroundLog 3s infinite alternate; */
+}
+@keyframes spinningBackgroundLog {
+    0%{background-image: linear-gradient(35deg, darkred, darkorange, rgb(107, 107, 0), green, blue, teal, purple);}
+    50%{background-image: linear-gradient(35deg, rgb(188, 0, 0), orange, rgb(186, 186, 1), lime, deepskyblue, turquoise, blueviolet);}
+    100%{background-image: linear-gradient(35deg, red, gold, yellow, lawngreen, lightskyblue, aqua, magenta);}
+    /* 100%{background-image: linear-gradient(35deg, darkred, darkorange, rgb(107, 107, 0), green, blue, teal, purple);} */
 }
 
 .center {
@@ -14,6 +23,27 @@
     margin-left: auto;
     margin-right: auto;
 }
+#slogan{
+    color:black;
+    text-shadow:
+        0 0 7px #fff,
+        0 0 10px #fff,
+        0 0 21px #fff,
+        0 0 42px #0fa,
+        0 0 82px #0fa,
+        0 0 92px #0fa,
+        0 0 102px #0fa,
+        0 0 151px #0fa;
+    font-family: "Apple Chancery";
+    float:none;
+}
+h2 {
+    text-align: center;
+    font-weight: 400;
+    font-size: 1.8rem;
+  }
+
+
 
 #login{
     width: fit-content;
@@ -146,6 +176,8 @@ button:active{
     border-left:3px darkslateblue solid;
     border-bottom:3px darkslateblue solid;
     float: left;
+    /* Creates a reflection of the board */
+    /* -webkit-box-reflect: below 10px linear-gradient(to bottom, rgba(0,0,0,0.0), rgba(0,0,0,0.4)); */
 }
 
 #data_box{
@@ -213,6 +245,7 @@ button:active{
 
 #chess_game{
     display: none;
+    border:1px black solid;
 }
 
 body{

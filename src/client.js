@@ -80,6 +80,11 @@ if (whatPageWeOn == 0){
             updateStatus()
         }
     });
+
+
+    document.getElementById('chess_game').style.height = (document.getElementById('myBoard').clientHeight + 5) + 'px';
+    console.log((document.getElementById('myBoard').clientHeight + 5))
+
     let board = ChessBoard('myBoard', 'start')
     let game = null
     let $status = $('#status')
@@ -114,7 +119,7 @@ if (whatPageWeOn == 0){
           return false
         }
     }
-    
+
 
     function onDrop (source, target) {
         // see if the move is legal
@@ -156,7 +161,6 @@ if (whatPageWeOn == 0){
 
     // checkmate?
     if (game.isCheckmate()) {
-        let the_winning_color;
         const createImage = document.createElement('img')
         document.body.appendChild(createImage)
         status = 'Game over, ' + moveColor + ' is in checkmate.'
