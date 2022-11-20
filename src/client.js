@@ -1,9 +1,11 @@
- const black_pieces = ['chessboardjs-1.0.0/img/chesspieces/wikipedia/bB.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/bK.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/bN.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/bP.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/bQ.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/bR.png']
- const white_pieces = ['chessboardjs-1.0.0/img/chesspieces/wikipedia/wB.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/wK.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/wN.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/wP.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/wQ.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/wR.png']
+ const chess_pieces = ['chessboardjs-1.0.0/img/chesspieces/wikipedia/bB.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/bK.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/bN.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/bP.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/bQ.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/bR.png', 
+                       'chessboardjs-1.0.0/img/chesspieces/wikipedia/wB.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/wK.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/wN.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/wP.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/wQ.png', 'chessboardjs-1.0.0/img/chesspieces/wikipedia/wR.png']
  let whatPageWeOn = 0;
  function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
+
+// addes an image that rotates, is not used
  function rotatingImage(source, posX, posY, Width, speedMode){
     let rotationSpeed = 4;
     if (speedMode == 1) rotationSpeed = getRandomInt(5)
@@ -24,11 +26,9 @@
     document.body.appendChild(Image)
  }
 
-
-
-
+ // the submit button that switches between the two screens if the information is correct, and the user info
  let log_in_info = {'test': 'test'}
-
+ let rating = 1200
  document.getElementById('submit').addEventListener("click", function() {
     let username = document.getElementById('username').value;
     let password = document.getElementById('password').value;
@@ -39,6 +39,9 @@
             document.getElementById('main_page').style.display = 'none';
             whatPageWeOn = 1;
             document.getElementById('username_value').innerText = username;
+            document.getElementById('rating_value').innerText = rating;
+            // document.getElementById('user_image').src = chess_pieces[getRandomInt(chess_pieces.length)]
+            console.log(getRandomInt(12))
         }
         else console.log('incorrect password');
     }
@@ -57,6 +60,8 @@ if (whatPageWeOn == 0){
     rotatingImage(white_pieces[getRandomInt(6)], document.body.clientWidth-100, 0, 100, 1)
 }
 */
+
+    // Control the game - start the game, quit game and keep pgn, restart game
     document.getElementById("startBtn").addEventListener("click", function() {
         document.getElementById("startBtn").disabled = true;
         board = ChessBoard('myBoard', config)
@@ -78,9 +83,6 @@ if (whatPageWeOn == 0){
         }
     });
 
-
-    document.getElementById('chess_game').style.height = (document.getElementById('myBoard').clientHeight + 5) + 'px';
-    console.log((document.getElementById('myBoard').clientHeight + 5))
 
     let board = ChessBoard('myBoard', 'start')
     let game = null
@@ -162,6 +164,12 @@ if (whatPageWeOn == 0){
         document.body.appendChild(createImage)
         status = 'Game over, ' + moveColor + ' is in checkmate.'
         document.getElementById("startBtn").disabled = false;
+        if (moveColor == "White") document.getElementById('white_king_dsp').src = 'additional_images/wKx.png';
+        else document.getElementById('black_king_dsp').src = 'additional_images/bKx.png';
+    }
+    if (!game.isCheckmate()) {
+        document.getElementById('white_king_dsp').src = 'chessboardjs-1.0.0/img/chesspieces/wikipedia/wK.png';
+        document.getElementById('black_king_dsp').src = 'chessboardjs-1.0.0/img/chesspieces/wikipedia/bK.png';
     }
 
     // draw?
@@ -208,6 +216,8 @@ if (whatPageWeOn == 0){
     removeGreySquares()
     }
 
+
+    // allows costomization WIP
     let ChessStyleMode = 0;
     document.getElementById('customizeBtn').addEventListener("click", function(){
        if (ChessStyleMode == 3) ChessStyleMode = 0;
@@ -255,6 +265,7 @@ if (whatPageWeOn == 0){
     }
 
 
+// copying logged info to clipboard
 
     document.getElementById("copy_fen").addEventListener("click", function() {
         if (game){

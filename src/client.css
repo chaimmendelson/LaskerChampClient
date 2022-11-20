@@ -11,6 +11,13 @@
     /* background-image: linear-gradient(35deg, darkred, orange, darkkhaki, green, blue, teal, purple); */
     /* animation: spinningBackgroundLog 3s infinite alternate; */
 }
+
+#user_image{
+    height:25px;
+    width:auto;
+}
+
+
 @keyframes spinningBackgroundLog {
     0%{background-image: linear-gradient(35deg, darkred, darkorange, rgb(107, 107, 0), green, blue, teal, purple);}
     50%{background-image: linear-gradient(35deg, rgb(188, 0, 0), orange, rgb(186, 186, 1), lime, deepskyblue, turquoise, blueviolet);}
@@ -58,36 +65,7 @@ h2 {
      text-align:center;
      /* -webkit-text-stroke: 3px #ffaa00; */
 }
-/* the bottom three options are option for what to display */
-/* #chess_game_txt{
-    text-align: center;
-    font-family: fantasy;
-    font-size: xx-large;
-    -webkit-animation:spin_txt 3s linear infinite alternate;
-    -moz-animation:spin_txt 3s linear infinite alternate;
-    animation:spin_txt 3s linear infinite alternate;
-} */
-/*
-#chess_game_txt{
-    text-align: center;
-    font-family: "Avenir Next";
-    font-style: italic;
-    color:blue;
-    letter-spacing: 0.05em;
-    font-size: xx-large;
-    font-weight:bolder;
-    text-shadow: 1px 1px honeydew
-                 2px 2px azure
-                 3px 3px ghostwhite
-                 4px 4px beige
-                 5px 5px antiquewhite
-                 6px 6px ivory
-                 7px 7px lavenderblush
-                 8px 8px mistyrose
-                 9px 9px white
-                 10px 10px wheat
-                 10px 10px 30px rgba(0,0,0,.7);
-}*/
+
 #chess_game_txt{
     font-size: 3cm;
     text-align: center;
@@ -163,6 +141,9 @@ button:active{
 
 .chess_control{
     margin: 10px;
+}
+.chess_control:active{
+    background-color: goldenrod;
 }
 #buttons{
     padding: 6px;
@@ -245,7 +226,6 @@ button:active{
 
 #chess_game{
     display: none;
-    border:1px black solid;
 }
 
 body{
