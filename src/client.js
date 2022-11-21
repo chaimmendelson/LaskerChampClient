@@ -29,25 +29,66 @@
  // the submit button that switches between the two screens if the information is correct, and the user info
  let log_in_info = {'test': 'test'}
  let rating = 1200
+
  document.getElementById('submit').addEventListener("click", function() {
     let username = document.getElementById('username').value;
     let password = document.getElementById('password').value;
+    document.getElementById('username').style.border = '1px solid black';
+    document.getElementById('password').style.border = '1px solid black';
+    if (!checkUsername(username)){
+        document.getElementById('username').style.border = '2px solid red';
+        return;
+    }
+    if (!checkPassword(password)){
+        document.getElementById('password').style.border = '2px solid red';
+        return;
+    }
     if (username in log_in_info){
         if (log_in_info[username] == password){
             console.log('success')
+            document.getElementById('rating_value').innerHTML = rating;
             document.getElementById('chess_game').style.display = 'block';
             document.getElementById('main_page').style.display = 'none';
             whatPageWeOn = 1;
             document.getElementById('username_value').innerText = username;
-            document.getElementById('rating_value').innerText = rating;
-            // document.getElementById('user_image').src = chess_pieces[getRandomInt(chess_pieces.length)]
-            console.log(getRandomInt(12))
         }
-        else console.log('incorrect password');
+        else {
+            console.log('incorrect password');
+            document.getElementById('password').style.border = '2px solid red';
+        }
     }
-    else console.log('incorrect username');
-});
+    else {
+        console.log('incorrect username');
+        document.getElementById('username').style.border = '2px solid red';
+    }
+ });
+ function showPassword(){
+    if (document.getElementById('password').type == 'text'){
+        document.getElementById('password').type = 'password';
+    }
+    else{
+        document.getElementById('password').type = 'text';
+    }
+    
+ }
 
+ function checkChar(char){
+    let charList = ['q', 'r', 'b', 'n']
+    for (let i = 0; i < charList.length; i++){
+        if (char == charList[i]) return true;
+    }
+    return false;
+ }
+
+ function checkUsername(char){
+    let regex = /^\w{3,32}$/;
+    return regex.test(char);
+}
+
+function checkPassword(char){
+    let regex = /^\w{3,32}$/;
+    return regex.test(char);
+}
 /* Add the spinning images, because...
 for (i=1;i<15;i++){
     if (whatPageWeOn == 0){

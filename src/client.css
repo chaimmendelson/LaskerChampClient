@@ -18,6 +18,32 @@
 }
 
 
+
+.alert {
+    padding: 20px;
+    color: white;
+    opacity: 0.5;
+    width:fit-content;
+  }
+  #error_alert {
+    background-color: red;
+  }
+  .closebtn {
+    margin-left: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .closebtn:hover {
+    color: black;
+  }
+
+
 @keyframes spinningBackgroundLog {
     0%{background-image: linear-gradient(35deg, darkred, darkorange, rgb(107, 107, 0), green, blue, teal, purple);}
     50%{background-image: linear-gradient(35deg, rgb(188, 0, 0), orange, rgb(186, 186, 1), lime, deepskyblue, turquoise, blueviolet);}
@@ -125,6 +151,10 @@ h1 {
                  10px 10px hsl(50, 50%, 28%),
                  10px 10px 30px rgba(0,0,0,.7);
   }
+
+input{
+    border: 2px solid black;
+}
 button{
     width:fit-content;
     background-color: gold;
