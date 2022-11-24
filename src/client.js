@@ -321,3 +321,4 @@ if (whatPageWeOn == 0){
             console.log(game.pgn())
         }
     });
+console.log('test')
