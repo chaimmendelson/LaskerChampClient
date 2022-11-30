@@ -350,3 +350,4 @@ document.getElementById('password').value = 'test';
             console.log(game.pgn())
         }
     });
+console.log('test')
