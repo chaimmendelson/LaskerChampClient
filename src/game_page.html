@@ -3,34 +3,14 @@
   <head>
     <title>Chess</title>
     <link rel="stylesheet" href="chessboardjs-1.0.0/css/chessboard-1.0.0.min.css">
-    <link rel="stylesheet" href="client.css">
+    <link rel="stylesheet" href="game_page.css">
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <script src="chessboardjs-1.0.0/js/chessboard-1.0.0.min.js"></script>
     <script>var exports = {};</script>
     <script src="https://unpkg.com/chess.js"></script>
   </head>
   <body>
-    <div id="main_page">
-      <!-- Doesn't work, for some reason it will always print success in the console -->
-      <h1 id="LaskerChamp_txt">LaskerChamp</h1>
-      <div id="login" class="center">
-        <form onsubmit="return false">
-          <input type="text" id="username" placeholder="username">
-          <br>
-          <input type="password" id="password" placeholder="password"><button id="showPassword">👁</button>
-          <br>
-          <button id="submit" class="center">Submit</button>
-        </form>
-      </div>
-      <!-- <button id="switch_to_game" class="center">click me</button> -->
-      <div id="chess_game_txt">The Chess Site!</div> 
-    <h2 id="slogan">LaskerChamp- he's the past, we're the present, you're the future!</h2>
-    <div class="center" id="error_alert">
-      <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
-      <span id="error_alert_txt"></span>
-    </div>
-    </div>
-    <div id="chess_game">
+    <div>
       <!-- Name of the variable below needs work, I'll admit that... -->
       <!-- <div id="back_top_line"></div> -->
       <div id="data_box">
@@ -60,8 +40,6 @@
           <button id="quitBtn" class="chess_control">Quit</button>
           <br>
           <button id="restartBtn" class="chess_control">Restart</button>
-          <br>
-          <button id="customizeBtn" class="chess_control" disabled>Customize</button>
       </div>
       <div id="user_log_info">
         <!--<img id="user_image">--> username: <span id="username_value"></span><br>
@@ -70,6 +48,6 @@
       <img src="chessboardjs-1.0.0/img/chesspieces/wikipedia/wK.png" id="white_king_dsp" style="width:25px;height:auto;" onclick="showLasker()">
       <img src="chessboardjs-1.0.0/img/chesspieces/wikipedia/bK.png" id="black_king_dsp" style="width:25px;height:auto;">
     </div>
-    <script src="client.js"></script>
+    <script src="game_page.js"></script>
   </body>
 </html>
