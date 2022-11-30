@@ -5,6 +5,17 @@
     return Math.floor(Math.random() * max);
 }
 
+function EnterSubmit(locStart, clicked){
+    let placement = document.getElementById(locStart)
+    if (locStart == 0) placement = document
+    placement.addEventListener("keypress", function(event) {
+        if (event.key == "Enter") {
+            event.preventDefault();
+            document.getElementById(clicked).click();
+        }
+    })
+}
+
 // addes an image that rotates, is not used
  function rotatingImage(source, posX, posY, Width, speedMode){
     let rotationSpeed = 4;
@@ -62,6 +73,11 @@
         document.getElementById('username').style.border = '2px solid red';
     }
  });
+ if (whatPageWeOn == 0){
+    EnterSubmit('password', 'submit')
+    EnterSubmit('username', 'submit')
+ }
+
  function showPassword(){
     if (document.getElementById('password').type == 'text'){
         document.getElementById('password').type = 'password';
@@ -257,10 +273,23 @@ if (whatPageWeOn == 0){
     removeGreySquares()
     }
 
-
+    function showLasker(){
+        confirm_the_process = 'I hereby confirm the process'
+        let prompter = prompt('do you wish to learn more about Lasker?\nType "'+confirm_the_process+'" if yes (in exactly the same letter case).')
+        if (prompter == confirm_the_process){
+            let aLinkToLasker = document.createElement('a');
+            aLinkToLasker.target = '_blank';
+            aLinkToLasker.href = 'https://en.wikipedia.org/wiki/Emanuel_Lasker';
+            aLinkToLasker.click();
+        }
+    }
+    
+document.getElementById('username').value = 'test';
+document.getElementById('password').value = 'test';
     // allows costomization WIP
     let ChessStyleMode = 0;
     document.getElementById('customizeBtn').addEventListener("click", function(){
+        return true;
        if (ChessStyleMode == 3) ChessStyleMode = 0;
        else ChessStyleMode++;
        const white_squares = document.querySelectorAll('.white-1e1d7');
@@ -272,7 +301,7 @@ if (whatPageWeOn == 0){
                squareW.style.background = '#f0d9b5';
            }
            else if (ChessStyleMode == 2) {
-               squareW.style.backgroundImage = 'linear-gradient(90deg, red, gold, yellow, lawngreen, aqua, deepskyblue, violet, pink, white, lightgray, chocolate)';
+               squareW.style.background = 'tan';
            }
            else{
                squareW.style.background = 'mintcream';
@@ -287,7 +316,7 @@ if (whatPageWeOn == 0){
                squareB.style.background = '#b58863';
            }
            else if (ChessStyleMode == 2) {
-               squareB.style.background = 'linear-gradient(90deg, darkred, orange, khaki, green, teal, blue, purple, deeppink, black, dimgray, saddlebrown)';
+               squareB.style.background = 'saddlebrown';
            }
            else {
                squareB.style.background = 'limegreen';

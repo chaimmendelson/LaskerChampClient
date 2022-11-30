@@ -17,7 +17,7 @@
         <form onsubmit="return false">
           <input type="text" id="username" placeholder="username">
           <br>
-          <input type="password" id="password" placeholder="password"><button onclick="showPassword()">👁</button>
+          <input type="password" id="password" placeholder="password"><button onclick="showPassword()" id="showPassword">👁</button>
           <br>
           <button id="submit" class="center">Submit</button>
         </form>
@@ -50,7 +50,7 @@
             FEN: <span id="fen"></span>
         </div>
         <br>
-        <button id = "copy_fen" class="copy_btn">Copy FEN to clipboard</button>
+        <button id = "copy_fen" class="copy_btn popup">Copy FEN to clipboard</button>
         <button id = "copy_pgn" class="copy_btn">Copy PGN to clipboard</button>
       </div>
       <div id="myBoard" style="width:400px;height:auto;"></div>
@@ -67,7 +67,7 @@
         <!--<img id="user_image">--> username: <span id="username_value"></span><br>
         rating: <span id="rating_value"></span>
       </div>
-      <img src="chessboardjs-1.0.0/img/chesspieces/wikipedia/wK.png" id="white_king_dsp" style="width:25px;height:auto;">
+      <img src="chessboardjs-1.0.0/img/chesspieces/wikipedia/wK.png" id="white_king_dsp" style="width:25px;height:auto;" onclick="showLasker()">
       <img src="chessboardjs-1.0.0/img/chesspieces/wikipedia/bK.png" id="black_king_dsp" style="width:25px;height:auto;">
     </div>
     <script src="client.js"></script>

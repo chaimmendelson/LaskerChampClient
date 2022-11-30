@@ -3,6 +3,9 @@
 
 }
 
+
+
+
 #user_log_info{
     font-family: 'Courier New', Courier, monospace;
     float:right;
@@ -127,6 +130,12 @@ h2 {
         -webkit-transform: skew(25deg); 
         transform:skew(25deg); 
     } 
+}
+
+#showPassword{
+    border:1px solid black;
+    border-radius: 50%;
+    background-color: transparent;
 }
 
 @import url('https://fonts.googleapis.com/css?family=Bangers&display=swap');
