@@ -88,6 +88,8 @@ function EnterSubmit(locStart, clicked){
     
  }
 
+ document.getElementById('showPassword').addEventListener("click", function() {showPassword()})
+
  function checkChar(char){
     let charList = ['q', 'r', 'b', 'n']
     for (let i = 0; i < charList.length; i++){
