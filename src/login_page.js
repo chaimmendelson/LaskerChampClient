@@ -47,10 +47,9 @@ let rating = 1200
 
 //submit function
 document.getElementById("submit").addEventListener("click", async function () { // this function will run when the user click on the login button
-    var username = document.getElementById("username").value;
-    var password = document.getElementById("password").value;
-    var user = {username: username, password: password};
-    let url = 'http://localhost:8000/login'; // the url to send the request to
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
+    let user = {username: username, password: password};
     const response  = await fetch('/login', {
         method: 'POST',
         headers: {
