@@ -36,13 +36,13 @@ async def task(sid):
 async def login_page(request):
     """Serve the client-side application."""
     print(request)
-    with open('login.html') as f:
+    with open('src/login.html') as f:
         return web.Response(text=f.read(), content_type='text/html')
 
 async def game_page(request):
     """Serve the client-side application."""
     print(request)
-    with open('client.html') as f:
+    with open('src/client.html') as f:
         return web.Response(text=f.read(), content_type='text/html')
 
 @sio.event
@@ -86,19 +86,13 @@ async def login_validation(request: web.Request):
             return web.Response()
     return(web.Response(status=401))
 
-
-async def first_page(request):
-    print(request)
-    with open('first.html') as f:
-        return web.Response(text=f.read(), content_type='text/html')
-
 app.add_routes([web.get('/', game_page),
                 web.get('/login', login_page),
                 web.post('/validate', login_validation),
                 web.get('/validate', login_validation),
-                web.static('/scripts', 'scripts'),
-                web.static('/styles', 'styles'),
-                web.static('/images', 'images')])
+                web.static('/scripts', 'src/scripts'),
+                web.static('/styles', 'src/styles'),
+                web.static('/images', 'src/images')])
 
 if __name__ == '__main__':
     web.run_app(app, port=8000)
