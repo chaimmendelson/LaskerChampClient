@@ -1,9 +1,6 @@
 //Game control btns
 document.getElementById("startBtn").addEventListener("click", function() {
-    document.getElementById("startBtn").disabled = true;
-    board = ChessBoard('myBoard', config)
-    game = new Chess()
-    updateStatus()
+    start_game();
 }); // start
 document.getElementById("quitBtn").addEventListener("click", function() {
     if (confirm("Quit?")){
@@ -13,16 +10,23 @@ document.getElementById("quitBtn").addEventListener("click", function() {
 }); // quit
 document.getElementById("restartBtn").addEventListener("click", function() {
     if (confirm("Restart?")){
-        document.getElementById("startBtn").disabled = true;
-        board = ChessBoard('myBoard', config)
-        game = new Chess()
-        updateStatus()
+        start_game();
     }
 }); // restart
+
+async function start_game(){
+    document.getElementById("startBtn").disabled = true;
+    board = ChessBoard('myBoard', config)
+    game = new Chess()
+    color = await socket.emit('start_game')
+    console.log(color)
+    updateStatus()
+}
 
 // variables for the information on the board and of the board
 let board = ChessBoard('myBoard', 'start')
 let game = null
+let can_move = false;
 let $status = $('#status')
 let $fen = $('#fen')
 let $pgn = $('#pgn')
@@ -46,6 +50,7 @@ $square.css('background', background)
 
 // control piece movement
 function onDragStart (source, piece, position, orientation) {
+    if (!can_move) return false;
     // do not pick up pieces if the game is over
     if (game.isCheckmate() || game.isDraw()) return false
 
@@ -92,33 +97,33 @@ function onSnapEnd () {
 }
 // update status as of turn
 function updateStatus () {
-let status = ''
+    let status = ''
 
-let moveColor = 'White'
-if (game.turn() === 'b') {
-    moveColor = 'Black'
-}
-
-// checkmate?
-if (game.isCheckmate()) {
-    status = 'Game over, ' + moveColor + ' is in checkmate.'
-    document.getElementById("startBtn").disabled = false;
-}
-
-// draw?
-else if (game.isDraw()) {
-    status = 'Game over, drawn position'
-    document.getElementById("startBtn").disabled = false;
-}
-
-// game still on
-else {
-    status = moveColor + ' to move'
-
-    // check?
-    if (game.isCheck()) {
-    status += ', ' + moveColor + ' is in check'
+    let moveColor = 'White'
+    if (game.turn() === 'b') {
+        moveColor = 'Black'
     }
+
+    // checkmate?
+    if (game.isCheckmate()) {
+        status = 'Game over, ' + moveColor + ' is in checkmate.'
+        document.getElementById("startBtn").disabled = false;
+    }
+
+    // draw?
+    else if (game.isDraw()) {
+        status = 'Game over, drawn position'
+        document.getElementById("startBtn").disabled = false;
+    }
+
+    // game still on
+    else {
+        status = moveColor + ' to move'
+
+        // check?
+        if (game.isCheck()) {
+        status += ', ' + moveColor + ' is in check'
+        }
 }
 
 $status.html(status)
@@ -128,24 +133,24 @@ $pgn.html(game.pgn())
 // check legal moves and highlight legal moves
 function onMouseoverSquare (square, piece) {
 // get list of possible moves for this square
-let moves = game.moves({
-    square: square,
-    verbose: true
-})
+    let moves = game.moves({
+        square: square,
+        verbose: true
+    })
 
-// exit if there are no moves available for this square
-if (moves.length === 0) return
+    // exit if there are no moves available for this square
+    if (moves.length === 0) return
 
-// highlight the square they moused over
-greySquare(square)
+    // highlight the square they moused over
+    greySquare(square)
 
-// highlight the possible squares for this piece
-for (let i = 0; i < moves.length; i++) {
-    greySquare(moves[i].to)
-}
+    // highlight the possible squares for this piece
+    for (let i = 0; i < moves.length; i++) {
+        greySquare(moves[i].to)
+    }
 }
 function onMouseoutSquare (square, piece) {
-removeGreySquares()
+    removeGreySquares()
 }
 
 // configure site

@@ -61,6 +61,10 @@ async def connect(sid, environ, auth):
     # sio.start_background_task(task, sid)
 
 @sio.event
+async def start_game(sid):
+    return {'color': 'black'}
+
+@sio.event
 async def disconnect(sid):
     global CLIENTS   
     print('disconnect ', sid)
