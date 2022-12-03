@@ -1,0 +1,10 @@
+so about cookies
+the deal is that when the user logs in I will implement a cookie in his storage
+that will be used to identify him in the future and doing that by every time he logs in I check
+if the cookie is there and if it is I will redirect him to the main page and if it is not I will
+redirect him to the login page where I will implemnet the cookie
+therefor every page will firstly check if the user has a cookie, 
+just remmeber, I control the the whole site, 
+then about the socketio, probably I will connect and when I do that I will send the cookie to the server
+since its better then sending the username or mabye it is not, I dont know, I will check it out
+ofcourse validation will be executed on the server side
