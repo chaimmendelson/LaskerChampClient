@@ -52,7 +52,7 @@ async def game_page(request: web.Request):
         if does_cookie_exist(cookie):
             with open('src/client.html') as f:
                 return web.Response(text=f.read(), content_type='text/html')
-    return web.Response(status=302, headers={'Location': 'http://localhost:8000/login'})
+    return web.Response(status=302, headers={'Location': '/login'})
 
 async def login(request: web.Request):
     """Serve the client-side application."""
