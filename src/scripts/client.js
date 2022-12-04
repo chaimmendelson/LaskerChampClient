@@ -4,27 +4,35 @@ document.getElementById("startBtn").addEventListener("click", function() {
 }); // start
 document.getElementById("quitBtn").addEventListener("click", function() {
     if (confirm("Quit?")){
+        console.clear()
         document.getElementById("startBtn").disabled = false;
         board = ChessBoard('myBoard', 'start');
     }
 }); // quit
 document.getElementById("restartBtn").addEventListener("click", function() {
     if (confirm("Restart?")){
+        console.clear()
         start_game();
     }
 }); // restart
 
 async function start_game(){
     document.getElementById("startBtn").disabled = true;
-    board = ChessBoard('myBoard', config)
-    game = new Chess()
-    color = await socket.emit('start_game')
-    console.log(color)
-    updateStatus()
+    await socket.emit('start_game', (data) => {
+        players_color = data['color']
+        color = players_color[0]
+        config['orientation'] = players_color
+        board = ChessBoard('myBoard', config)
+        game = new Chess()
+        console.log('you are playing as ' + players_color)
+        updateGame();
+    });
 }
 
 // variables for the information on the board and of the board
 let board = ChessBoard('myBoard', 'start')
+let color = null
+let players_color = 'white'
 let game = null
 let can_move = false;
 let $status = $('#status')
@@ -33,19 +41,30 @@ let $pgn = $('#pgn')
 let whiteSquareGrey = 'silver'
 let blackSquareGrey = 'darkgrey'
 
+
+function updateGame(){
+    updateStatus()
+    if (game.turn() === color){
+        can_move = true;
+    }
+    else{
+        socket.emit('get_opponent_move', {'fen': game.fen()})
+    }
+}
+
 // highlight
 function removeGreySquares () {
     $('#myBoard .square-55d63').css('background', '')
 }
 function greySquare (square) {
-let $square = $('#myBoard .square-' + square)
+    let $square = $('#myBoard .square-' + square)
 
-let background = whiteSquareGrey
-if ($square.hasClass('black-3c85d')) {
-    background = blackSquareGrey
-}
+    let background = whiteSquareGrey
+    if ($square.hasClass('black-3c85d')) {
+        background = blackSquareGrey
+    }
 
-$square.css('background', background)
+    $square.css('background', background)
 }
 
 // control piece movement
@@ -87,7 +106,7 @@ function onDrop (source, target) {
         move_str += move.promotion
     }
     console.log(move_str)
-    updateStatus()
+    updateGame()
 }
 
 // update the board position after the piece snap
@@ -157,6 +176,7 @@ function onMouseoutSquare (square, piece) {
 let config = {
     draggable: true,
     position: 'start',
+    orientation: 'white',
     onDragStart: onDragStart,
     onDrop: onDrop,
     onMouseoutSquare: onMouseoutSquare,
@@ -181,7 +201,7 @@ document.getElementById("copy_pgn").addEventListener("click", function() {
 });
 const socket = io({
     auth: {
-      token: localStorage.getItem('chess-cookie')
+      token: get_cookie()
     }
 });
  socket.on('connect', () => {
@@ -196,24 +216,33 @@ const socket = io({
  socket.on('login_error', (data) => {
     console.log('login error: ' + data);
  });
- socket.on('opponent_ move', (data) => {
-    console.log('opponent move: ' + data);
- })
-async function validate_login(){
-    cookie = localStorage.getItem('chess-cookie')
-    console.log(cookie)
-    if (cookie) {
-        const response  = await fetch('/validate', {
-            method: 'GET',
-            headers: {
-                'chess-cookie': cookie
-            }
+ socket.on('opponent_move', (data) => {
+    let from = data['from']
+    let to = data['to']
+    if (data['promotion']){
+        game.move({
+            from: from,
+            to: to,
+            promotion: data['promotion']
         })
-        if (response.status === 200){
-            console.log('logged in');
-            return true;
+    }
+    else{
+        game.move({
+            from: from,
+            to: to
+        })
+    }
+    console.log(data['move'])
+    board.position(game.fen())
+    updateGame()
+})
+function get_cookie(){
+    cookies = document.cookie.split(';')
+    for (let i = 0; i < cookies.length; i++){
+        cookie = cookies[i].split('=')
+        if (cookie[0] === 'chess-cookie'){
+            return cookie[1];
         }
     }
-    window.location.href = '/login';
+    return None;
 }
-window.onload = validate_login

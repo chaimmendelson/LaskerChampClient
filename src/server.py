@@ -1,6 +1,9 @@
 import socketio
 from aiohttp import web
 import secrets
+import random
+from stockfish import Stockfish
+PATH = 'src/stockfish_15_win_x64_avx2/stockfish_15_x64_avx2.exe'
 sio = socketio.AsyncServer()
 app = web.Application()
 sio.attach(app)
@@ -28,21 +31,32 @@ def create_cookie():
     return cookie
 
 
+def get_move(fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'):
+    stockfish = Stockfish(PATH)
+    stockfish.set_fen_position(fen)
+    return stockfish.get_best_move()
+
+
 async def task(sid):
     await sio.sleep(5)
     resault = await sio.call('mult', {'numbers': [2, 3]}, to=sid)
     print(resault)
 
-async def login_page(request):
-    """Serve the client-side application."""
-    print(request)
-    with open('src/login.html') as f:
-        return web.Response(text=f.read(), content_type='text/html')
 
-async def game_page(request):
+async def game_page(request: web.Request):
     """Serve the client-side application."""
     print(request)
-    with open('src/client.html') as f:
+    cookies = request.cookies
+    if COOKIE_NAME in cookies:
+        cookie = cookies[COOKIE_NAME]
+        if does_cookie_exist(cookie):
+            with open('src/client.html') as f:
+                return web.Response(text=f.read(), content_type='text/html')
+    return web.Response(status=302, headers={'Location': 'http://localhost:8000/login'})
+
+async def login(request: web.Request):
+    """Serve the client-side application."""
+    with open('src/login.html') as f:
         return web.Response(text=f.read(), content_type='text/html')
 
 @sio.event
@@ -62,7 +76,19 @@ async def connect(sid, environ, auth):
 
 @sio.event
 async def start_game(sid):
-    return {'color': 'black'}
+    color = random.choice(['white', 'black'])
+    return {'color': color}
+
+@sio.event
+async def get_opponent_move(sid, data):
+    move = str(get_move(data.get('fen')))
+    move_d = {'move': move}
+    move_d['from'] = move[:2]
+    move_d['to'] = move[2:4]
+    if len(move) == 5:
+        move_d['promotion'] = move[4]
+    await sio.emit('opponent_move', move_d, to=sid)
+
 
 @sio.event
 async def disconnect(sid):
@@ -74,26 +100,20 @@ async def disconnect(sid):
 
 async def login_validation(request: web.Request):
     headers = request.headers
-    if request.method == 'POST':
-        if request.body_exists:
-            data = await request.json()
-            if 'username' in data and 'password' in data:
-                if data['username'] == 'test' and data['password'] == 'test':
-                    cookie = create_cookie()
-                    CLIENTS.append(Clients(data['username'], cookie))
-                    cookie = f'{COOKIE_NAME}={cookie}'
-                    return web.json_response({'status': 'ok', 'set-cookie': cookie, 'redirect': '/'})
-        return web.json_response({'status': 'error'})
-    cookie = headers.get(COOKIE_NAME)
-    if cookie:
-        if does_cookie_exist(cookie):
-            return web.Response()
-    return(web.Response(status=401))
+    if request.body_exists:
+        data = await request.json()
+        if 'username' in data and 'password' in data:
+            if data['username'] == 'test' and data['password'] == 'test':
+                cookie = create_cookie()
+                CLIENTS.append(Clients(data['username'], cookie))
+                response = web.json_response({'status': 'ok'})
+                response.set_cookie(COOKIE_NAME, cookie)
+                return response
+    return web.json_response({'status': 'error'})
 
 app.add_routes([web.get('/', game_page),
-                web.get('/login', login_page),
+                web.get('/login', login),
                 web.post('/validate', login_validation),
-                web.get('/validate', login_validation),
                 web.static('/scripts', 'src/scripts'),
                 web.static('/styles', 'src/styles'),
                 web.static('/images', 'src/images')])

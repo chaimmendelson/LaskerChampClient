@@ -52,12 +52,5 @@ document.getElementById("submit").addEventListener("click", async function () { 
         const message = 'An error has occured: ${response.status}';
         throw new Error(message);
     }
-    const data = await response.json();
-    if (data.status === 'ok') {
-        let cookie = data['set-cookie'];
-        cookie = cookie.split('=');
-        localStorage.setItem(cookie[0], cookie[1]);
-        window.location.href = data['redirect'];
-    };
-    console.log(data.status);
+    window.location.href = '/';
 });
