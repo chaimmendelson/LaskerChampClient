@@ -14,20 +14,7 @@ document.getElementById("restartBtn").addEventListener("click", function() {
         console.clear()
         start_game();
     }
-}); // restart
-
-async function start_game(){
-    document.getElementById("startBtn").disabled = true;
-    await socket.emit('start_game', (data) => {
-        players_color = data['color']
-        color = players_color[0]
-        config['orientation'] = players_color
-        board = ChessBoard('myBoard', config)
-        game = new Chess()
-        console.log('you are playing as ' + players_color)
-        updateGame();
-    });
-}
+}); // restartBtn
 
 // variables for the information on the board and of the board
 let board = ChessBoard('myBoard', 'start')
@@ -42,13 +29,13 @@ let whiteSquareGrey = 'silver'
 let blackSquareGrey = 'darkgrey'
 
 
-function updateGame(){
+function updateGame(move){
     updateStatus()
     if (game.turn() === color){
         can_move = true;
     }
     else{
-        socket.emit('get_opponent_move', {'fen': game.fen()})
+        can_move = false;
     }
 }
 
@@ -79,18 +66,29 @@ function onDragStart (source, piece, position, orientation) {
         return false
     }
 }
+
+function get_promotion(){
+    let possible_promotion = ['q', 'r', 'b', 'n']
+    console.log(possible_promotion)
+    let promotion = prompt('Please enter promotion (q, r, b, n):');
+    console.log(promotion)
+    while (!(possible_promotion.includes(promotion))) {
+        console.log(promotion)
+        promotion = prompt('Please enter promotion (q, r, b, n):');
+    }
+    return promotion
+}
 function onDrop (source, target) {
     // see if the move is legal
     removeGreySquares()
-    let piece = game.get(source).type
+    let piece = game.get(source)
     let move = null;
-    let promotion = null;
-    if (piece === 'p' && (target[1] === '1' || target[1] === '8')){
-        promotion = window.prompt('Promote to: (q, r, b, n)')
+    if (piece.type === 'p' && ((target[1] === '1' && piece.color === 'b') || (target[1] === '8' && piece.color === 'w'))){
+        
         move = game.move({
             from: source,
             to: target,
-            promotion: promotion
+            promotion: get_promotion()
         })
     }
     else{
@@ -105,8 +103,9 @@ function onDrop (source, target) {
     if (move.promotion){
         move_str += move.promotion
     }
-    console.log(move_str)
+    console.log('your move: ' + move_str)
     updateGame()
+    socket.emit('my_move', {'move': move_str})
 }
 
 // update the board position after the piece snap
@@ -152,6 +151,9 @@ $pgn.html(game.pgn())
 // check legal moves and highlight legal moves
 function onMouseoverSquare (square, piece) {
 // get list of possible moves for this square
+    if (!can_move) {
+        return
+    }
     let moves = game.moves({
         square: square,
         verbose: true
@@ -177,6 +179,7 @@ let config = {
     draggable: true,
     position: 'start',
     orientation: 'white',
+    //pieceTheme: 'img/chesspieces/alpha/{piece}.png',
     onDragStart: onDragStart,
     onDrop: onDrop,
     onMouseoutSquare: onMouseoutSquare,
@@ -217,6 +220,7 @@ const socket = io({
     console.log('login error: ' + data);
  });
  socket.on('opponent_move', (data) => {
+    console.log('opponent move: '+ data['move']);
     let from = data['from']
     let to = data['to']
     if (data['promotion']){
@@ -232,10 +236,37 @@ const socket = io({
             to: to
         })
     }
-    console.log(data['move'])
     board.position(game.fen())
     updateGame()
 })
+
+socket.on('game_started', (data) => {
+    color = data[0]
+    config['orientation'] = data
+    board = ChessBoard('myBoard', config)
+    game = new Chess()
+    console.log('you are playing as ' + data)
+    updateGame();
+})
+
+socket.on('game_over', (resault) => {
+    console.log(resault);
+    can_move = false;
+});
+
+socket.on('opponent_quit', () => {
+    can_move = false;
+    console.clear()
+    document.getElementById("startBtn").disabled = false;
+    board = ChessBoard('myBoard', 'start');
+
+})
+async function start_game(){
+    document.getElementById("startBtn").disabled = true;
+    await socket.emit('start_game', {'type': 'stockfish'})
+}
+
+
 function get_cookie(){
     cookies = document.cookie.split(';')
     for (let i = 0; i < cookies.length; i++){
@@ -244,5 +275,5 @@ function get_cookie(){
             return cookie[1];
         }
     }
-    return None;
+    return null;
 }
