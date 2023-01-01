@@ -11,6 +11,7 @@ TABLE_NAME = 'accounts'
 USERNAME = 'username'
 PASSWORD = 'password_hash'
 EMAIL = 'email_address'
+COOKIE = 'cookie'
 ELO = 'elo'
 GAMES_PLAYED = 'games_played'
 PERMISSIONS = 'permissions'
@@ -25,6 +26,7 @@ COLUMNS = {
     USERNAME:       {C_TYPE: 'string',      C_LEN: 32,   C_CONSTRAINS: 'unique not null primary key'},
     PASSWORD:       {C_TYPE: 'string',      C_LEN: 128,  C_CONSTRAINS: 'not null'},
     EMAIL:          {C_TYPE: 'email',       C_LEN: None, C_CONSTRAINS: 'unique not null'},
+    #COOKIE:         {C_TYPE: 'string',      C_LEN: 128,  C_CONSTRAINS: 'not null unique'},
     ELO:            {C_TYPE: 'decimal',     C_LEN: None, C_CONSTRAINS: 'not null'},
     GAMES_PLAYED:   {C_TYPE: 'number',      C_LEN: None, C_CONSTRAINS: 'not null'},
     PERMISSIONS:    {C_TYPE: 'string',      C_LEN: 10,   C_CONSTRAINS: 'not null'},

@@ -5,6 +5,7 @@ document.getElementById("startBtn").addEventListener("click", function() {
 document.getElementById("quitBtn").addEventListener("click", function() {
     if (confirm("Quit?")){
         console.clear()
+        quit_game();
         document.getElementById("startBtn").disabled = false;
         board = ChessBoard('myBoard', 'start');
     }
@@ -12,6 +13,7 @@ document.getElementById("quitBtn").addEventListener("click", function() {
 document.getElementById("restartBtn").addEventListener("click", function() {
     if (confirm("Restart?")){
         console.clear()
+        quit_game();
         start_game();
     }
 }); // restartBtn
@@ -262,8 +264,14 @@ socket.on('opponent_quit', () => {
 
 })
 async function start_game(){
+    let game_type = confirm('play against stockfish?');
     document.getElementById("startBtn").disabled = true;
-    await socket.emit('start_game', {'type': 'stockfish'})
+    await socket.emit('start_game', {'stockfish': game_type})
+}
+
+
+async function quit_game(){
+    await socket.emit('quit_game');
 }
 
 

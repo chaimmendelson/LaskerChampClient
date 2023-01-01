@@ -4,6 +4,7 @@ import secrets
 import re as re
 from stockfish import Stockfish
 import chess_rooms as rooms
+import hashlib
 PATH = 'src/stockfish_15_win_x64_avx2/stockfish_15_x64_avx2.exe'
 sio = socketio.AsyncServer()
 app = web.Application()
@@ -35,11 +36,8 @@ def does_cookie_exist(cookie):
             return True
     return False
 
-def create_cookie():
-    cookie = secrets.token_hex(16)
-    while does_cookie_exist(cookie):
-        cookie = secrets.token_hex(16)
-    return cookie
+def create_cookie(username):
+    return f'{secrets.token_hex(16)}{hashlib.sha1(username.encode("utf-8")).hexdigest()}'
 
 
 def get_stockfish_move(fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'):
@@ -56,7 +54,6 @@ async def task(sid):
 
 async def game_page(request: web.Request):
     """Serve the client-side application."""
-    print(request)
     cookies = request.cookies
     if COOKIE_NAME in cookies:
         cookie = cookies[COOKIE_NAME]
@@ -88,7 +85,7 @@ async def connect(sid, environ, auth):
 async def start_game(sid, data):
     if rooms.is_in_room(sid):
         return False
-    if data.get('type') == 'stockfish':
+    if data.get('stockfish'):
         rooms.add_room(player1=sid)
         white_player = rooms.get_white_player(sid)
         if white_player == sid:
@@ -114,6 +111,7 @@ async def start_game(sid, data):
 
 @sio.event
 async def send_stockfish_move(sid):
+    rooms.start_clock(sid)
     move = str(get_stockfish_move(rooms.get_fen(sid)))
     rooms.commit_move(sid, move)
     move_d = {'move': move}
@@ -144,6 +142,7 @@ async def my_move(sid, data):
 async def send_move_to_opponent(sid, move_d):
     resault_d = {0: 'lost', 1: 'won', -1: 'tie'}
     await sio.emit('opponent_move', move_d, to=sid)
+    rooms.start_clock(sid)
     if not rooms.is_game_over(sid):
         return
     player_resault = rooms.get_game_results(sid)
@@ -153,22 +152,34 @@ async def send_move_to_opponent(sid, move_d):
         await sio.emit('game_over', resault_d[player_resault], to=opponent)
     rooms.close_room(sid)
 
+
+@sio.event
+async def quit_game(sid):
+    await handle_quit(sid)
+
+
 @sio.event
 async def disconnect(sid):
-    global CLIENTS   
+    global CLIENTS, WAITING_ROOM   
     print('disconnect ', sid)
     client = get_client(sid=sid)
-    print("searching for client")
+    print(f"searching for client ({sid})")
     if client:
-        print("client found")
+        print(f"client ({sid}) found")
         CLIENTS.remove(client)
-        print("removing client")
+        print(f"removing client ({sid})")
+        if sid in WAITING_ROOM:
+            WAITING_ROOM.remove(sid)
         if rooms.is_in_room(sid):
-            opponent = rooms.get_opponent(sid)
-            rooms.close_room(sid)
-            if opponent !='stockfish':
-                print("sending quit message")
-                await sio.emit("opponent_quit", to=opponent)
+            await handle_quit(sid)
+
+
+async def handle_quit(sid):
+    opponent = rooms.get_opponent(sid)
+    rooms.close_room(sid)
+    if opponent !='stockfish':
+        print(f"sending quit message to opponent ({opponent})")
+        await sio.emit("opponent_quit", to=opponent)
 
 
 def validate_move(move) -> dict|None:
@@ -196,9 +207,11 @@ async def login_validation(request: web.Request):
     if request.body_exists:
         data = await request.json()
         if 'username' in data and 'password' in data:
-            if data['username'] == 'test' and data['password'] == 'test':
-                cookie = create_cookie()
-                CLIENTS.append(Clients(data['username'], cookie))
+            username = data['username']
+            password = data['password']
+            if username == 'test' and password == 'test':
+                cookie = create_cookie(username)
+                CLIENTS.append(Clients(username, cookie))
                 response = web.json_response({'status': 'ok'})
                 response.set_cookie(COOKIE_NAME, cookie)
                 print(cookie)
@@ -213,4 +226,4 @@ app.add_routes([web.get('/', game_page),
                 web.static('/images', 'src/images')])
 
 if __name__ == '__main__':
-    web.run_app(app, port=8000)
+    web.run_app(app, port=5678)

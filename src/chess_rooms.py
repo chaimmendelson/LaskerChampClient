@@ -4,6 +4,7 @@ import chess
 from random import shuffle
 from stockfish import Stockfish
 import threading
+import time
 
 import os_values
 
@@ -12,15 +13,42 @@ WHITE = 0
 BLACK = 1
 
 
-class ChessRoom:
+class ChessClock(object):
+    def __init__(self, time_limit=10, addition=0):
+        self.time_left = time_limit * 60
+        self.start_time = None
+        self.addition = addition
 
-    def __init__(self, player1, player2='stockfish', fen=START_FEN, engine_level=10):
-        self.players:list = [player1, player2]
+    def start(self):
+        self.start_time = time.time()
+    
+    def get_time_used(self):
+        if self.start_time is None:
+            return 0
+        return time.time() - self.start_time
+
+    def stop(self):
+        print(type(self.time_left), self.time_left)
+        self.time_left -= self.get_time_used()
+        self.start_time = None
+        self.time_left += self.addition
+    
+    def get_time_left(self):
+        return self.time_left - self.get_time_used()
+
+    def is_time_over(self):
+        return not self.get_time_left() > 0
+
+
+class ChessRoom:
+    def __init__(self, player1, player2='stockfish', time_limit=10, bonus_time=0, fen=START_FEN, level=10):
+        self.players:tuple(str) = [player1, player2]
+        self.clocks:tuple(ChessClock) = (ChessClock(time_limit, bonus_time), ChessClock(time_limit, bonus_time))
         shuffle(self.players)
         self.board : chess.Board = chess.Board(fen)
-        self.turn:str = self.players[0]
-        self.waiting:bool = False
-        self.level:int = engine_level
+        self.turn:str = 0
+        self.level:int = level
+        self.closed = False
 
     def __len__(self) -> int:
         return len(self.board.move_stack)
@@ -32,14 +60,15 @@ class ChessRoom:
         return f'chess.Board({self.board.fen()})'
 
     def update_turn(self) -> None:
-        if self.turn == self.players[0]:
-            self.turn = self.players[1]
-        else:
-            self.turn = self.players[0]
-        self.update_status()
-
-    def update_status(self) -> None:
-        self.waiting = not self.waiting
+        # flip turn from 1 to 0 or 0 to 1
+        self.stop_clock()
+        self.turn = int(not self.turn)
+    
+    def stop_clock(self) -> None:
+        self.clocks[self.turn].stop()
+    
+    def start_clock(self) -> None:
+        self.clocks[self.turn].start()
 
 
 CHESS_ROOMS:list[ChessRoom] = []
@@ -75,7 +104,8 @@ def get_last_move(player) -> str:
 
 
 def is_client_turn(player) -> bool:
-    return player == get_room(player).turn
+    room = get_room(player)
+    return room.players.index(player) == room.turn
 
 
 def color(player) -> int:
@@ -112,19 +142,13 @@ def commit_move(player, move) -> bool:
     return True
 
 
-def add_room(player1, player2='', fen=START_FEN, level=10) -> None:
+def add_room(player1, player2='stockfish', time_limit=10, bonus_time=0, fen=START_FEN, level=10) -> None:
     global CHESS_ROOMS
-    if player2:
-        CHESS_ROOMS.append(ChessRoom(player1, player2, fen))
-    else:
-        CHESS_ROOMS.append(ChessRoom(player1, 'stockfish', fen, int(level)))
+    CHESS_ROOMS.append(ChessRoom(player1, player2, time_limit=time_limit, bonus_time=bonus_time, fen=fen, level=int(level)))
 
 
 def is_in_room(player) -> bool:
-    for room in CHESS_ROOMS:
-        if player in room.players:
-            return True
-    return False
+    return get_room(player) != None
 
 
 def get_room(player) -> ChessRoom|None:
@@ -137,6 +161,10 @@ def get_room(player) -> ChessRoom|None:
 def close_room(player) -> None:
     global CHESS_ROOMS
     CHESS_ROOMS.remove(get_room(player))
+
+
+def start_clock(player) -> None:
+    get_room(player).start_clock()
 
 
 def get_engine_move(player) -> str|None:
