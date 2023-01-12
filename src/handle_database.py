@@ -215,7 +215,7 @@ def update_entry(username) -> None:
 get functions
 """
 def get_username_by_cookie(cookie):
-    db.selectValue(TABLE_NAME, USERNAME, f'{COOKIE} = {var(cookie)}')
+    return db.selectValue(TABLE_NAME, USERNAME, f'{COOKIE} = {var(cookie)}')
 
 
 def get_entry(username) -> datetime.strftime:
