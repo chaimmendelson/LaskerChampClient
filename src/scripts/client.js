@@ -80,34 +80,40 @@ function get_promotion(){
     }
     return promotion
 }
+
+
+function validate_move(source, target){
+    let promotion_peice = '';
+    let valid_moves = game.moves({ verbose: true })
+    for(let i = 0; i < valid_moves.length; i++)
+    {
+        if (source == valid_moves[i].from && target == valid_moves[i].to){
+            if('promotion' in valid_moves[i]){
+                promotion_peice = prompt('Please enter promotion (q, r, b, n):')
+                while (!(promotion_peice in ['q', 'r', 'b', 'n']))
+                    promotion_peice = prompt('Please enter promotion (q, r, b, n):')
+            }
+            return {from: source, to: target, promotion: promotion_peice}
+        }
+    }
+    return false
+}
+
+
 function onDrop (source, target) {
     // see if the move is legal
     removeGreySquares()
-    let piece = game.get(source)
-    let move = null;
-    if (piece.type === 'p' && ((target[1] === '1' && piece.color === 'b') || (target[1] === '8' && piece.color === 'w'))){
-        
-        move = game.move({
-            from: source,
-            to: target,
-            promotion: get_promotion()
-        })
-    }
-    else{
-        move = game.move({
-            from: source,
-            to: target
-        })
+    move = validate_move(source, target)
+    if (move){
+        game.move(move)
+        let move_str = move.from + move.to + move.promotion
+        console.log('your move: ' + move_str)
+        updateGame()
+        socket.emit('my_move', {'move': move_str})
+        return true
     }
     // illegal move
-    if (move === null) return 'snapback'
-    let move_str = move.from + move.to
-    if (move.promotion){
-        move_str += move.promotion
-    }
-    console.log('your move: ' + move_str)
-    updateGame()
-    socket.emit('my_move', {'move': move_str})
+    return 'snapback'
 }
 
 // update the board position after the piece snap
