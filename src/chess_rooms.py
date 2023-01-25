@@ -10,41 +10,41 @@ BLACK = 1
 
 
 class ChessClock(object):
-    def __init__(self, time_limit=10, addition=0):
-        self.time_left = time_limit * 60
-        self.start_time = None
-        self.addition = addition
+    def __init__(self, time_limit:float=10, addition: float=0) -> None:
+        self.time_left: float = time_limit * 60
+        self.start_time: float|None = None
+        self.addition: float = addition
 
-    def start(self):
+    def start(self) -> None:
         self.start_time = time.time()
     
-    def get_time_used(self):
+    def get_time_used(self) -> float:
         if self.start_time is None:
             return 0
         return time.time() - self.start_time
 
-    def stop(self):
+    def stop(self) -> None:
         self.time_left -= self.get_time_used()
         self.start_time = None
         self.time_left += self.addition
     
-    def get_time_left(self):
+    def get_time_left(self) -> float:
         return self.time_left - self.get_time_used()
 
-    def is_timeout(self):
+    def is_timeout(self) -> bool:
         return not self.get_time_left() > 0
 
 
 class ChessRoom:
-    def __init__(self, player1, player2='stockfish', time_limit=10, bonus_time=0, fen=START_FEN, level=10):
-        self.players:list(str) = [player1, player2]
-        self.clocks:tuple(ChessClock) = (ChessClock(time_limit, bonus_time), ChessClock(time_limit, bonus_time))
+    def __init__(self, player1:str, player2:str='stockfish', time_limit:int=10, bonus_time:int=0, fen:str=START_FEN, level:int=10):
+        self.players: list[str] = [player1, player2]
+        self.clocks: list[ChessClock] = [ChessClock(time_limit, bonus_time), ChessClock(time_limit, bonus_time)]
         shuffle(self.players)
-        self.board:chess.Board = chess.Board(fen)
-        self.turn:int = 0
-        self.level:int = level
-        self.closed:bool = False
-        self.pvp = not (player2 == 'stockfish')
+        self.board: chess.Board = chess.Board(fen)
+        self.turn: int = 0
+        self.level: int = level
+        self.closed: bool = False
+        self.pvp: bool = not (player2 == 'stockfish')
 
     def __len__(self) -> int:
         return len(self.board.move_stack)
@@ -61,18 +61,19 @@ class ChessRoom:
         self.stop_clock()
         self.turn = int(not self.turn)
 
-    def opponent(self, player) -> str:
+    def opponent(self, player: str) -> str:
         if player == self.players[0]:
             return self.players[1]
         return self.players[0]
     
-    def commit_move(self, move) -> bool:
+    def commit_move(self, move_str: str) -> bool:
         regex = r'^[a-h][1-8][a-h][1-8][q,r,b,n]?$'
-        if not re.fullmatch(regex, move):
+        if not re.fullmatch(regex, move_str):
             return False
-        if not chess.Move.from_uci(move) in self.board.legal_moves:
+        move: chess.Move = chess.Move.from_uci(move_str)
+        if not move in self.board.legal_moves:
             return False
-        self.board.push(chess.Move.from_uci(move))
+        self.board.push(move)
         self.update_turn()
         return True
 
@@ -91,9 +92,8 @@ class ChessRoom:
     def last_move(self) -> str:
         return str(self.board.peek())
 
-    def color(self, player) -> int:
-        if player in self.players:
-            return self.players.index(player)
+    def color(self, player: str) -> int:
+        return self.players.index(player)
 
     def is_game_over(self) -> bool:
         return self.board.result() != '*'
@@ -102,9 +102,9 @@ class ChessRoom:
         resault = ['0.5', '0.5']
         if self.is_game_over():
             resault = self.board.result().split('-')
-        return {self.players[0]: eval(resault[0]), self.players[1]: eval(resault[1])}
+        return {self.players[0]: float(resault[0]), self.players[1]: float(resault[1])}
 
-    def is_turn(self, player) -> bool:
+    def is_players_turn(self, player: str) -> bool:
         return self.players[self.turn] == player
 
     def fen(self) -> str:

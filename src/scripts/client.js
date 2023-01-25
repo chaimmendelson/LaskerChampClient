@@ -31,7 +31,7 @@ let whiteSquareGrey = 'silver'
 let blackSquareGrey = 'darkgrey'
 
 
-function updateGame(move){
+function updateGame(){
     updateStatus()
     if (game.turn() === color){
         can_move = true;
@@ -69,51 +69,36 @@ function onDragStart (source, piece, position, orientation) {
     }
 }
 
-function get_promotion(){
-    let possible_promotion = ['q', 'r', 'b', 'n']
-    console.log(possible_promotion)
-    let promotion = prompt('Please enter promotion (q, r, b, n):');
-    console.log(promotion)
-    while (!(possible_promotion.includes(promotion))) {
-        console.log(promotion)
-        promotion = prompt('Please enter promotion (q, r, b, n):');
-    }
-    return promotion
-}
-
-
-function validate_move(source, target){
-    let promotion_peice = '';
-    let valid_moves = game.moves({ verbose: true })
-    for(let i = 0; i < valid_moves.length; i++)
-    {
-        if (source == valid_moves[i].from && target == valid_moves[i].to){
-            if('promotion' in valid_moves[i]){
-                promotion_peice = prompt('Please enter promotion (q, r, b, n):')
-                while (!(promotion_peice in ['q', 'r', 'b', 'n']))
-                    promotion_peice = prompt('Please enter promotion (q, r, b, n):')
-            }
-            return {from: source, to: target, promotion: promotion_peice}
+function validateMove(source, target) {
+    let validMoves = game.moves({ verbose: true });
+    let move = validMoves.find(move => move.from === source && move.to === target);
+    let promotion = '';
+    if (!move) return null;
+    if ('promotion' in move) {
+        let validPromotions = ['q', 'r', 'b', 'n'];
+        promotion = prompt(`Please enter a promotion piece (${validPromotions.join(', ')}):`);
+        while (!validPromotions.includes(promotion)) {
+            promotion = prompt(`Invalid promotion piece. Please enter a valid promotion piece (${validPromotions.join(', ')}):`);
         }
     }
-    return false
+    return { from: source, to: target, promotion: promotion};
 }
 
 
-function onDrop (source, target) {
-    // see if the move is legal
-    removeGreySquares()
-    move = validate_move(source, target)
-    if (move){
-        game.move(move)
-        let move_str = move.from + move.to + move.promotion
-        console.log('your move: ' + move_str)
-        updateGame()
-        socket.emit('my_move', {'move': move_str})
-        return true
+
+
+function onDrop(source, target) {
+    removeGreySquares();
+    const move = validateMove(source, target);
+    if (!move) {
+        return 'snapback';
     }
-    // illegal move
-    return 'snapback'
+    game.move(move);
+    updateGame();
+    let move_str = `${move.from}${move.to}${move.promotion}`;
+    console.log(`Your move: ${move_str}`);
+    socket.emit('my_move', {move: move_str});
+    return true;
 }
 
 // update the board position after the piece snap
@@ -187,7 +172,6 @@ let config = {
     draggable: true,
     position: 'start',
     orientation: 'white',
-    //pieceTheme: 'img/chesspieces/alpha/{piece}.png',
     onDragStart: onDragStart,
     onDrop: onDrop,
     onMouseoutSquare: onMouseoutSquare,
@@ -228,9 +212,9 @@ const socket = io({
     console.log('login error: ' + data);
  });
  socket.on('opponent_move', (data) => {
-    console.log('opponent move: '+ data['move']);
-    let from = data['from']
-    let to = data['to']
+    console.log('opponent move: '+ data['move'] + data);
+    let from = data['src']
+    let to = data['dst']
     if (data['promotion']){
         game.move({
             from: from,
@@ -256,6 +240,13 @@ socket.on('game_started', (data) => {
     console.log('you are playing as ' + data)
     updateGame();
 })
+
+socket.on('timeout', () => {
+    can_move = false;
+    console.clear()
+    document.getElementById("startBtn").disabled = false;
+    board = ChessBoard('myBoard', 'start');
+});
 
 socket.on('game_over', (resault) => {
     console.log(resault);

@@ -48,15 +48,15 @@ def var(string): return f"'{string}'"
 
 
 def update_value(username, column, value) -> None:
-    db.updateValue(TABLE_NAME, column, value, f"{USERNAME} = '{username}'")
+    db.update_value(TABLE_NAME, column, value, f"{USERNAME} = '{username}'")
 
 
 def get_value(username, column) -> str:
-    return db.selectValue(TABLE_NAME, column, f"{USERNAME} = '{username}'")
+    return db.select_value(TABLE_NAME, column, f"{USERNAME} = '{username}'")
 
 
 def does_exist(column, value) -> bool:
-    return db.selectValue(TABLE_NAME, '*', f"{column} = '{value}'") != None
+    return db.select_value(TABLE_NAME, '*', f"{column} = '{value}'") != None
 
 
 def hash(password)->str:
@@ -131,7 +131,7 @@ def create_new_user(username, password, email) -> bool:
         return "invalid email"
     if does_exist(EMAIL, email):
         return "email already exists"
-    db.insertRow(TABLE_NAME, {
+    db.insert_row(TABLE_NAME, {
         USERNAME: username,
         PASSWORD: hash(password),
         EMAIL: email,
@@ -145,7 +145,7 @@ def delete_user(username) -> None:
     """
     calls delete_user to delete the user from the database
     """
-    db.deleteRow(TABLE_NAME, f"{USERNAME} = {var(username)}")
+    db.delete_row(TABLE_NAME, f"{USERNAME} = {var(username)}")
 
 
 def check_password(username, password) -> bool:
@@ -215,7 +215,7 @@ def update_entry(username) -> None:
 get functions
 """
 def get_username_by_cookie(cookie):
-    return db.selectValue(TABLE_NAME, USERNAME, f'{COOKIE} = {var(cookie)}')
+    return db.select_value(TABLE_NAME, USERNAME, f'{COOKIE} = {var(cookie)}')
 
 
 def get_entry(username) -> datetime.strftime:
@@ -248,7 +248,7 @@ def reset_table():
     """
     reset the table and insert default users
     """
-    db.resetTable(TABLE_NAME, STRUCTURE)
+    db.reset_table(TABLE_NAME, STRUCTURE)
 
 
 def test():
