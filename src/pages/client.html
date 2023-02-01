@@ -11,45 +11,51 @@
     <script>var exports = {};</script>
     <script src="https://unpkg.com/chess.js"></script>
   </head>
-  <body>
-    <div>
-      <!-- box displays game information- PGN, STATUS, FEN -->
-      <div id="data_box">
-        <div id="box">
-          <!-- Header for info box -->
-          <b>LaskerChamp Chess!</b><br>
-          The #1 chess site in the world and in the universe!
-        </div>
-        <div id="pgnText">
-          PGN: <span id="pgn"></span>
-        </div>
-          <br>
-        <div id="StatusDisplay">
-            STATUS: <span id="status"></span>
-        </div>
-          <br>
-        <div id="fenDisplay">
-            FEN: <span id="fen"></span>
-        </div>
-          <br>
-        <!-- copy info to computer clipboard -->
-        <button id = "copy_fen" class="copy_btn popup">Copy FEN to clipboard</button>
-        <button id = "copy_pgn" class="copy_btn">Copy PGN to clipboard</button>
+  <body onresize='resizeBoard()'>  
+    <!-- box displays game information- PGN, STATUS, FEN -->
+    <div id="game_data_box">
+      <div id="user_info">
+        username: <span id="username"></span>
+        <br>
+        rating: <span id="elo"></span>
       </div>
-      <!-- create board -->
-      <div id="myBoard" style="width:400px;height:auto;"></div>
-      <!-- game controlling buttons- start, quit, restart  -->
-      <div id="buttons">
-          <button id="startBtn" class="chess_control">Start</button>
-            <br>
-          <button id="quitBtn" class="chess_control">Quit</button>
-            <br>
-          <button id="restartBtn" class="chess_control">Restart</button>
+      <div id="box">
+        <!-- Header for info box -->
+        <b>LaskerChamp Chess!</b><br>
+        The #1 chess site in the world and in the universe!
       </div>
-      <!-- username and user rating -->
-      <div id="user_log_info">
-        username: <span id="username_value"></span><br>
-        rating: <span id="rating_value"></span>
+      <div id="pgnText">
+        PGN: <span id="pgn"></span>
+      </div>
+        <br>
+      <div id="StatusDisplay">
+          STATUS: <span id="status"></span>
+      </div>
+        <br>
+      <div id="fenDisplay">
+          FEN: <span id="fen"></span>
+      </div>
+        <br>
+      <!-- copy info to computer clipboard -->
+      <button id = "copy_fen" class="copy_btn">Copy FEN to clipboard</button>
+      <button id = "copy_pgn" class="copy_btn">Copy PGN to clipboard</button>
+      <span class="clear_fix"></span>
+      <div id="game_control_buttons">
+        <button id="startBtn" class="chess_control">Start</button>
+        <button id="quitBtn" class="chess_control">Quit</button>
+      </div>
+    </div>
+
+    <!-- create board -->
+    <div id="game_box">
+      <div id="player2-clock" class="clock">
+        <div id="player2-time"></div>
+      </div>
+
+      <div id="myBoard"></div>
+
+      <div id="player1-clock" class="clock">
+        <div id="player1-time"></div>
       </div>
     </div>
     <script src="scripts/client.js"></script>

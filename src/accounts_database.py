@@ -1,14 +1,19 @@
+"""
+send and receive data from the database.
+"""
 import psycopg
+
 
 def execute_query(query: str, args: tuple = None) -> psycopg.cursor:
     """
     Execute a SQL query on the database and return the cursor object.
     """
-    try:
-        with psycopg.connect("dbname=chess_users user=postgres password=132005", autocommit=True) as conn:
-            return conn.execute(query, args)
-    except Exception as e:
-        print(f"Error: {e}")
+    conn_str = "dbname=chess_users user=postgres password=132005"
+    conn: psycopg.Connection = psycopg.connect(conn_str, autocommit=True)
+    cursor = conn.execute(query, args)
+    conn.close()
+    return cursor
+
 
 def create_table(table_name: str, columns: list) -> None:
     """
@@ -17,11 +22,13 @@ def create_table(table_name: str, columns: list) -> None:
     query = f"CREATE TABLE IF NOT EXISTS {table_name}({', '.join(columns)});"
     execute_query(query)
 
+
 def drop_table(table_name: str) -> None:
     """
     Drop the table with the given name if it exists.
     """
     execute_query(f"DROP TABLE IF EXISTS {table_name};")
+
 
 def reset_table(table_name: str, columns: list) -> None:
     """
@@ -29,6 +36,7 @@ def reset_table(table_name: str, columns: list) -> None:
     """
     drop_table(table_name)
     create_table(table_name, columns)
+
 
 def insert_row(table_name: str, columns: dict) -> None:
     """
@@ -38,6 +46,7 @@ def insert_row(table_name: str, columns: dict) -> None:
     placeholders = ', '.join(['%s'] * len(columns))
     query = f"INSERT INTO {table_name}({column_names}) VALUES({placeholders});"
     execute_query(query, tuple(columns.values()))
+
 
 def select_value(table_name: str, column: str, where: str) -> any:
     """
@@ -50,9 +59,9 @@ def select_value(table_name: str, column: str, where: str) -> any:
     if data:
         return data[0]
     return None
-    
 
-def update_value(table_name: str, column:str, value:str, where: str) -> None:
+
+def update_value(table_name: str, column: str, value: str, where: str) -> None:
     """
     Update a row in the table with the given name and updates where the where clause is true.
     """
@@ -61,6 +70,7 @@ def update_value(table_name: str, column:str, value:str, where: str) -> None:
     query = f"UPDATE {table_name} SET {column} = {value} WHERE {where};"
     execute_query(query)
 
+
 def delete_row(table_name: str, where: str) -> None:
     """
     Delete a row from the table with the given name where the where clause is true.
@@ -68,8 +78,12 @@ def delete_row(table_name: str, where: str) -> None:
     query = f"DELETE FROM {table_name} WHERE {where};"
     execute_query(query)
 
+
 def main():
-    pass
+    """
+    main function
+    """
+
 
 if __name__ == '__main__':
     main()

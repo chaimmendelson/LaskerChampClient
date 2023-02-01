@@ -1,59 +1,87 @@
 //Game control btns
 document.getElementById("startBtn").addEventListener("click", function() {
+    resetClock();
     start_game();
 }); // start
-document.getElementById("quitBtn").addEventListener("click", function() {
-    if (confirm("Quit?")){
-        console.clear()
-        quit_game();
-        document.getElementById("startBtn").disabled = false;
-        board = ChessBoard('myBoard', 'start');
-    }
+document.getElementById("quitBtn").addEventListener("click", function(){ 
+    quit_game()
 }); // quit
-document.getElementById("restartBtn").addEventListener("click", function() {
-    if (confirm("Restart?")){
-        console.clear()
-        quit_game();
-        start_game();
-    }
-}); // restartBtn
 
 // variables for the information on the board and of the board
 let board = ChessBoard('myBoard', 'start')
+let $board = $('#myBoard')
 let color = null
 let players_color = 'white'
 let game = null
 let can_move = false;
+
 let $status = $('#status')
 let $fen = $('#fen')
 let $pgn = $('#pgn')
-let whiteSquareGrey = 'silver'
-let blackSquareGrey = 'darkgrey'
 
+let whiteSquareColour = 'mintcream'
+let blackSquareColour = 'green'
+
+let whiteSquareGrey = 'grey'
+let blackSquareGrey = 'dimgrey'
+
+let whiteSquareHighlight = 'orange'
+let blackSquareHighlight = 'darkorange'
+
+let moveToHighlight = null
+let squareClass = 'square-55d63'
+let whiteSquareClass = 'white-1e1d7'
+let blackSquareClass = 'black-3c85d'
+
+document.getElementById("quitBtn").style.display = "none";
+
+
+function specificSquareClass(square){
+    return '.square-' + square;
+}
 
 function updateGame(){
+    resetSquareColor();
     updateStatus()
-    if (game.turn() === color){
-        can_move = true;
-    }
-    else{
-        can_move = false;
+    can_move = game.turn() === color;
+}
+
+function isWhiteSquare(square){
+    return !(square.charCodeAt(0) % 2 === square.charCodeAt(1) % 2);
+}
+
+function resetSquareColor(){
+    $board.find('.' + whiteSquareClass).css('background', whiteSquareColour)
+    $board.find('.' + blackSquareClass).css('background', blackSquareColour)
+    if (moveToHighlight){
+        highlightMove();
     }
 }
 
-// highlight
-function removeGreySquares () {
-    $('#myBoard .square-55d63').css('background', '')
+function highlightSquare(square){
+    let background = isWhiteSquare(square) ? whiteSquareHighlight : blackSquareHighlight;
+    $board.find(specificSquareClass(square)).css('background', background)
 }
+
+function highlightMove() {
+    highlightSquare(moveToHighlight.from);
+    highlightSquare(moveToHighlight.to);
+}
+
+
 function greySquare (square) {
-    let $square = $('#myBoard .square-' + square)
+    let background = isWhiteSquare(square) ? whiteSquareGrey : blackSquareGrey;
+    $board.find(specificSquareClass(square)).css('background', background)
+}
 
-    let background = whiteSquareGrey
-    if ($square.hasClass('black-3c85d')) {
-        background = blackSquareGrey
-    }
-
-    $square.css('background', background)
+function clear_game(message){
+    can_move = false;
+    moveToHighlight = null;
+    stopClock();
+    $status.html(message);
+    document.getElementById("startBtn").style.display = "block";
+    document.getElementById("quitBtn").style.display = "none";
+    document.getElementById("startBtn").disabled = false;
 }
 
 // control piece movement
@@ -85,19 +113,23 @@ function validateMove(source, target) {
 }
 
 
+function moveColor() {
+    return game.turn() === 'w' ? 'white' : 'black';
+}
 
 
 function onDrop(source, target) {
-    removeGreySquares();
+    resetSquareColor();
     const move = validateMove(source, target);
-    if (!move) {
+    if (!move || !can_move) {
         return 'snapback';
     }
+    moveToHighlight = move;
     game.move(move);
     updateGame();
     let move_str = `${move.from}${move.to}${move.promotion}`;
-    console.log(`Your move: ${move_str}`);
     socket.emit('my_move', {move: move_str});
+    nextPlayer();
     return true;
 }
 
@@ -110,37 +142,24 @@ function onSnapEnd () {
 function updateStatus () {
     let status = ''
 
-    let moveColor = 'White'
-    if (game.turn() === 'b') {
-        moveColor = 'Black'
-    }
-
     // checkmate?
-    if (game.isCheckmate()) {
-        status = 'Game over, ' + moveColor + ' is in checkmate.'
-        document.getElementById("startBtn").disabled = false;
+    if (game.isCheckmate() || game.isDraw()) {
+        stopClock();
     }
-
-    // draw?
-    else if (game.isDraw()) {
-        status = 'Game over, drawn position'
-        document.getElementById("startBtn").disabled = false;
-    }
-
     // game still on
     else {
-        status = moveColor + ' to move'
+        status = moveColor() + ' to move'
 
         // check?
         if (game.isCheck()) {
-        status += ', ' + moveColor + ' is in check'
+        status += ', ' + moveColor() + ' is in check'
         }
+    }
+    $status.html(status)
+    $fen.html(game.fen())
+    $pgn.html(game.pgn())
 }
 
-$status.html(status)
-$fen.html(game.fen())
-$pgn.html(game.pgn())
-}
 // check legal moves and highlight legal moves
 function onMouseoverSquare (square, piece) {
 // get list of possible moves for this square
@@ -163,105 +182,104 @@ function onMouseoverSquare (square, piece) {
         greySquare(moves[i].to)
     }
 }
+
+
 function onMouseoutSquare (square, piece) {
-    removeGreySquares()
+    resetSquareColor()
 }
 
 // configure site
 let config = {
     draggable: true,
     position: 'start',
-    orientation: 'white',
     onDragStart: onDragStart,
     onDrop: onDrop,
     onMouseoutSquare: onMouseoutSquare,
     onMouseoverSquare: onMouseoverSquare,
-    onSnapEnd: onSnapEnd
+    onSnapEnd: onSnapEnd,
 }
 
 // copying logged info to clipboard
-    //FEN
+//FEN
 document.getElementById("copy_fen").addEventListener("click", function() {
     if (game){
         navigator.clipboard.writeText(game.fen())
-        console.log(game.fen())
     }
 });
-    //PGN
+//PGN
 document.getElementById("copy_pgn").addEventListener("click", function() {
     if (game){
         navigator.clipboard.writeText(game.pgn())
-        console.log(game.pgn())
     }
 });
+
 const socket = io({
     auth: {
       token: get_cookie()
     }
 });
- socket.on('connect', () => {
-    console.log('Connected to server');
- });
- socket.on('connect_error', (error) => {
-    console.log('Connection error: ' + error);
- });
- socket.on('disconnect', () => {
-    console.log('Disconnected from server');
- });
- socket.on('login_error', (data) => {
-    console.log('login error: ' + data);
- });
- socket.on('opponent_move', (data) => {
-    console.log('opponent move: '+ data['move'] + data);
-    let from = data['src']
-    let to = data['dst']
+
+socket.on('connect', () => {
+   console.log('Connected to server');
+});
+
+socket.on('connect_error', (error) => {
+   console.log('Connection error: ' + error);
+});
+
+socket.on('disconnect', () => {
+   console.log('Disconnected from server');
+});
+
+socket.on('login_error', (data) => {
+   console.log('login error: ' + data);
+});
+
+socket.on('user_data', (data) => {
+   console.log('user data: ' + data);
+   document.getElementById("username").innerHTML = data['username'];
+   document.getElementById("elo").innerHTML = data['elo'];
+});
+
+socket.on('opponent_move', (data) => {
+    let move = {from: data['src'], to: data['dst']};
+    moveToHighlight = move;
     if (data['promotion']){
-        game.move({
-            from: from,
-            to: to,
-            promotion: data['promotion']
-        })
+        move[promotion] = data['promotion']
     }
-    else{
-        game.move({
-            from: from,
-            to: to
-        })
-    }
+    game.move(move);
     board.position(game.fen())
-    updateGame()
+    nextPlayer();
+    updateGame();
 })
 
 socket.on('game_started', (data) => {
     color = data[0]
-    config['orientation'] = data
     board = ChessBoard('myBoard', config)
+    if (color == 'b'){
+        board.flip()
+    }
     game = new Chess()
-    console.log('you are playing as ' + data)
+    currentPlayer = 0
+    playerNum = data == 'white' ? 0 : 1
+    document.getElementById("startBtn").style.display = "none";
+    document.getElementById("quitBtn").style.display = "block";
+    startClock();
     updateGame();
 })
 
-socket.on('timeout', () => {
-    can_move = false;
-    console.clear()
-    document.getElementById("startBtn").disabled = false;
-    board = ChessBoard('myBoard', 'start');
-});
+socket.on('timeout', () => clear_game('you have run out of time'));
 
-socket.on('game_over', (resault) => {
-    console.log(resault);
-    can_move = false;
-});
+socket.on('game_over', (resault) => clear_game({0: 'you have lost', 0.5: 'its a tie', 1: 'you have won'}[resault]));
 
-socket.on('opponent_quit', () => {
-    can_move = false;
-    console.clear()
-    document.getElementById("startBtn").disabled = false;
-    board = ChessBoard('myBoard', 'start');
+socket.on('opponent_quit', () => clear_game('your opponent quit the match'))
 
-})
+socket.on('opponent_timeout', () => clear_game('your opponent ran out of time'))
+
+
 async function start_game(){
-    let game_type = confirm('play against stockfish?');
+    // let game_type = confirm('play against stockfish?');
+    let game_type = true;
     document.getElementById("startBtn").disabled = true;
     await socket.emit('start_game', {'stockfish': game_type})
 }
@@ -269,6 +287,80 @@ async function start_game(){
 
 async function quit_game(){
     await socket.emit('quit_game');
+    clear_game('you lost')
+}
+
+// Initial time for each player (in seconds)
+const player1Time = 60;
+const player2Time = 60;
+
+// Variables to keep track of the current time remaining for each player
+let player1TimeRemaining = player1Time;
+let player2TimeRemaining = player2Time;
+
+// Variable to keep track of which player's turn it is
+let currentPlayer = 0;
+let playerNum = 0;
+// Timer interval variable
+let interval;
+
+// Function to start the clock
+function startClock() {
+    interval = setInterval(() => {
+        // Check which player's turn it is
+        if (currentPlayer === playerNum) {
+            player1TimeRemaining--;
+            if (player1TimeRemaining < 0) {
+                clearInterval(interval);
+                player1TimeRemaining = 0;
+                // alert("Player 1 ran out of time!");
+            }
+        } else {
+            player2TimeRemaining--;
+            if (player2TimeRemaining < 0) {
+                clearInterval(interval);
+                player2TimeRemaining = 0;
+                // alert("Player 2 ran out of time!");
+            }
+        }
+        formatClock();
+    }, 1000);
+}
+
+
+// Function to stop the clock
+function stopClock() {
+    clearInterval(interval);
+}
+
+// Function to switch to the next player
+function nextPlayer() {
+    stopClock();
+    currentPlayer = 1 - currentPlayer;
+    startClock();
+}
+
+// Function to format the clock
+function formatClock() {
+    // Update the time remaining display
+    let player1Minutes = Math.floor(player1TimeRemaining / 60);
+    let player1Seconds = player1TimeRemaining % 60;
+    document.getElementById("player1-time").innerHTML = player1Minutes + ":" + (player1Seconds < 10 ? "0" : "") + player1Seconds;
+
+    let player2Minutes = Math.floor(player2TimeRemaining / 60);
+    let player2Seconds = player2TimeRemaining % 60;
+    document.getElementById("player2-time").innerHTML = player2Minutes + ":" + (player2Seconds < 10 ? "0" : "") + player2Seconds;
+}
+
+// Function to reset the clock
+function resetClock() {
+    stopClock();
+    player1TimeRemaining = player1Time;
+    player2TimeRemaining = player2Time;
+    currentPlayer = 0;
+    document.getElementById("player1-time").innerHTML = player1Time;
+    document.getElementById("player2-time").innerHTML = player2Time;
+    formatClock();
 }
 
 
@@ -282,3 +374,10 @@ function get_cookie(){
     }
     return null;
 }
+
+function resizeBoard(){
+    // resize the widthe of 'myBoard' to 100% and the hight to auto
+    console.log('resize');
+    board.resize();
+};
+formatClock();
