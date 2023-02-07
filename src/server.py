@@ -275,7 +275,6 @@ async def handle_game_over(username: str, move: dict[str, str]):
     close_room(username)
 
 
-
 async def send_move_to_opponent(username: str, move_d: dict[str, str]):
     """
     send the given move to the given username.
@@ -304,6 +303,7 @@ async def ping(sid):
     handle the ping event.
     """
     await sio.emit('pong', to=sid)
+
 
 @sio.event
 async def disconnect(sid):

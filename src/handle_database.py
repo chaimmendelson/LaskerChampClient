@@ -85,9 +85,9 @@ def does_exist(column: str, value: str) -> bool:
 
 def hash_pass(password: str) -> str:
     """
-    use sha512 to hash the password to a length of 128.
+    use sha256 to hash the password to a length of 128.
     """
-    return hashlib.sha512(password.encode()).hexdigest()
+    return hashlib.sha256(password.encode()).hexdigest()
 
 
 def create_cookie(username: str):
