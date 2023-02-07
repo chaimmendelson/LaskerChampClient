@@ -1,6 +1,6 @@
 button{
     width:fit-content;
-    background-color: gold;
+    background-color: lightslategray;
 }
 button:hover{
     cursor:grab;
@@ -16,24 +16,26 @@ button:active{
     width: 100%;
 }
 .chess_control:active{
-    background-color: goldenrod;
+    background-color: gray;
 }
 
 #game_data_box{
-    width: 25%;
-    float: left;
-    margin-right: 10%;
-    background-color: aqua;
+    width: 20%;
+    min-width: 200px;
+    background-color: gray;
+    border-radius: 20px;
     padding: 10px;
+    float: left;
 }
 
 #game_box{
     width: 35%;
+    min-width: 300px;
     float: left;
+    margin-left: 5%;
 }
 
 #myBoard{
-    clear: both;
     width: 100%;
     height: auto;
     background-color: brown;
@@ -52,7 +54,7 @@ button:active{
 }
 
 #chess-clock{
-    width: 100%;
+    width: 100%;    
 }
 #pgnText{
     height: 100px;
@@ -67,7 +69,7 @@ button:active{
     border:5px black solid;
     font-size: small;
     font-family: 'Courier New', Courier, monospace;
-    background-color: wheat;
+    background-color: lightseagreen;
 }
 #fenDisplay{
     height: 50px;
@@ -92,29 +94,54 @@ button:active{
     float: right;
 }
 
-.highlight-white {
-    box-shadow: inset 0 0 3px 3px red;
-}
-.highlight-black {
-    box-shadow: inset 0 0 3px 3px blue;
-}
-
-.highlight{
-    background-color: yellow;
-}
-
 .clock{
     width: fit-content;
-    margin: auto;
-    padding: 5px;
-    background-color: gainsboro
+    margin: 10px auto;
+    padding: 10px;
+    border: 1px black solid;
+    border-radius: 10px;
+    background-color: lightcoral;
+    font-family: cursive;
 }
 
+#logoutBtn{
+    width: 100%;
+    margin-top: 15px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: green
+}
 
 #box{
     text-align: center;
     border:1px black solid;
     background-color: white;
+    padding: 5px;
+}
+
+#engine_box{
+    width: 20%;
+    min-width: 100px;
+    background-color: gray;
+    border-radius: 20px;
+    padding: 10px;
+    margin-left: 5%;
+    float: left;
+}
+
+#engine_level{
+    width: 100%;
+    margin-top: 10px;
+}
+
+#level_display{
+    width: fit-content;
+    margin: auto;
+}
+
+#game_mode{
+    width: fit-content;
+    margin: 10px auto;
 }
 
 body{

@@ -133,6 +133,12 @@ class ChessRoom:
         """
         return self.players[self.turn]
 
+    def get_time_left(self, player: str) -> float:
+        """
+        return the time left for the given player
+        """
+        return self.clocks[self.players.index(player)].get_time_left()
+
     def last_move(self) -> str:
         """
         return the last move in uci format

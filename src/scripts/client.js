@@ -1,9 +1,15 @@
 //Game control btns
-document.getElementById("startBtn").addEventListener("click", function() {
+document.getElementById('startBtn').addEventListener('click', async function() {
     resetClock();
-    start_game();
+    document.getElementById('startBtn').disabled = true;
+    //get the selected game mode from the radio buttons
+    let game_mode = document.querySelector('input[name="game_mode"]:checked').value;
+    //get the selected level from the slider
+    let level = document.getElementById('engine_level').value;
+    await socket.emit('start_game', {game_mode: game_mode, level: level});
 }); // start
-document.getElementById("quitBtn").addEventListener("click", function(){ 
+
+document.getElementById('quitBtn').addEventListener('click', function(){ 
     quit_game()
 }); // quit
 
@@ -25,15 +31,15 @@ let blackSquareColour = 'green'
 let whiteSquareGrey = 'grey'
 let blackSquareGrey = 'dimgrey'
 
-let whiteSquareHighlight = 'orange'
-let blackSquareHighlight = 'darkorange'
+let whiteSquareHighlight = 'yellow'
+let blackSquareHighlight = 'gold'
 
 let moveToHighlight = null
 let squareClass = 'square-55d63'
 let whiteSquareClass = 'white-1e1d7'
 let blackSquareClass = 'black-3c85d'
 
-document.getElementById("quitBtn").style.display = "none";
+document.getElementById('quitBtn').style.display = 'none';
 
 
 function specificSquareClass(square){
@@ -42,7 +48,7 @@ function specificSquareClass(square){
 
 function updateGame(){
     resetSquareColor();
-    updateStatus()
+    updateStatus();
     can_move = game.turn() === color;
 }
 
@@ -50,12 +56,14 @@ function isWhiteSquare(square){
     return !(square.charCodeAt(0) % 2 === square.charCodeAt(1) % 2);
 }
 
+function isPlyersPiece(piece){
+    return (piece[0] === players_color[0]);
+}
+
 function resetSquareColor(){
     $board.find('.' + whiteSquareClass).css('background', whiteSquareColour)
     $board.find('.' + blackSquareClass).css('background', blackSquareColour)
-    if (moveToHighlight){
-        highlightMove();
-    }
+    if (moveToHighlight) highlightMove();
 }
 
 function highlightSquare(square){
@@ -79,9 +87,9 @@ function clear_game(message){
     moveToHighlight = null;
     stopClock();
     $status.html(message);
-    document.getElementById("startBtn").style.display = "block";
-    document.getElementById("quitBtn").style.display = "none";
-    document.getElementById("startBtn").disabled = false;
+    document.getElementById('startBtn').style.display = 'block';
+    document.getElementById('quitBtn').style.display = 'none';
+    document.getElementById('startBtn').disabled = false;
 }
 
 // control piece movement
@@ -91,10 +99,7 @@ function onDragStart (source, piece, position, orientation) {
     if (game.isCheckmate() || game.isDraw()) return false
 
     // only pick up pieces for the side to move
-    if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
-        (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
-        return false
-    }
+    return isPlyersPiece(piece)
 }
 
 function validateMove(source, target) {
@@ -201,16 +206,13 @@ let config = {
 
 // copying logged info to clipboard
 //FEN
-document.getElementById("copy_fen").addEventListener("click", function() {
-    if (game){
-        navigator.clipboard.writeText(game.fen())
-    }
+document.getElementById('copy_fen').addEventListener('click', function() {
+    if (game) navigator.clipboard.writeText(game.fen());
 });
+
 //PGN
-document.getElementById("copy_pgn").addEventListener("click", function() {
-    if (game){
-        navigator.clipboard.writeText(game.pgn())
-    }
+document.getElementById('copy_pgn').addEventListener('click', function() {
+    if (game) navigator.clipboard.writeText(game.pgn());
 });
 
 const socket = io({
@@ -219,8 +221,31 @@ const socket = io({
     }
 });
 
+let start = null;
+let delay_time = 0;
 socket.on('connect', () => {
    console.log('Connected to server');
+   start = Date.now();
+   socket.emit('ping')
+});
+
+socket.on('pong', () => {
+    delay_time = Math.round((Date.now() - start) / 1000);
+    console.log('ping: ' + delay_time);
+});
+
+
+socket.on('clock_update', (data) => {
+    // the format is {white: seconds, black: seconds}
+    // change the clocks to reflect the new time
+    if (players_color === 'white') {
+        player1TimeRemaining = data['white'];
+        player2TimeRemaining = data['black'];
+    }
+    else {
+        player1TimeRemaining = data['black'];
+        player2TimeRemaining = data['white'];
+    }
 });
 
 socket.on('connect_error', (error) => {
@@ -235,10 +260,14 @@ socket.on('login_error', (data) => {
    console.log('login error: ' + data);
 });
 
+socket.on('update_elo', (data) => {
+    document.getElementById('elo').innerHTML = data['elo'];
+});
+
+
 socket.on('user_data', (data) => {
-   console.log('user data: ' + data);
-   document.getElementById("username").innerHTML = data['username'];
-   document.getElementById("elo").innerHTML = data['elo'];
+   document.getElementById('username').innerHTML = data['username'];
+   document.getElementById('elo').innerHTML = data['elo'];
 });
 
 socket.on('opponent_move', (data) => {
@@ -254,16 +283,17 @@ socket.on('opponent_move', (data) => {
 })
 
 socket.on('game_started', (data) => {
-    color = data[0]
-    board = ChessBoard('myBoard', config)
+    color = data[0];
+    board = ChessBoard('myBoard', config);
     if (color == 'b'){
-        board.flip()
+        board.flip();
     }
-    game = new Chess()
-    currentPlayer = 0
-    playerNum = data == 'white' ? 0 : 1
-    document.getElementById("startBtn").style.display = "none";
-    document.getElementById("quitBtn").style.display = "block";
+    game = new Chess();
+    currentPlayer = 0;
+    players_color = data;
+    playerNum = data == 'white' ? 0 : 1;
+    document.getElementById('startBtn').style.display = 'none';
+    document.getElementById('quitBtn').style.display = 'block';
     startClock();
     updateGame();
 })
@@ -272,22 +302,14 @@ socket.on('timeout', () => clear_game('you have run out of time'));
 
 socket.on('game_over', (resault) => clear_game({0: 'you have lost', 0.5: 'its a tie', 1: 'you have won'}[resault]));
 
-socket.on('opponent_quit', () => clear_game('your opponent quit the match'))
+socket.on('opponent_quit', () => clear_game('your opponent quit the match'));
 
-socket.on('opponent_timeout', () => clear_game('your opponent ran out of time'))
-
-
-async function start_game(){
-    // let game_type = confirm('play against stockfish?');
-    let game_type = true;
-    document.getElementById("startBtn").disabled = true;
-    await socket.emit('start_game', {'stockfish': game_type})
-}
+socket.on('opponent_timeout', () => clear_game('your opponent ran out of time'));
 
 
 async function quit_game(){
     await socket.emit('quit_game');
-    clear_game('you lost')
+    clear_game('you lost');
 }
 
 // Initial time for each player (in seconds)
@@ -313,14 +335,12 @@ function startClock() {
             if (player1TimeRemaining < 0) {
                 clearInterval(interval);
                 player1TimeRemaining = 0;
-                // alert("Player 1 ran out of time!");
             }
         } else {
             player2TimeRemaining--;
             if (player2TimeRemaining < 0) {
                 clearInterval(interval);
                 player2TimeRemaining = 0;
-                // alert("Player 2 ran out of time!");
             }
         }
         formatClock();
@@ -341,15 +361,16 @@ function nextPlayer() {
 }
 
 // Function to format the clock
-function formatClock() {
-    // Update the time remaining display
-    let player1Minutes = Math.floor(player1TimeRemaining / 60);
-    let player1Seconds = player1TimeRemaining % 60;
-    document.getElementById("player1-time").innerHTML = player1Minutes + ":" + (player1Seconds < 10 ? "0" : "") + player1Seconds;
 
-    let player2Minutes = Math.floor(player2TimeRemaining / 60);
-    let player2Seconds = player2TimeRemaining % 60;
-    document.getElementById("player2-time").innerHTML = player2Minutes + ":" + (player2Seconds < 10 ? "0" : "") + player2Seconds;
+function formatTime(time) {
+    let minutes = Math.floor(time / 60);
+    let seconds = time % 60;
+    return (minutes < 10 ? '0': '') + minutes + ' : ' + (seconds < 10 ? '0' : '') + seconds;
+}
+
+function formatClock() {
+    document.getElementById('player1-time').innerHTML = formatTime(player1TimeRemaining);
+    document.getElementById('player2-time').innerHTML = formatTime(player2TimeRemaining);
 }
 
 // Function to reset the clock
@@ -358,8 +379,6 @@ function resetClock() {
     player1TimeRemaining = player1Time;
     player2TimeRemaining = player2Time;
     currentPlayer = 0;
-    document.getElementById("player1-time").innerHTML = player1Time;
-    document.getElementById("player2-time").innerHTML = player2Time;
     formatClock();
 }
 
@@ -375,9 +394,19 @@ function get_cookie(){
     return null;
 }
 
+// get the value of the slide bar engine_level upon sliding it and log it
+document.getElementById('engine_level').addEventListener('input', function() {
+    engine_level = this.value;
+    document.getElementById('level_display').innerHTML = 'Level: ' + engine_level;
+});
+
+
+document.getElementById('logoutBtn').addEventListener('click', function() {
+    document.cookie = 'chess-cookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    window.location.href = '/';
+});
+
 function resizeBoard(){
-    // resize the widthe of 'myBoard' to 100% and the hight to auto
-    console.log('resize');
     board.resize();
 };
 formatClock();

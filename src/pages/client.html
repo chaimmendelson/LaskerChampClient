@@ -8,8 +8,8 @@
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <script src="images/chessboardjs-1.0.0/js/chessboard-1.0.0.min.js"></script>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js" integrity="sha384-/KNQL8Nu5gCHLqwqfQjA689Hhoqgi2S84SNUxC3roTe4EhJ9AfLkp8QiQcU8AMzI" crossorigin="anonymous"></script>
-    <script>var exports = {};</script>
-    <script src="https://unpkg.com/chess.js"></script>
+    <!-- <script>var exports = {};</script> -->
+    <!-- <script src="https://unpkg.com/chess.js@1.0.0-beta.3/dist/chess.js" type="module"></script> -->
   </head>
   <body onresize='resizeBoard()'>  
     <!-- box displays game information- PGN, STATUS, FEN -->
@@ -35,17 +35,32 @@
       <div id="fenDisplay">
           FEN: <span id="fen"></span>
       </div>
-        <br>
+      <br>
       <!-- copy info to computer clipboard -->
-      <button id = "copy_fen" class="copy_btn">Copy FEN to clipboard</button>
-      <button id = "copy_pgn" class="copy_btn">Copy PGN to clipboard</button>
+      <button id = "copy_fen" class="copy_btn">Copy FEN</button>
+      <button id = "copy_pgn" class="copy_btn">Copy PGN</button>
       <span class="clear_fix"></span>
       <div id="game_control_buttons">
         <button id="startBtn" class="chess_control">Start</button>
         <button id="quitBtn" class="chess_control">Quit</button>
       </div>
+      <!-- let the user select between online and engine -->
+      <div id="game_mode">
+        <input type="radio" id="engine" name="game_mode" value="engine" checked>
+        <label for="engine">Engine</label>
+        <input type="radio" id="online" name="game_mode" value="online">
+        <label for="online">Online</label>
+      </div>
+      <div id="level_display">
+        Level: 10
+      </div>
+      <div id="engine_level_box">
+        <input type="range" min="0" max="20" value="10" class="slider" id="engine_level">
+      </div>
+      <div>
+        <button id="logoutBtn">Logout</button>
+      </div>
     </div>
-
     <!-- create board -->
     <div id="game_box">
       <div id="player2-clock" class="clock">
@@ -58,6 +73,7 @@
         <div id="player1-time"></div>
       </div>
     </div>
+    <script src="scripts/chess.js"></script>
     <script src="scripts/client.js"></script>
   </body>
 </html>

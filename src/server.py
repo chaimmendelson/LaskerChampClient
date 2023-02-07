@@ -19,6 +19,7 @@ class Clients():
     """
     save the connection between the username and the sid.
     """
+
     def __init__(self, username: str, sid: str):
         self.username = username
         self.sid = sid
@@ -91,18 +92,22 @@ def close_room(player: str) -> None:
     CHESS_ROOMS.remove(get_room(player))
 
 
-def add_engine_room(player: str, level: int = 10, time_limit: int = 10, bonus_time: int = 0):
+def add_engine_room(player: str, level: int = 10, time_limit: int = 10, bonus_time: int = 0) -> EngineRoom:
     """
     add a new engine room to the CHESS_ROOMS list.
     """
     CHESS_ROOMS.append(EngineRoom(player, level, time_limit, bonus_time))
+    return get_room(player)
 
 
-def add_player_room(player1: str, player2: str, time_limit: int = 10, bonus_time: int = 0):
+def add_player_room(player1: str, player2: str, time_limit: int = 10, bonus_time: int = 0) -> PlayerRoom:
     """
     add a player room to the CHESS_ROOMS list.
     """
     CHESS_ROOMS.append(PlayerRoom(player1, player2, time_limit, bonus_time))
+    hd.update_games_played(player1)
+    hd.update_games_played(player2)
+    return get_room(player1)
 
 
 async def game_page(request: web.Request):
@@ -128,6 +133,35 @@ async def login(request: web.Request):
         return web.Response(text=login_page.read(), content_type='text/html')
 
 
+async def register(request: web.Request):
+    """
+    Serve the client-side application.
+    """
+    print(request)
+    with open('src/pages/register.html', encoding='utf-8') as register_page:
+        return web.Response(text=register_page.read(), content_type='text/html')
+
+
+def update_elo(score_dict: dict[str, str]):
+    """
+    RatA + K * (score - (1 / (1 + 10**((RatB - RatA)/400))))
+    K = 400 / games_played + 16
+    """
+    player1, player2 = tuple(score_dict.keys())
+    player1_elo = float(hd.get_value(player1, hd.ELO))
+    player2_elo = float(hd.get_value(player2, hd.ELO))
+    player1_k = 400 / int(hd.get_value(player1, hd.GAMES_PLAYED)) + 16
+    player2_k = 400 / int(hd.get_value(player2, hd.GAMES_PLAYED)) + 16
+    player1_score = score_dict[player1]
+    player2_score = score_dict[player2]
+    player1_elo = player1_elo + player1_k * \
+        (player1_score - (1 / (1 + 10 ** ((player2_elo - player1_elo) / 400))))
+    player2_elo = player2_elo + player2_k * \
+        (player2_score - (1 / (1 + 10 ** ((player1_elo - player2_elo) / 400))))
+    hd.update_elo(player1, player1_elo)
+    hd.update_elo(player2, player2_elo)
+
+
 @sio.event
 async def connect(sid, environ, auth):
     """
@@ -141,7 +175,7 @@ async def connect(sid, environ, auth):
                 username = hd.get_username_by_cookie(token)
                 CLIENTS.append(Clients(username, sid))
                 data_d = {'username': username,
-                          'elo': str(hd.get_value(username, hd.ELO))}
+                          'elo': str(round(hd.get_value(username, hd.ELO)))}
                 await sio.emit('user_data', data_d, to=sid)
                 return True
     return False
@@ -156,27 +190,32 @@ async def start_game(sid, data):
     then it will start the game.
     """
     username = get_username(sid)
-    if is_in_room(username):
+    if is_in_room(username) or username in WAITING_ROOM or not data.get('game_mode'):
         return False
-    if data.get('stockfish'):
-        add_engine_room(username, level=20, time_limit=1)
-        room = get_room(username)
-        if room.is_players_turn(username):
-            await sio.emit('game_started', 'white', to=sid)
-            room.start_clock()
-        else:
-            await sio.emit('game_started', 'black', to=sid)
-            await send_stockfish_move(username)
-    else:
-        if len(WAITING_ROOM) > 0:
+    match data['game_mode']:
+        case 'online':
+            if len(WAITING_ROOM) == 0:
+                WAITING_ROOM.append(username)
+                return
             player2 = WAITING_ROOM.pop(0)
-            add_player_room(player1=username, player2=player2)
-            room = get_room(username)
+            room = add_player_room(player1=username, player2=player2)
             await sio.emit('game_started', 'white', to=get_sid(room.players[0]))
             await sio.emit('game_started', 'black', to=get_sid(room.players[1]))
             room.start_clock()
-        else:
-            WAITING_ROOM.append(username)
+
+        case 'engine':
+            if not data.get('level'):
+                return False
+            room = add_engine_room(
+                username, level=data.get('level'), time_limit=1)
+            if room.is_players_turn(username):
+                await sio.emit('game_started', 'white', to=sid)
+                room.start_clock()
+            else:
+                await sio.emit('game_started', 'black', to=sid)
+                await send_stockfish_move(username)
+        case _:
+            return False
 
 
 @sio.event
@@ -215,6 +254,7 @@ async def my_move(sid: str, data):
         await send_stockfish_move(username)
     else:
         await send_move_to_opponent(opponent, move)
+    await send_clock_update(username)
 
 
 async def handle_game_over(username: str, move: dict[str, str]):
@@ -223,13 +263,17 @@ async def handle_game_over(username: str, move: dict[str, str]):
     """
     room = get_room(username)
     room.stop_clock()
-    player_resault = room.get_game_results()
-    await sio.emit('game_over', player_resault.get(username), to=get_sid(username))
+    resaults = room.get_game_results()
+    await sio.emit('game_over', resaults.get(username), to=get_sid(username))
     if not is_engine_room(room):
+        update_elo(resaults)
         opponent = room.opponent()
         await sio.emit('opponent_move', move, to=get_sid(opponent))
-        await sio.emit('game_over', player_resault.get(opponent), to=get_sid(opponent))
+        await sio.emit('game_over', resaults.get(opponent), to=get_sid(opponent))
+        await send_elo(username)
+        await send_elo(opponent)
     close_room(username)
+
 
 
 async def send_move_to_opponent(username: str, move_d: dict[str, str]):
@@ -238,6 +282,7 @@ async def send_move_to_opponent(username: str, move_d: dict[str, str]):
     """
     room = get_room(username)
     await sio.emit('opponent_move', move_d, to=get_sid(username))
+    await send_clock_update(username)
     room.start_clock()
 
 
@@ -249,7 +294,16 @@ async def quit_game(sid):
     username = get_username(sid)
     if is_in_room(username):
         await handle_quit(username)
+    elif username in WAITING_ROOM:
+        WAITING_ROOM.remove(username)
 
+
+@sio.event
+async def ping(sid):
+    """
+    handle the ping event.
+    """
+    await sio.emit('pong', to=sid)
 
 @sio.event
 async def disconnect(sid):
@@ -264,12 +318,33 @@ async def disconnect(sid):
         await handle_quit(username)
 
 
+async def send_clock_update(username: str):
+    """
+    send the clock update to the given username.
+    """
+    room = get_room(username)
+    white_player = room.players[0]
+    clocks = {'white': round(room.get_time_left(white_player)),
+              'black': round(room.get_time_left(room.opponent(white_player)))}
+    await sio.emit('clock_update', clocks, to=get_sid(username))
+    if not is_engine_room(room):
+        await sio.emit('clock_update', clocks, to=get_sid(room.opponent(username)))
+
+
 def remove_client(username: str):
     """
     remove the client from the list of clients.
     """
     CLIENTS.remove(
         [client for client in CLIENTS if client.username == username][0])
+
+
+async def send_elo(username: str):
+    """
+    send the given username's elo to the client.
+    """
+    elo = str(round(hd.get_value(username, hd.ELO)))
+    await sio.emit('update_elo', {'elo': elo}, to=get_sid(username))
 
 
 async def handle_quit(username: str) -> None:
@@ -280,7 +355,11 @@ async def handle_quit(username: str) -> None:
     opponent = room.opponent(username)
     close_room(username)
     if not is_engine_room(room):
+        update_elo({username: 0, opponent: 1})
         await sio.emit('opponent_quit', to=get_sid(opponent))
+        await send_elo(opponent)
+        if is_connected(username):
+            await send_elo(username)
 
 
 async def handle_timeout(username: str, room: EngineRoom | PlayerRoom) -> None:
@@ -293,6 +372,7 @@ async def handle_timeout(username: str, room: EngineRoom | PlayerRoom) -> None:
         return
     await sio.emit('timeout', to=get_sid(username))
     if not is_engine_room(room):
+        update_elo({username: 0, room.opponent(username): 1})
         await sio.emit('opponent_timeout', to=get_sid(room.opponent(username)))
     close_room(username)
 
@@ -341,9 +421,25 @@ async def login_validation(request: web.Request):
     return web.json_response({'status': 'error'})
 
 
+async def sign_up(request: web.Request):
+    """
+    sign up.
+    """
+    if request.body_exists:
+        data = await request.json()
+        if 'username' in data and 'password' in data and 'email' in data:
+            username = data.get('username')
+            password = data.get('password')
+            email = data.get('email')
+            return web.json_response({'status': hd.create_new_user(username, password, email)})
+    return web.json_response({'status': 400})
+
+
 app.add_routes([web.get('/', game_page),
                 web.get('/login', login),
+                web.get('/register', register),
                 web.post('/validate', login_validation),
+                web.post('/sign_up', sign_up),
                 web.static('/scripts', 'src/scripts'),
                 web.static('/styles', 'src/styles'),
                 web.static('/images', 'src/images')])
@@ -354,7 +450,8 @@ def main():
     main function.
     """
     stop_thread = False
-    thread = threading.Thread(target=check_for_timeout, args=(lambda: stop_thread,))
+    thread = threading.Thread(target=check_for_timeout,
+                              args=(lambda: stop_thread,))
     try:
         thread.start()
         web.run_app(app, port=5678)

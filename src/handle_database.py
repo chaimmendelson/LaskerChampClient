@@ -34,7 +34,7 @@ MIN_PASSWORD_L = 8
 HASH_LEN = 128
 
 # table structure.
-STRUCTURE = [
+STRUCTURE: list[str] = [
     f'{USERNAME} varchar({MAX_USERNAME_L}) unique not null primary key',
     f'{PASSWORD} varchar({HASH_LEN}) not null',
     f'{EMAIL} varchar({EMAIL_L}) unique not null',
@@ -45,8 +45,15 @@ STRUCTURE = [
     f'{CREATION_DATE} timestamp not null default now()'
 ]
 
-SQL_CURRENT_TIME = 'current_timestamp'
+SQL_CURRENT_TIME: str = 'current_timestamp'
 
+# error codes.
+INVALID_USERNAME: int = 471
+INVALID_PASSWORD: int = 472
+INVALID_EMAIL: int = 473
+
+USERNAME_EXISTS: int = 481
+EMAIL_EXISTS: int = 482
 
 def var(string):
     """
@@ -140,21 +147,21 @@ def is_email_valid(email: str) -> bool:
         return response.json().get('status') == "valid"
 
 
-def create_new_user(username: str, password: str, email: str) -> bool:
+def create_new_user(username: str, password: str, email: str) -> int:
     """
     add a new user to the database after verifying the username and password
     (the email will be verfied later).
     """
     if not is_username_valid(username):
-        return "invalid username"
+        return INVALID_USERNAME
     if does_exist(USERNAME, username):
-        return "username already exists"
+        return USERNAME_EXISTS
     if not is_password_valid(password):
-        return "invalid password"
+        return INVALID_PASSWORD
     if not is_email_valid(email):
-        return "invalid email"
+        return INVALID_EMAIL
     if does_exist(EMAIL, email):
-        return "email already exists"
+        return EMAIL_EXISTS
     db.insert_row(TABLE_NAME, {
         USERNAME: username,
         PASSWORD: hash_pass(password),
@@ -162,7 +169,7 @@ def create_new_user(username: str, password: str, email: str) -> bool:
         COOKIE: create_cookie(username),
         ELO: '1200'
     })
-    return "created successfully"
+    return 200
 
 
 def delete_user(username: str) -> None:
@@ -292,11 +299,7 @@ def main():
     """
     main function
     """
-    # reset_table()
-    # create_new_user('test', 'test1234', 'chaimm2005@gmail.com')
-    # create_new_user('test1', 'test1234', 'chaimke2005@gmail.com')
-    for _ in range(1000):
-        print(is_email_valid('a@gmail.com'))
+    reset_table()
 
 
 if __name__ == '__main__':

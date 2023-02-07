@@ -10,7 +10,11 @@
 }
 
 
-
+body{
+    overflow: hidden;
+    background-color: darkslategray;
+    padding: 5px;
+}
 
 #user_log_info{
     font-family: 'Courier New', Courier, monospace;

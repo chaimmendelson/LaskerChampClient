@@ -8,7 +8,8 @@ def execute_query(query: str, args: tuple = None) -> psycopg.cursor:
     """
     Execute a SQL query on the database and return the cursor object.
     """
-    conn_str = "dbname=chess_users user=postgres password=132005"
+    # dbname=chess_users user=postgres password=132005"
+    conn_str = "host=rogue.db.elephantsql.com dbname=cqscdcwf user=cqscdcwf password=5lgP45vTxWWrFN5d1nWiH98vnfaWgZ95"
     conn: psycopg.Connection = psycopg.connect(conn_str, autocommit=True)
     cursor = conn.execute(query, args)
     conn.close()
@@ -83,7 +84,6 @@ def main():
     """
     main function
     """
-
 
 if __name__ == '__main__':
     main()

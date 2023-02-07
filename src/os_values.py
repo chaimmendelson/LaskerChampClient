@@ -2,6 +2,9 @@
 for now, this is just a test file
 """
 
+from datetime import datetime
+
+
 def update_elo_tester():
     """
     RatA + K * (score - (1 / (1 + 10(RatB - RatA)/400)))
@@ -18,10 +21,13 @@ def update_elo_tester():
     print(p_new_elo)
     print(o_new_elo)
 
-
+ 
 def main():
     """
     main function
     """
+    current_time = datetime.now()
+    print(current_time.strftime('%H:%M:%S'))
+    
 if __name__ == '__main__':
     main()

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="styles/register.css">
+</head>
+
+<body>
+    <div id="form-container">
+        <form action="" class="form">
+            <div id="username_box" class="form_group">
+                <input type="text" id="username" class="form_input" placeholder="Username" required>
+            </div>
+            <div class="form_group" id="email_box">
+                <input type="email" id="email" class="form_input" placeholder="Email" required>
+            </div>
+            <div class="form_group" id="password_box">
+                <input type="password" id="password" class="form_input" placeholder="Password" required>
+            </div>
+            <div class="form_group">
+                <input type="checkbox" id="show_password" class="form_checkbox">
+                <label for="show_password" class="form_label">Show Password</label>
+            </div>
+            <div class="form_group">
+                <input type="submit" value="Sign Up" class="form_button">
+            </div>
+            <div class="form_group">
+                <span>Already have an account?</span>
+                <a href="login" class="form_link">Log In</a>
+            </div>
+        </form>
+    </div>
+    <script src="scripts/register.js"></script>
+</body>
+</html>
