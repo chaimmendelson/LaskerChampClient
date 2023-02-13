@@ -12,37 +12,53 @@
     <!-- <script src="https://unpkg.com/chess.js@1.0.0-beta.3/dist/chess.js" type="module"></script> -->
   </head>
   <body onresize='resizeBoard()'>  
-    <!-- box displays game information- PGN, STATUS, FEN -->
-    <div id="game_data_box">
+    <!-- box displays user info and logout button -->
+    <div id="user_data">
       <div id="user_info">
         username: <span id="username"></span>
         <br>
         rating: <span id="elo"></span>
       </div>
-      <div id="box">
-        <!-- Header for info box -->
-        <b>LaskerChamp Chess!</b><br>
-        The #1 chess site in the world and in the universe!
+      <br>
+      <div id="StatusDisplay">
+        STATUS: <span id="status"></span>
       </div>
+      <br>
+      <div>
+        <button id="logoutBtn">Logout</button>
+      </div>
+    </div>
+    <!-- create board -->
+    <div id="game_container">
+      <div id="player2-clock" class="clock">
+        <div id="player2-time"></div>
+      </div>
+
+      <div id="myBoard"></div>
+
+      <div id="player1-clock" class="clock">
+        <div id="player1-time"></div>
+      </div>
+    </div>
+    <!-- box displays game controls -->
+    <div id="game_controls">
+      <!-- copy info to computer clipboard -->
+      <div id="copyBtn">
+        <button id = "copy_fen" class="copy_btn">Copy FEN</button>
+        <button id = "copy_pgn" class="copy_btn">Copy PGN</button>
+      </div>
+      <br id="clearfix">
+      <div id="fenDisplay">
+        FEN: <span id="fen"></span>
+      </div>
+      <br>
       <div id="pgnText">
         PGN: <span id="pgn"></span>
       </div>
-        <br>
-      <div id="StatusDisplay">
-          STATUS: <span id="status"></span>
-      </div>
-        <br>
-      <div id="fenDisplay">
-          FEN: <span id="fen"></span>
-      </div>
       <br>
-      <!-- copy info to computer clipboard -->
-      <button id = "copy_fen" class="copy_btn">Copy FEN</button>
-      <button id = "copy_pgn" class="copy_btn">Copy PGN</button>
-      <span class="clear_fix"></span>
       <div id="game_control_buttons">
-        <button id="startBtn" class="chess_control">Start</button>
-        <button id="quitBtn" class="chess_control">Quit</button>
+        <button id="startBtn" class="gameBtn">Start</button>
+        <button id="quitBtn" class="gameBtn">Quit</button>
       </div>
       <!-- let the user select between online and engine -->
       <div id="game_mode">
@@ -56,21 +72,6 @@
       </div>
       <div id="engine_level_box">
         <input type="range" min="0" max="20" value="10" class="slider" id="engine_level">
-      </div>
-      <div>
-        <button id="logoutBtn">Logout</button>
-      </div>
-    </div>
-    <!-- create board -->
-    <div id="game_box">
-      <div id="player2-clock" class="clock">
-        <div id="player2-time"></div>
-      </div>
-
-      <div id="myBoard"></div>
-
-      <div id="player1-clock" class="clock">
-        <div id="player1-time"></div>
       </div>
     </div>
     <script src="scripts/chess.js"></script>

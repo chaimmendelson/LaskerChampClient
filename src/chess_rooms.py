@@ -164,6 +164,8 @@ class ChessRoom:
         resault = ['0.5', '0.5']
         if self.is_game_over():
             resault = self.board.result().split('-')
+            if resault[0] == '1/2':
+                resault = ['0.5', '0.5']
         return {self.players[0]: float(resault[0]), self.players[1]: float(resault[1])}
 
     def is_players_turn(self, player: str) -> bool:

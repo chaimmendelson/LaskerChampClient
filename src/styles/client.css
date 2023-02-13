@@ -8,31 +8,48 @@ button:hover{
 button:active{
     cursor: grabbing;
 }
+
+.gameBtn{
+    width: 100%;
+    padding: 5px;
+    border-radius: 5px;
+}
+
 .clearfix {
     clear: both;
 }
 
-.chess_control{
-    width: 100%;
-}
-.chess_control:active{
-    background-color: gray;
+body{
+    overflow: hidden;
+    background-color: darkslategray;
+    padding: 5px;
 }
 
-#game_data_box{
-    width: 20%;
-    min-width: 200px;
+#user_data{
+    width: 15%;
+    min-width: 100px;
     background-color: gray;
     border-radius: 20px;
     padding: 10px;
     float: left;
 }
 
-#game_box{
+#game_container{
     width: 35%;
     min-width: 300px;
     float: left;
-    margin-left: 5%;
+    margin-left: 10%;
+}
+
+#game_controls{
+    width: 20%;
+    min-width: 200px;
+    background-color: gray;
+    border-radius: 20px;
+    padding: 10px;
+    float: right;
+    margin-right: 5%;
+    margin-top: 5%;
 }
 
 #myBoard{
@@ -59,6 +76,7 @@ button:active{
 #pgnText{
     height: 100px;
     border:5px mediumblue solid;
+    padding: 5px;
     overflow-y:auto;
     background-color: black;
     color:lime;
@@ -71,6 +89,8 @@ button:active{
     font-family: 'Courier New', Courier, monospace;
     background-color: lightseagreen;
 }
+
+
 #fenDisplay{
     height: 50px;
     padding: 5px;
@@ -85,6 +105,10 @@ button:active{
 .copy_btn{
     width: fit-content;
     border: 2px solid black;
+}
+
+#quitBtn{
+    display: none;
 }
 #copy_fen{
     float: left;
@@ -142,10 +166,4 @@ button:active{
 #game_mode{
     width: fit-content;
     margin: 10px auto;
-}
-
-body{
-    overflow: hidden;
-    background-color: darkslategray;
-    padding: 5px;
 }

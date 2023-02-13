@@ -39,8 +39,6 @@ let squareClass = 'square-55d63'
 let whiteSquareClass = 'white-1e1d7'
 let blackSquareClass = 'black-3c85d'
 
-document.getElementById('quitBtn').style.display = 'none';
-
 
 function specificSquareClass(square){
     return '.square-' + square;
@@ -273,8 +271,9 @@ socket.on('user_data', (data) => {
 socket.on('opponent_move', (data) => {
     let move = {from: data['src'], to: data['dst']};
     moveToHighlight = move;
+    console.log(data);
     if (data['promotion']){
-        move[promotion] = data['promotion']
+        move['promotion'] = data['promotion']
     }
     game.move(move);
     board.position(game.fen())
@@ -313,8 +312,8 @@ async function quit_game(){
 }
 
 // Initial time for each player (in seconds)
-const player1Time = 60;
-const player2Time = 60;
+const player1Time = 0;
+const player2Time = 0;
 
 // Variables to keep track of the current time remaining for each player
 let player1TimeRemaining = player1Time;
@@ -409,4 +408,9 @@ document.getElementById('logoutBtn').addEventListener('click', function() {
 function resizeBoard(){
     board.resize();
 };
-formatClock();
+
+window.onload = (e) => {
+    formatClock();
+    resetSquareColor();
+    resizeBoard();
+};
