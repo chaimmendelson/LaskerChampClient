@@ -9,6 +9,7 @@ import socketio
 from aiohttp import web
 from chess_rooms import EngineRoom, PlayerRoom, ChessRoom
 import handle_database as hd
+import os
 
 sio = socketio.AsyncServer()
 app = web.Application()
@@ -487,7 +488,7 @@ def main():
                               args=(lambda: stop_thread,))
     try:
         thread.start()
-        web.run_app(app, port=5678)
+        web.run_app(app, port=os.getenv('PORT'))
     except KeyboardInterrupt:
         pass
     stop_thread = True
