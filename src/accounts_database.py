@@ -81,13 +81,3 @@ def delete_row(table_name: str, where: str) -> None:
     """
     query = f"DELETE FROM {table_name} WHERE {where};"
     execute_query(query)
-
-
-def main():
-    """
-    main function
-    """
-
-
-if __name__ == '__main__':
-    main()

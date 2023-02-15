@@ -274,33 +274,3 @@ def reset_table():
     """
     db.reset_table(TABLE_NAME, STRUCTURE)
 
-
-def test():
-    """
-    test the functions
-    """
-    username = 'test1'
-    password = 'test12345'
-
-    create_new_user(username, password, 'chaimm2005@gmail.com')
-
-    update_elo(username, 1300)
-    assert get_value(username, ELO) == 1300
-
-    update_password(username, password, 'test123456')
-    assert get_value(username, PASSWORD) == hash_pass('test123456')
-
-    password = 'test123456'
-
-    delete_user(username)
-
-
-def main():
-    """
-    main function
-    """
-    reset_table()
-
-
-if __name__ == '__main__':
-    main()

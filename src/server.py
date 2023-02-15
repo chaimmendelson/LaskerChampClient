@@ -450,14 +450,25 @@ async def sign_up(request: web.Request):
     return web.json_response({'status': 400})
 
 
-app.add_routes([web.get('/', game_page),
-                web.get('/login', login),
-                web.get('/register', register),
-                web.post('/validate', login_validation),
-                web.post('/sign_up', sign_up),
-                web.static('/scripts', 'src/scripts'),
-                web.static('/styles', 'src/styles'),
-                web.static('/images', 'src/images')])
+async def pong(request: web.Request):
+    """
+    Serve the client-side application.
+    """
+    print(request)
+    return web.json_response({'status': 'ok'}, text='pong')
+
+
+app.add_routes([
+    web.get('/', game_page),
+    web.get('/login', login),
+    web.get('/register', register),
+    web.post('/validate', login_validation),
+    web.post('/sign_up', sign_up),
+    web.static('/scripts', 'src/scripts'),
+    web.static('/styles', 'src/styles'),
+    web.static('/images', 'src/images'),
+    web.get('/ping', pong),
+])
 
 
 def print(line: str):
