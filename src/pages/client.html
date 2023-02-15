@@ -11,7 +11,7 @@
     <!-- <script>var exports = {};</script> -->
     <!-- <script src="https://unpkg.com/chess.js@1.0.0-beta.3/dist/chess.js" type="module"></script> -->
   </head>
-  <body onresize='resizeBoard()'>  
+  <body onresize='resizeBoard()' class="unselectable">  
     <!-- box displays user info and logout button -->
     <div id="user_data">
       <div id="user_info">
@@ -23,42 +23,12 @@
       <div id="StatusDisplay">
         STATUS: <span id="status"></span>
       </div>
-      <br>
-      <div>
-        <button id="logoutBtn">Logout</button>
-      </div>
-    </div>
-    <!-- create board -->
-    <div id="game_container">
-      <div id="player2-clock" class="clock">
-        <div id="player2-time"></div>
-      </div>
-
-      <div id="myBoard"></div>
-
-      <div id="player1-clock" class="clock">
-        <div id="player1-time"></div>
-      </div>
-    </div>
-    <!-- box displays game controls -->
-    <div id="game_controls">
-      <!-- copy info to computer clipboard -->
-      <div id="copyBtn">
-        <button id = "copy_fen" class="copy_btn">Copy FEN</button>
-        <button id = "copy_pgn" class="copy_btn">Copy PGN</button>
-      </div>
-      <br id="clearfix">
-      <div id="fenDisplay">
-        FEN: <span id="fen"></span>
-      </div>
-      <br>
-      <div id="pgnText">
-        PGN: <span id="pgn"></span>
-      </div>
-      <br>
       <div id="game_control_buttons">
         <button id="startBtn" class="gameBtn">Start</button>
         <button id="quitBtn" class="gameBtn">Quit</button>
+      </div>
+      <div>
+        <button id="flipBtn" class="gameBtn">Flip Board</button>
       </div>
       <!-- let the user select between online and engine -->
       <div id="game_mode">
@@ -72,6 +42,57 @@
       </div>
       <div id="engine_level_box">
         <input type="range" min="0" max="20" value="10" class="slider" id="engine_level">
+      </div>
+      <div>
+        <button id="logoutBtn">Logout</button>
+      </div>
+    </div>
+    <!-- create board -->
+    <div id="game_container">
+      <div id="player2-clock" class="clock">
+        <div id="player2-time"></div>
+      </div>
+      <div id="myBoard"></div>
+      <div id="player1-clock" class="clock">
+        <div id="player1-time"></div>
+      </div>
+      <div id="crownOpt">
+        <div id="blackCrownOpt" class="colorCrownOpt">
+          <button id="bQueen" class="crownBtn"  onclick="crowning('q')">
+            <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\bQ.png" alt="Q" width="20" height="20">
+          </button>
+          <button id="bRook" class="crownBtn" onclick="crowning('r')">
+            <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\bR.png" alt="R" width="20" height="20">
+          </button>
+          <button id="bBishop"class="crownBtn" onclick="crowning('b')">
+            <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\bB.png" alt="B" width="20" height="20">
+          </button>
+          <button id="bKnight" class="crownBtn" onclick="crowning('n')">
+            <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\bN.png" alt="N" width="20" height="20">
+          </button>
+        </div>
+        <div id="whiteCrownOpt" class="colorCrownOpt">
+          <button id="wQueen" class="crownBtn" onclick="crowning('q')">
+            <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\wQ.png" alt="Q" width="20" height="20">
+          </button>
+          <button id="wRook" class="crownBtn" onclick="crowning('r')">
+            <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\wR.png" alt="R" width="20" height="20">
+          </button>
+          <button id="wBishop" class="crownBtn" onclick="crowning('b')">
+            <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\wB.png" alt="B" width="20" height="20">
+          </button>
+          <button id="wKnight" class="crownBtn" onclick="crowning('n')">
+            <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\wN.png" alt="N" width="20" height="20">
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- box displays game controls -->
+    <div id="game_controls">
+      <!-- copy info to computer clipboard -->
+      <div id="pgnDisplay" onmouseover='show_copy_btn()' onmouseout='hide_copy_btn()'>
+        <button id="pgnBtn">C</button>
+        <pre id="pgnText"></pre>
       </div>
     </div>
     <script src="scripts/chess.js"></script>

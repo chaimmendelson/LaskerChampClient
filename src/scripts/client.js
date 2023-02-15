@@ -22,14 +22,16 @@ let game = null
 let can_move = false;
 
 let $status = $('#status')
-let $fen = $('#fen')
-let $pgn = $('#pgn')
+let $pgn = $('#pgnText')
 
 let whiteSquareColour = 'mintcream'
 let blackSquareColour = 'green'
 
 let whiteSquareGrey = 'grey'
 let blackSquareGrey = 'dimgrey'
+
+let whiteSquarePreMove = 'tomato'
+let blackSquarePreMove = 'orangered'
 
 let whiteSquareHighlight = 'yellow'
 let blackSquareHighlight = 'gold'
@@ -39,6 +41,10 @@ let squareClass = 'square-55d63'
 let whiteSquareClass = 'white-1e1d7'
 let blackSquareClass = 'black-3c85d'
 
+let waitingForCrowning = false;
+let crowningMove = null;
+
+let move_stack = [];
 
 function specificSquareClass(square){
     return '.square-' + square;
@@ -62,11 +68,24 @@ function resetSquareColor(){
     $board.find('.' + whiteSquareClass).css('background', whiteSquareColour)
     $board.find('.' + blackSquareClass).css('background', blackSquareColour)
     if (moveToHighlight) highlightMove();
+    highlightPreMove();
 }
 
 function highlightSquare(square){
     let background = isWhiteSquare(square) ? whiteSquareHighlight : blackSquareHighlight;
     $board.find(specificSquareClass(square)).css('background', background)
+}
+
+function highlightPreMoveSquare(square){
+    let background = isWhiteSquare(square) ? whiteSquarePreMove : blackSquarePreMove;
+    $board.find(specificSquareClass(square)).css('background', background)
+}
+
+function highlightPreMove(){
+    for (let i = 0; i < move_stack.length; i++){
+        highlightPreMoveSquare(move_stack[i].from);
+        highlightPreMoveSquare(move_stack[i].to);
+    }
 }
 
 function highlightMove() {
@@ -100,19 +119,33 @@ function onDragStart (source, piece, position, orientation) {
     return isPlyersPiece(piece)
 }
 
-function validateMove(source, target) {
+function crowning(piece){
+    document.getElementById('blackCrownOpt').style.display = 'none';
+    document.getElementById('whiteCrownOpt').style.display = 'none';
+    if (waitingForCrowning){
+        crowningMove.promotion = piece;
+        commit_move(crowningMove);
+        board.position(game.fen());
+        waitingForCrowning = false;
+    }
+}
+
+function validateMove(source, target) 
+{
     let validMoves = game.moves({ verbose: true });
     let move = validMoves.find(move => move.from === source && move.to === target);
-    let promotion = '';
     if (!move) return null;
-    if ('promotion' in move) {
-        let validPromotions = ['q', 'r', 'b', 'n'];
-        promotion = prompt(`Please enter a promotion piece (${validPromotions.join(', ')}):`);
-        while (!validPromotions.includes(promotion)) {
-            promotion = prompt(`Invalid promotion piece. Please enter a valid promotion piece (${validPromotions.join(', ')}):`);
-        }
+    if ('promotion' in move) 
+    {
+        can_move = false;
+        waitingForCrowning = true;
+        crowningMove = {from: source, to: target}
+        if (players_color === 'white') 
+            document.getElementById('whiteCrownOpt').style.display = 'block';
+        else 
+            document.getElementById('blackCrownOpt').style.display = 'block';
     }
-    return { from: source, to: target, promotion: promotion};
+    return {from: source, to: target, promotion: ''};
 }
 
 
@@ -127,6 +160,11 @@ function onDrop(source, target) {
     if (!move || !can_move) {
         return 'snapback';
     }
+    if (!waitingForCrowning)
+        commit_move(move);
+}
+
+function commit_move(move){
     moveToHighlight = move;
     game.move(move);
     updateGame();
@@ -159,8 +197,27 @@ function updateStatus () {
         }
     }
     $status.html(status)
-    $fen.html(game.fen())
-    $pgn.html(game.pgn())
+    update_pgn();
+}
+
+function update_pgn(){
+    // the pgn is a string '1. e2 e4 2. e7 e5'
+    // we want to display it as a table
+    let pgn = game.pgn();
+    let lines = pgn.split(' ');
+    let pgn_lines = [];
+    let line = '';
+    for (let i = 0; i < lines.length; i++)
+    {
+        if (i % 3 === 0 && i !== 0)
+        {
+            pgn_lines.push(line);
+            line = '';
+        }
+        line += lines[i].padEnd(8);
+    }
+    pgn_lines.push(line);
+    $pgn.html(pgn_lines.join('\n'));
 }
 
 // check legal moves and highlight legal moves
@@ -203,13 +260,8 @@ let config = {
 }
 
 // copying logged info to clipboard
-//FEN
-document.getElementById('copy_fen').addEventListener('click', function() {
-    if (game) navigator.clipboard.writeText(game.fen());
-});
-
 //PGN
-document.getElementById('copy_pgn').addEventListener('click', function() {
+document.getElementById('pgnBtn').addEventListener('click', function() {
     if (game) navigator.clipboard.writeText(game.pgn());
 });
 
@@ -271,7 +323,6 @@ socket.on('user_data', (data) => {
 socket.on('opponent_move', (data) => {
     let move = {from: data['src'], to: data['dst']};
     moveToHighlight = move;
-    console.log(data);
     if (data['promotion']){
         move['promotion'] = data['promotion']
     }
@@ -407,10 +458,84 @@ document.getElementById('logoutBtn').addEventListener('click', function() {
 
 function resizeBoard(){
     board.resize();
+    resetSquareColor();
 };
+
+function show_copy_btn(){
+    document.getElementById('pgnBtn').style.display = 'block';
+}
+
+function hide_copy_btn(){
+    document.getElementById('pgnBtn').style.display = 'none';
+}
+
+function get_all_moves(square){
+    // get all the moves a the piece on the square could have done if the board was empty
+    let piece = game.get(square);
+    let test_game = new Chess();
+    test_game.clear();
+    test_game.put(piece, square);
+    if (piece === null){
+        return moves;
+    }
+    let moves = test_game.moves({square: square, verbose: true});
+    // replace each move with only the to square
+    for (let i = 0; i < moves.length; i++){
+        moves[i] = moves[i].to;
+    }
+    if (piece.type === 'p'){
+        up_or_down = piece.color === 'w' ? 1 : -1;
+        moves.push(String.fromCharCode(square.charCodeAt(0) + 1) + (parseInt(square[1]) + up_or_down));
+        moves.push(String.fromCharCode(square.charCodeAt(0) - 1) + (parseInt(square[1]) + up_or_down));
+    }
+    // add castling moves if the piece is a king and its allowed
+    if (piece.type === 'k'){
+        castling_rights = game.fen().split(' ')[2];
+        if (players_color === 'white'){
+            if (castling_rights.includes('K')) moves.push('g1');
+            if (castling_rights.includes('Q')) moves.push('c1');
+        } else {
+            if (castling_rights.includes('k')) moves.push('g8');
+            if (castling_rights.includes('q')) moves.push('c8');
+        }
+    }
+    // remove duplicates
+    moves = moves.filter((move, index) => moves.indexOf(move) === index);
+    let all_moves = [];
+    for (let i = 0; i < moves.length; i++){
+        let move = moves[i];
+        let promotion = null;
+        if (piece.type === 'p' && (move[1] === '8' || move[1] === '1')){
+            promotion = 'q';
+        }
+        all_moves.push({from: square, to: move, promotion: promotion});
+    }
+    return all_moves;
+}
+
+
+document.getElementById('flipBtn').addEventListener('click', function() {
+    board.flip();
+    resetSquareColor();
+});
+
 
 window.onload = (e) => {
     formatClock();
     resetSquareColor();
     resizeBoard();
+    // board = ChessBoard('myBoard', config);
+    // game = new Chess();
+    // board.position(game.fen());
+    // move_stack.push(get_all_moves('e1')[4]);
+    // resetSquareColor();
+    // game = new Chess();
+    // game.put({type: 'p', color: 'w'}, 'e7');
+    // board.position(game.fen());
+    // let moves = get_all_moves('e1');
+    // // grey all the squares that the piece on e7 could move to
+    // greySquare('e1');
+    // for (let i = 0; i < moves.length; i++){
+    //     greySquare(moves[i].to);
+    // }
 };

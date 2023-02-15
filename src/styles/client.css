@@ -9,13 +9,26 @@ button:active{
     cursor: grabbing;
 }
 
+.crownBtn{
+    width: fit-content;
+    float: left;
+}
+.unselectable {
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 .gameBtn{
     width: 100%;
     padding: 5px;
     border-radius: 5px;
+    margin-bottom: 5px;
 }
 
-.clearfix {
+.clearfix{
     clear: both;
 }
 
@@ -27,7 +40,7 @@ body{
 
 #user_data{
     width: 15%;
-    min-width: 100px;
+    min-width: 150px;
     background-color: gray;
     border-radius: 20px;
     padding: 10px;
@@ -42,8 +55,8 @@ body{
 }
 
 #game_controls{
-    width: 20%;
-    min-width: 200px;
+    width: 16%;
+    min-width: 150px;
     background-color: gray;
     border-radius: 20px;
     padding: 10px;
@@ -73,33 +86,36 @@ body{
 #chess-clock{
     width: 100%;    
 }
-#pgnText{
-    height: 100px;
-    border:5px mediumblue solid;
+
+#pgnBtn{
+    position: relative;
+    float: right;
+    display: None;
+}
+#pgnDisplay{
+    height: 400px;
+    border:1px black solid;
     padding: 5px;
     overflow-y:auto;
-    background-color: black;
-    color:lime;
+    background-color:black;
+    border-radius: 20px;
+    color: cornsilk;
     font-family: 'Courier New', Courier, monospace;
+    font-size: large;
 }
+
+
 #StatusDisplay{
     padding:6px;
     border:5px black solid;
+    min-height: 50px;
     font-size: small;
     font-family: 'Courier New', Courier, monospace;
     background-color: lightseagreen;
 }
 
-
-#fenDisplay{
-    height: 50px;
-    padding: 5px;
-    border:5px mediumblue solid;
-    font-size: xx-small;
-    overflow-x: auto;
-    background-color: black;
-    color:lime;
-    font-family: 'Courier New', Courier, monospace;
+#copyBtns{
+    margin-bottom: 10px;
 }
 
 .copy_btn{
@@ -109,13 +125,6 @@ body{
 
 #quitBtn{
     display: none;
-}
-#copy_fen{
-    float: left;
-}
-
-#copy_pgn{
-    float: right;
 }
 
 .clock{
@@ -166,4 +175,17 @@ body{
 #game_mode{
     width: fit-content;
     margin: 10px auto;
+}
+
+.colorCrownOpt{
+    width: fit-content;
+    margin: 10px auto;
+}
+
+#blackCrownOpt{
+    display: none;
+}
+
+#whiteCrownOpt{
+    display: none;
 }

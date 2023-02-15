@@ -114,9 +114,8 @@ def calc_new_elo(player, player_elo, opponent_elo, player_score):
     """
     calculate the new elo of the player.
     """
-    k_val = 400 / (int(hd.get_value(player, hd.GAMES_PLAYED)) + 16)
-    elo_gain = k_val * \
-        (player_score - (1 / (1 + 10 ** ((opponent_elo - player_elo) / 400))))
+    k_val = (400 / (int(hd.get_value(player, hd.GAMES_PLAYED)))) + 16
+    elo_gain = k_val * (player_score - (1 / (1 + 10 ** ((opponent_elo - player_elo) / 400))))
     return player_elo + elo_gain
 
 
