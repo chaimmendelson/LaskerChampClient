@@ -215,5 +215,5 @@ class PlayerRoom(ChessRoom):
     """
 
     def __init__(self, player1: str, player2: str, time_limit: int = 10, bonus_time: int = 0):
-        super().__init__(player1, player2, time_limit, bonus_time)
+        super().__init__(player1.username, player2.username, time_limit, bonus_time)
         self.time_limit = time_limit
