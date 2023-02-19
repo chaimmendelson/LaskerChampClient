@@ -16,3 +16,20 @@ def validate_move(move: str) -> dict[str, str] | None:
     if len(move) == 5:
         move_d.update(promotion=move[4])
     return move_d
+
+def print(line: str):
+    """
+    write the given line to the file 'output.txt'.
+    """
+    # pylint: disable=redefined-builtin
+    # add the line to the file 'output.txt'
+    with open('src/output.txt', 'a', encoding='utf-8') as output_file:
+        output_file.write(str(line) + '\n')
+
+
+def clear_file():
+    """
+    clear the file 'output.txt'.
+    """
+    with open('src/output.txt', 'w', encoding='utf-8') as output_file:
+        output_file.write('')

@@ -17,6 +17,13 @@ app = web.Application()
 sio.attach(app)
 
 
+async def send_elo(client: con.Client):
+    """
+    send the given username's elo to the client.
+    """
+    await sio.emit('update_elo', {'elo': client.elo}, to=client.sid)
+
+
 async def send_clock_update(client: con.Client):
     """
     send the clock update to the given username.
@@ -29,8 +36,8 @@ async def send_clock_update(client: con.Client):
     await sio.emit('clock_update', clocks, to=client.sid)
     if not con.is_engine_room(room):
         await sio.emit('clock_update', clocks, to=con.get_oppoent(client).sid)
-        
-        
+
+
 async def handle_game_over(client: con.Client, move: dict[str, str]):
     """
     handle the game over event.
@@ -56,13 +63,6 @@ async def send_move_to_opponent(client: con.Client, move_d: dict[str, str]):
     await sio.emit('opponent_move', move_d, to=client.sid)
     client.room.start_clock()
     await send_clock_update(client)
-
-
-async def send_elo(client: con.Client):
-    """
-    send the given username's elo to the client.
-    """
-    await sio.emit('update_elo', {'elo': client.elo}, to=client.sid)
 
 
 async def handle_quit(client: con.Client) -> None:
@@ -247,29 +247,10 @@ app.add_routes([
 ])
 
 
-def print(line: str):
-    """
-    write the given line to the file 'output.txt'.
-    """
-    # pylint: disable=redefined-builtin
-    # add the line to the file 'output.txt'
-    with open('src/output.txt', 'a', encoding='utf-8') as output_file:
-        output_file.write(str(line) + '\n')
-
-
-def clear_file():
-    """
-    clear the file 'output.txt'.
-    """
-    with open('src/output.txt', 'w', encoding='utf-8') as output_file:
-        output_file.write('')
-
-
 def main():
     """
     main function.
     """
-    clear_file()
     stop_thread = False
     thread = threading.Thread(target=check_for_timeout,
                               args=(lambda: stop_thread,))

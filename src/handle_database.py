@@ -55,6 +55,7 @@ INVALID_EMAIL: int = 473
 USERNAME_EXISTS: int = 481
 EMAIL_EXISTS: int = 482
 
+
 def var(string):
     """
     turn a string into a sql formatted variable.
@@ -122,7 +123,7 @@ def is_password_valid(password: str) -> bool:
     if MIN_PASSWORD_L <= len(password) <= MAX_PASSWORD_L:
         if password.isalnum():
             return any(char.isdigit() for char in password) and \
-                    any(char.islower() for char in password)
+                any(char.islower() for char in password)
     return False
 
 
@@ -137,10 +138,10 @@ def is_email_valid(email: str) -> bool:
     # make a do while loop.
     while True:
         response = requests.get(
-                                url="https://isitarealemail.com/api/email/validate",
-                                params={'email': email},
-                                timeout=5,
-                                )
+            url="https://isitarealemail.com/api/email/validate",
+            params={'email': email},
+            timeout=5,
+        )
         if response.status_code == 429:
             time.sleep(1)
             continue
@@ -273,4 +274,3 @@ def reset_table():
     reset the table and insert default users
     """
     db.reset_table(TABLE_NAME, STRUCTURE)
-

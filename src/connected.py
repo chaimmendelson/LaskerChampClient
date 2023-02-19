@@ -77,7 +77,7 @@ def get_oppoent(client: Client) -> Client:
     """
     get the opponent of the given client.
     """
-    return client.room.opponent(client.username)
+    return get_client(username=client.room.opponent(client.username))
 
 
 def close_room(client: Client) -> None:
@@ -128,6 +128,6 @@ def update_elo(score_dict: dict[Client, str]):
     """
     player1, player2 = tuple(score_dict.keys())
     player1_elo, player2_elo = player1.elo, player2.elo
-    player1_score, player2_score = score_dict[player1.username], score_dict[player2.username]
+    player1_score, player2_score = score_dict[player1], score_dict[player2]
     player1.update_elo(player2_elo, player1_score)
     player2.update_elo(player1_elo, player2_score)
