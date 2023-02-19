@@ -80,4 +80,4 @@ async def pong(request: web.Request):
     Serve the client-side application.
     """
     print(request)
-    return web.json_response({'status': 'ok'}, text='pong')
+    return web.json_response(text='pong')

@@ -261,7 +261,7 @@ def main():
         pass
     stop_thread = True
     thread.join()
-    print('the server has been shut down')
+    print('The server has been shut down')
 
 
 if __name__ == '__main__':
