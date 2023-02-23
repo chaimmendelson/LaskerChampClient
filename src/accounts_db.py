@@ -7,7 +7,7 @@ from datetime import datetime
 import re
 import time
 import requests
-import accounts_database as db
+import execute_sql as db
 
 # the name of the table.
 TABLE_NAME = 'accounts'
@@ -53,7 +53,7 @@ INVALID_PASSWORD: int = 472
 INVALID_EMAIL: int = 473
 
 USERNAME_EXISTS: int = 481
-EMAIL_EXISTS: int = 482
+EMAIL_EXISTS: int = 483
 
 
 def var(string):

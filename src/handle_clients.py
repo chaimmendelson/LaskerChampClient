@@ -2,7 +2,7 @@
 handle the connected users.
 """
 from chess_rooms import PlayerRoom, EngineRoom
-import handle_database as hd
+import accounts_db as hd
 CHESS_ROOMS: list[PlayerRoom | EngineRoom] = []
 
 

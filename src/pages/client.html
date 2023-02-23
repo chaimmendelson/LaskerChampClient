@@ -13,89 +13,111 @@
   </head>
   <body onresize='resizeBoard()' class="unselectable">  
     <!-- box displays user info and logout button -->
-    <div id="user_data">
-      <div id="user_info">
-        username: <span id="username"></span>
+    <div id="container">
+      <div id="user_data">
+        <div id="user_info">
+          username: <span id="username"></span>
+          <br>
+          rating: <span id="elo"></span>
+        </div>
         <br>
-        rating: <span id="elo"></span>
-      </div>
-      <br>
-      <div id="StatusDisplay">
-        STATUS: <span id="status"></span>
-      </div>
-      <div id="game_control_buttons">
-        <button id="startBtn" class="gameBtn">Start</button>
-        <button id="quitBtn" class="gameBtn">Quit</button>
-      </div>
-      <div>
-        <button id="flipBtn" class="gameBtn">Flip Board</button>
-      </div>
-      <!-- let the user select between online and engine -->
-      <div id="game_mode">
-        <input type="radio" id="engine" name="game_mode" value="engine" checked>
-        <label for="engine">Engine</label>
-        <input type="radio" id="online" name="game_mode" value="online">
-        <label for="online">Online</label>
-      </div>
-      <div id="level_display">
-        Level: 10
-      </div>
-      <div id="engine_level_box">
-        <input type="range" min="0" max="20" value="10" class="slider" id="engine_level">
-      </div>
-      <div>
-        <button id="logoutBtn">Logout</button>
-      </div>
-    </div>
-    <!-- create board -->
-    <div id="game_container">
-      <div id="player2-clock" class="clock">
-        <div id="player2-time"></div>
-      </div>
-      <div id="myBoard"></div>
-      <div id="player1-clock" class="clock">
-        <div id="player1-time"></div>
-      </div>
-      <div id="crownOpt">
-        <div id="blackCrownOpt" class="colorCrownOpt">
-          <button id="bQueen" class="crownBtn"  onclick="crowning('q')">
-            <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\bQ.png" alt="Q" width="20" height="20">
-          </button>
-          <button id="bRook" class="crownBtn" onclick="crowning('r')">
-            <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\bR.png" alt="R" width="20" height="20">
-          </button>
-          <button id="bBishop"class="crownBtn" onclick="crowning('b')">
-            <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\bB.png" alt="B" width="20" height="20">
-          </button>
-          <button id="bKnight" class="crownBtn" onclick="crowning('n')">
-            <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\bN.png" alt="N" width="20" height="20">
-          </button>
+        <div id="StatusDisplay">
+          STATUS: <span id="status"></span>
         </div>
-        <div id="whiteCrownOpt" class="colorCrownOpt">
-          <button id="wQueen" class="crownBtn" onclick="crowning('q')">
-            <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\wQ.png" alt="Q" width="20" height="20">
-          </button>
-          <button id="wRook" class="crownBtn" onclick="crowning('r')">
-            <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\wR.png" alt="R" width="20" height="20">
-          </button>
-          <button id="wBishop" class="crownBtn" onclick="crowning('b')">
-            <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\wB.png" alt="B" width="20" height="20">
-          </button>
-          <button id="wKnight" class="crownBtn" onclick="crowning('n')">
-            <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\wN.png" alt="N" width="20" height="20">
-          </button>
+        <div id="game_control_buttons">
+          <button id="startBtn" class="gameBtn">Start</button>
+          <button id="quitBtn" class="gameBtn">Quit</button>
+        </div>
+        <div>
+          <button id="flipBtn" class="gameBtn">Flip Board</button>
+        </div>
+        <!-- create a table with 2 columns -->
+        <table id="settings">
+          <tr>
+            <td>Premove: </td>
+            <td>
+              <label class="switch">
+                <input type="checkbox" id="preMove" checked>
+                <span class="settingsSlider round"></span>
+              </label>
+            </td>
+          </tr><tr>
+            <td>Auto-Queen: </td>
+            <td>
+              <label class="switch">
+                <input type="checkbox" id="autoQueen" checked>
+                <span class="settingsSlider round"></span>
+              </label>
+          </tr>
+        </table>
+        <!-- let the user select between online and engine -->
+        <div id="game_mode">
+          <input type="radio" id="engine" name="game_mode" value="engine" checked>
+          <label for="engine">Engine</label>
+          <input type="radio" id="online" name="game_mode" value="online">
+          <label for="online">Online</label>
+        </div>
+        <div id="level_display">
+          Level: 10
+        </div>
+        <div id="engine_level_box">
+          <input type="range" min="0" max="20" value="10" class="slider" id="engine_level">
+        </div>
+        <div>
+          <button id="logoutBtn">Logout</button>
         </div>
       </div>
-    </div>
-    <!-- box displays game controls -->
-    <div id="game_controls">
-      <!-- copy info to computer clipboard -->
-      <div id="pgnDisplay" onmouseover='show_copy_btn()' onmouseout='hide_copy_btn()'>
-        <button id="pgnBtn">C</button>
-        <pre id="pgnText"></pre>
+      <!-- create board -->
+      <div id="game_container">
+        <div id="player2-clock" class="clock">
+          <div id="player2-time"></div>
+        </div>
+        <div id="myBoard"></div>
+        <div id="player1-clock" class="clock">
+          <div id="player1-time"></div>
+        </div>
+        <div id="crownOpt">
+          <div id="blackCrownOpt" class="colorCrownOpt">
+            <button id="bQueen" class="crownBtn"  onclick="crowning('q')">
+              <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\bQ.png" alt="Q" width="20" height="20">
+            </button>
+            <button id="bRook" class="crownBtn" onclick="crowning('r')">
+              <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\bR.png" alt="R" width="20" height="20">
+            </button>
+            <button id="bBishop"class="crownBtn" onclick="crowning('b')">
+              <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\bB.png" alt="B" width="20" height="20">
+            </button>
+            <button id="bKnight" class="crownBtn" onclick="crowning('n')">
+              <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\bN.png" alt="N" width="20" height="20">
+            </button>
+          </div>
+          <div id="whiteCrownOpt" class="colorCrownOpt">
+            <button id="wQueen" class="crownBtn" onclick="crowning('q')">
+              <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\wQ.png" alt="Q" width="20" height="20">
+            </button>
+            <button id="wRook" class="crownBtn" onclick="crowning('r')">
+              <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\wR.png" alt="R" width="20" height="20">
+            </button>
+            <button id="wBishop" class="crownBtn" onclick="crowning('b')">
+              <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\wB.png" alt="B" width="20" height="20">
+            </button>
+            <button id="wKnight" class="crownBtn" onclick="crowning('n')">
+              <img src="images\chessboardjs-1.0.0\img\chesspieces\wikipedia\wN.png" alt="N" width="20" height="20">
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- box displays game controls -->
+      <div id="game_controls">
+        <!-- copy info to computer clipboard -->
+        <div id="pgnDisplay" onmouseover='show_copy_btn()' onmouseout='hide_copy_btn()'>
+          <button id="pgnBtn">C</button>
+          <pre id="pgnText"></pre>
+        </div>
       </div>
     </div>
     <script src="scripts/chess.js"></script>
     <script src="scripts/client.js"></script>
+    <script src="scripts/handleBoard.js"></script>
   </body>
 </html>

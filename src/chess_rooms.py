@@ -2,9 +2,8 @@
 chess room class and chess clocks for the server
 """
 
-import time
+from time import time
 from random import shuffle
-import chess.engine
 import chess
 from stockfish import Stockfish
 
@@ -29,7 +28,7 @@ class ChessClock(object):
         """
         save the current time as the start time
         """
-        self.start_time = time.time()
+        self.start_time = time()
 
     def get_time_used(self) -> float:
         """
@@ -37,7 +36,7 @@ class ChessClock(object):
         """
         if self.start_time is None:
             return 0
-        return time.time() - self.start_time
+        return time() - self.start_time
 
     def stop(self) -> None:
         """
