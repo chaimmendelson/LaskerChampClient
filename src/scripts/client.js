@@ -38,7 +38,7 @@ socket.on('pong', () => {
 socket.on('clock_update', (data) => {
     // the format is {white: seconds, black: seconds}
     // change the clocks to reflect the new time
-    if (playerColor === 'white') {
+    if (playerColor === WHITE) {
         player1TimeRemaining = data['white'];
         player2TimeRemaining = data['black'];
     }
@@ -79,7 +79,7 @@ socket.on('opponent_move', (data) => {
     game.move(move);
     nextPlayer();
     updateTurn();
-    updateBoard();
+    resetPosition();
     if (usePreGame) try_pre_move();
 })
 
@@ -202,7 +202,6 @@ document.getElementById('logoutBtn').addEventListener('click', function() {
 
 function resizeBoard(){
     board.resize();
-    resetSquareColor();
 };
 
 function show_copy_btn(){
@@ -217,7 +216,6 @@ function hide_copy_btn(){
 document.getElementById('preMove').addEventListener('change', function() {
     usePreGame = this.checked;
     if (!usePreGame) reset_pre_moves();
-    if (game) updateBoard();
 });
 
 document.getElementById('autoQueen').addEventListener('change', function() {
@@ -229,18 +227,5 @@ window.onload = (e) => {
     formatClock();
     resetSquareColor();
     resizeBoard();
-    // board = ChessBoard('myBoard', config);
-    // game = new Chess();
-    // board.position(game.fen());
-    // move_stack.push(get_all_moves('e1')[4]);
-    // resetSquareColor();
-    // game = new Chess();
-    // game.put({type: 'p', color: 'w'}, 'e7');
-    // board.position(game.fen());
-    // let moves = get_all_moves('e1');
-    // // grey all the squares that the piece on e7 could move to
-    // greySquare('e1');
-    // for (let i = 0; i < moves.length; i++){
-    //     greySquare(moves[i].to);
-    // }
+
 };

@@ -1,4 +1,9 @@
 {
     "python.analysis.typeCheckingMode": "off",
-    "python.linting.enabled": true
+    "python.linting.enabled": true,
+    "python.testing.pytestArgs": [
+        "src"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
 }

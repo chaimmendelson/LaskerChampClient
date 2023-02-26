@@ -8,7 +8,7 @@ def execute_query(query: str, args: tuple = None) -> psycopg.cursor:
     """
     Execute a SQL query on the database and return the cursor object.
     """
-    use_local = True
+    use_local = False
     if use_local:
         conn_str = "dbname=chess_users user=postgres password=132005"
     else:

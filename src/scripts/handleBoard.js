@@ -56,10 +56,9 @@ function highlightPreMoveSquare(square){
 }
 
 function highlightPreMoves(){
-    if (!usePreGame) return;
-    for (let i = 0; i < move_stack.length; i++){
-        highlightPreMoveSquare(move_stack[i].from);
-        highlightPreMoveSquare(move_stack[i].to);
+    for (const move of move_stack){
+        highlightPreMoveSquare(move.from);
+        highlightPreMoveSquare(move.to);
     }
 }
 
@@ -79,7 +78,52 @@ function resetSquareColor(){
     $board.find('.' + whiteSquareClass).css('background', whiteSquareColour)
     $board.find('.' + blackSquareClass).css('background', blackSquareColour)
     highlightMove();
-    highlightPreMoves();
+    if (usePreGame) highlightPreMoves();
+    if (waitingForCrowning) showCrowningOptions();
+}
+
+function resetPosition(){
+    if (usePreGame){
+        board.position(game.fen(), false);
+        board.position(makeMovesOnBoard(move_stack), false);
+    }
+    else board.position(game.fen());
+    resetSquareColor();
+}
+
+
+function moveSquaresOnBoard(square, up, left){
+    let column = square.charCodeAt(0) + left;
+    let row = square.charCodeAt(1) + up;
+    if (column < 97 || column > 104 || row < 49 || row > 56) return null;
+    return String.fromCharCode(column) + String.fromCharCode(row);
+}
+
+function showCrowningOptions(){
+    let square = crowningMove.to;
+    let position = board.position();
+    delete position[crowningMove.from]
+    let pieces = ['Q', 'R', 'B', 'N'];
+    for (const piece of pieces){
+        position[square] = playerColor + piece;
+        $board.find(specificSquareClass(square)).css('background', 'white');
+        move = playerColor === WHITE ? -1 : 1;
+        square = moveSquaresOnBoard(square, move, 0);
+    }
+    board.position(position, false);
+}
+
+function makeMovesOnBoard(moves_l){
+    let position = board.position();
+    for(const move of moves_l){
+        let to = move.to;
+        let from = move.from;
+        position[to] = position[from];
+        delete position[from];
+        if ('promotion' in move && move.promotion)
+            position[to] = position[to][0] + move.promotion.toUpperCase();
+    }
+    return position;
 }
 
 function updateTurn(){
@@ -87,31 +131,11 @@ function updateTurn(){
     updateStatus();
 }
 
-function updateBoard(){
-    if (!usePreGame){
-        board.position(game.fen());
-    } else {
-        let pre_game = new Chess(game.fen());
-        for (let i = 0; i < move_stack.length; i++){
-            let move = move_stack[i];
-            let piece = pre_game.get(move.from);
-            if ('promotion' in move && move.promotion)
-                piece = {type: move.promotion, color: piece.color};
-            pre_game.remove(move.from);
-            pre_game.put(piece, move.to);
-        }
-        board.position(pre_game.fen());
-        preGame = pre_game;
-    }
-    resetSquareColor();
-}
-
-
 function resetBoard(){
     GameOver = true;
     stopClock();
     move_stack = [];
-    updateBoard();
+    resetPosition();
     moveToHighlight = null;
     $status.html('');
 }
@@ -122,7 +146,7 @@ function startGame(color){
     if (playerColor == BLACK) board.flip();
     game = new Chess();
     updateTurn();
-    updateBoard();
+    resetPosition();
     GameOver = false;
 }
 
@@ -136,28 +160,25 @@ function clear_game(message){
 
 // control piece movement
 function onDragStart (source, piece, position, orientation) {
-    if (GameOver || waitingForCrowning || !isPlyersPiece(piece)) return false;
+    if (GameOver || !isPlyersPiece(piece)) return false;
+    if (waitingForCrowning){
+        crowning(piece[1].toLowerCase());
+        return false;
+    }
     if (!usePreGame && !PlayersTurn) return false;
     return true;
 }
 
 function crowning(piece){
-    document.getElementById('blackCrownOpt').style.display = 'none';
-    document.getElementById('whiteCrownOpt').style.display = 'none';
-    if (waitingForCrowning){
-        crowningMove.promotion = piece;
-        if (!usePreGame) commit_move(crowningMove);
-        else
-        {
-            if(move_stack.length === 0 && PlayersTurn) commit_move(crowningMove);
-            else
-            {
-                move_stack.push(crowningMove);
-                updateBoard();
-            }
-        }
-        waitingForCrowning = false;
+    crowningMove.promotion = piece;
+    if (!usePreGame) commit_move(crowningMove);
+    else
+    {
+        if(move_stack.length === 0 && PlayersTurn) commit_move(crowningMove);
+        else move_stack.push(crowningMove);
     }
+    waitingForCrowning = false;
+    resetPosition();
 }
 
 function doesMoveExist(source, target){
@@ -183,14 +204,8 @@ function validateMove(source, target, preMove=false)
     {
         waitingForCrowning = true;
         crowningMove = {from: source, to: target}
-        if (autoQueen){
-            crowning('q');
-            return null;
-        }
-        if (playerColor === WHITE) 
-            document.getElementById('whiteCrownOpt').style.display = 'block';
-        else 
-            document.getElementById('blackCrownOpt').style.display = 'block';
+        if (autoQueen) crowning('q');
+        resetSquareColor();
         return null;
     }
     return {from: source, to: target, promotion: ''};
@@ -227,7 +242,7 @@ function commit_move(move){
 // update the board position after the piece snap
 // for castling, en passant, pawn promotion
 function onSnapEnd () {
-    updateBoard();
+    resetPosition();
 }
 
 // update status as of turn
@@ -245,25 +260,18 @@ function updateStatus () {
 function try_pre_move(){
     if (move_stack.length === 0) return;
     let move = move_stack.shift();
-    if (doesMoveExist(move.from, move.to)){
-        commit_move(move);
-    }
-    else{
-        reset_pre_moves();
-    }
+    if (doesMoveExist(move.from, move.to)) commit_move(move);
+    else reset_pre_moves();
 }
 
 
 function reset_pre_moves(){
     move_stack = [];
-    updateBoard();
-    resetSquareColor();
     if (waitingForCrowning){
         waitingForCrowning = false;
         crowningMove = null;
-        document.getElementById('blackCrownOpt').style.display = 'none';
-        document.getElementById('whiteCrownOpt').style.display = 'none';
     }
+    if (game) resetPosition();
 }
 
 function update_pgn(){
@@ -293,7 +301,7 @@ function update_pgn(){
 function onMouseoverSquare (square, piece) {
 // get list of possible moves for this square
     let moves = null;
-    if(!isPlyersPiece(piece) || GameOver) return;
+    if(!isPlyersPiece(piece) || GameOver || waitingForCrowning) return;
     if (!PlayersTurn && usePreGame) 
         moves = get_all_moves(square);
     else 
@@ -334,7 +342,8 @@ document.getElementById('pgnBtn').addEventListener('click', function() {
 
 function get_all_moves(square){
     // get all the moves a the piece on the square could have done if the board was empty
-    let piece = preGame.get(square);
+    let piece = board.position()[square];
+    piece = {type: piece[1].toLowerCase(), color: piece[0]}
     let test_game = new Chess();
     test_game.clear();
     test_game.put(piece, square);
@@ -379,5 +388,4 @@ function get_all_moves(square){
 
 document.getElementById('flipBtn').addEventListener('click', function() {
     board.flip();
-    resetSquareColor();
 });

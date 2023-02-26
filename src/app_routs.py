@@ -11,7 +11,6 @@ async def game_page(request: web.Request):
     """
     Serve the client-side application.
     """
-    print(request)
     cookies = request.cookies
     if COOKIE_NAME in cookies:
         cookie = cookies[COOKIE_NAME]
@@ -26,7 +25,6 @@ async def login(request: web.Request):
     """
     Serve the client-side application.
     """
-    print(request)
     with open('src/pages/login.html', encoding='utf-8') as login_page:
         return web.Response(text=login_page.read(), content_type='text/html')
 
@@ -35,7 +33,6 @@ async def register(request: web.Request):
     """
     Serve the client-side application.
     """
-    print(request)
     with open('src/pages/register.html', encoding='utf-8') as register_page:
         return web.Response(text=register_page.read(), content_type='text/html')
 
@@ -44,7 +41,6 @@ async def login_validation(request: web.Request):
     """
     validate login.
     """
-    print(request)
     if request.body_exists:
         data = await request.json()
         if 'username' in data and 'password' in data:
@@ -64,7 +60,6 @@ async def sign_up(request: web.Request):
     """
     sign up.
     """
-    print(request)
     if request.body_exists:
         data = await request.json()
         if 'username' in data and 'password' in data and 'email' in data:
@@ -79,5 +74,4 @@ async def pong(request: web.Request):
     """
     Serve the client-side application.
     """
-    print(request)
     return web.json_response(text='pong')

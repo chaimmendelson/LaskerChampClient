@@ -202,18 +202,6 @@ body{
     margin: 10px auto;
 }
 
-.colorCrownOpt{
-    width: fit-content;
-    margin: 10px auto;
-}
-
-#blackCrownOpt{
-    display: none;
-}
-
-#whiteCrownOpt{
-    display: none;
-}
 
 #settings{
     width: fit-content;
