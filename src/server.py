@@ -137,31 +137,30 @@ async def start_game(sid, data):
     client = hc.get_client(sid=sid)
     if client.is_in_room() or client in hc.WAITING_ROOM or not data.get('game_mode'):
         return False
-    match data['game_mode']:
-        case 'online':
-            if len(hc.WAITING_ROOM) == 0:
-                hc.WAITING_ROOM.append(client)
-                return
-            opponent = hc.WAITING_ROOM.pop(0)
-            room = hc.add_player_room(client, opponent)
-            await sio.emit('game_started', 'white', to=hc.get_client(username=room.players[0]).sid)
-            await sio.emit('game_started', 'black', to=hc.get_client(username=room.players[1]).sid)
+    if data.get('game_mode') == 'online':
+        if len(hc.WAITING_ROOM) == 0:
+            hc.WAITING_ROOM.append(client)
+            return
+        opponent = hc.WAITING_ROOM.pop(0)
+        room = hc.add_player_room(client, opponent)
+        await sio.emit('game_started', 'white', to=hc.get_client(username=room.players[0]).sid)
+        await sio.emit('game_started', 'black', to=hc.get_client(username=room.players[1]).sid)
+        room.start_clock()
+        await send_clock_update(client)
+    elif data.get('game_mode') == 'engine':
+        if not data.get('level'):
+            return False
+        room = hc.add_engine_room(client, data.get('level'))
+        if room.is_players_turn(client.username):
+            await sio.emit('game_started', 'white', to=sid)
             room.start_clock()
             await send_clock_update(client)
-        case 'engine':
-            if not data.get('level'):
-                return False
-            room = hc.add_engine_room(client, data.get('level'))
-            if room.is_players_turn(client.username):
-                await sio.emit('game_started', 'white', to=sid)
-                room.start_clock()
-                await send_clock_update(client)
-            else:
-                await sio.emit('game_started', 'black', to=sid)
-                await send_stockfish_move(client)
-                await send_clock_update(client)
-        case _:
-            return False
+        else:
+            await sio.emit('game_started', 'black', to=sid)
+            await send_stockfish_move(client)
+            await send_clock_update(client)
+    else:
+        return False
 
 
 @sio.event
