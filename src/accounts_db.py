@@ -63,7 +63,7 @@ def var(string):
     return f"'{string}'"
 
 
-def update_value(username: str, column: str, value: str | int | float) -> None:
+def update_value(username: str, column: str, value: any) -> None:
     """
     change the value of the given column for the given username.
     """
