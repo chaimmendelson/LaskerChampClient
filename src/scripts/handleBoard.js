@@ -4,7 +4,6 @@ let $pgn = $('#pgnText')
 
 let board = ChessBoard('myBoard', 'start')
 let game = null
-let preGame = null
 let usePreGame = true;
 let autoQueen = true;
 
@@ -113,15 +112,28 @@ function showCrowningOptions(){
     board.position(position, false);
 }
 
+function movePieceOnBoard(position, from, to){
+    position[to] = position[from];
+    delete position[from];
+    return position;
+}
+
 function makeMovesOnBoard(moves_l){
     let position = board.position();
     for(const move of moves_l){
         let to = move.to;
         let from = move.from;
-        position[to] = position[from];
-        delete position[from];
+        position = movePieceOnBoard(position, from, to);
         if ('promotion' in move && move.promotion)
             position[to] = position[to][0] + move.promotion.toUpperCase();
+        else if (position[to] === 'wK' && from === 'e1'){
+            if (to === 'g1') position = movePieceOnBoard(position, 'h1', 'f1');
+            if (to === 'c1') position = movePieceOnBoard(position, 'a1', 'd1');
+        }
+        else if (position[to] === 'bK' && from === 'e8'){
+            if (to === 'g8') position = movePieceOnBoard(position, 'h8', 'f8');
+            if (to === 'c8') position = movePieceOnBoard(position, 'a8', 'd8');
+        }
     }
     return position;
 }
@@ -355,22 +367,11 @@ function get_all_moves(square){
     }
     if (piece.type === 'p'){
         up_or_down = piece.color === 'w' ? 1 : -1;
-        if (square.charCodeAt(0) !== 97) 
-            moves.push(String.fromCharCode(square.charCodeAt(0) - 1) + (parseInt(square[1]) + up_or_down));
-        if (square.charCodeAt(0) !== 104) 
-            moves.push(String.fromCharCode(square.charCodeAt(0) + 1) + (parseInt(square[1]) + up_or_down));
+        if (square.charCodeAt(0) !== 97) moves.push(moveSquaresOnBoard(square, up_or_down, -1));
+        if (square.charCodeAt(0) !== 104) moves.push(moveSquaresOnBoard(square, up_or_down, 1));
     }
     // add castling moves if the piece is a king and its allowed
-    if (piece.type === 'k'){
-        castling_rights = game.fen().split(' ')[2];
-        if (playerColor === 'white'){
-            if (castling_rights.includes('K')) moves.push('g1');
-            if (castling_rights.includes('Q')) moves.push('c1');
-        } else {
-            if (castling_rights.includes('k')) moves.push('g8');
-            if (castling_rights.includes('q')) moves.push('c8');
-        }
-    }
+    if (piece.type === 'k') moves = moves.concat(getCastlingPreMoves());
     // remove duplicates
     moves = moves.filter((move, index) => moves.indexOf(move) === index);
     let all_moves = [];
@@ -385,6 +386,31 @@ function get_all_moves(square){
     return all_moves;
 }
 
+function getCastlingPreMoves(){
+    let moves = [];
+    let castling_rights = game.fen().split(' ')[2];
+    if (castling_rights === '-') return moves;
+    if (playerColor === 'white'){
+        for (const move of move_stack){
+            if (move.from === 'e1') return moves;
+            if (move.from === 'a1') castling_rights = castling_rights.replace('Q', '');
+            if (move.from === 'h1') castling_rights = castling_rights.replace('K', '');
+        }
+        if (castling_rights.split('-')[0] === '') return moves;
+        if (castling_rights.includes('K')) moves.push('g1');
+        if (castling_rights.includes('Q')) moves.push('c1');
+    } else {
+        for (const move of move_stack){
+            if (move.from === 'e8') return moves;
+            if (move.from === 'a8') castling_rights = castling_rights.replace('q', '');
+            if (move.from === 'h8') castling_rights = castling_rights.replace('k', '');
+        }
+        if (castling_rights.split('-')[1] === '') return moves;
+        if (castling_rights.includes('k')) moves.push('g8');
+        if (castling_rights.includes('q')) moves.push('c8');
+    }
+    return moves;
+}
 
 document.getElementById('flipBtn').addEventListener('click', function() {
     board.flip();
