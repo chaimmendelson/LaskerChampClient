@@ -259,9 +259,7 @@ def main():
         port = os.getenv('PORT')
         if port is None:
             port = 5678
-        st = os.stat(STOCKFISH_PATH)
-        os.chmod(STOCKFISH_PATH, st.st_mode | stat.S_IEXEC)
-        Stockfish(STOCKFISH_PATH)
+        os.chmod(STOCKFISH_PATH, stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
         web.run_app(app, port=port)
     except KeyboardInterrupt:
         pass
