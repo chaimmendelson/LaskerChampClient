@@ -2,20 +2,17 @@
 This file contains the server code for the chess game.
 """
 import os
-import platform
-import stat
 import threading
 import asyncio
 from time import sleep
 import socketio
 from aiohttp import web
-from chess_rooms import EngineRoom, PlayerRoom, STOCKFISH_W_PATH, STOCKFISH_L_PATH
+from chess_rooms import EngineRoom, PlayerRoom
 import accounts_db as hd
 import handle_clients as hc
 import app_routs as routs
 import useful_func as uf
-from stockfish import Stockfish
-
+#os.chmod(STOCKFISH_L_PATH, stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 sio = socketio.AsyncServer()
 app = web.Application()
 sio.attach(app)
@@ -257,11 +254,7 @@ def main():
                               args=(lambda: stop_thread,))
     try:
         thread.start()
-        port = os.getenv('PORT')
-        if port is None:
-            port = 5678
-        os.chmod(STOCKFISH_L_PATH, stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-        web.run_app(app, port=port)
+        web.run_app(app, port=os.getenv('PORT', 5678))
     except KeyboardInterrupt:
         pass
     stop_thread = True
