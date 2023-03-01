@@ -1,6 +1,7 @@
 """
 This file contains the server code for the chess game.
 """
+import os
 import threading
 import asyncio
 from time import sleep
@@ -254,7 +255,7 @@ def main():
     try:
         thread.start()
         # put the heroku port here
-        web.run_app(app)
+        web.run_app(app, port=os.getenv('PORT'))
     except KeyboardInterrupt:
         pass
     stop_thread = True
