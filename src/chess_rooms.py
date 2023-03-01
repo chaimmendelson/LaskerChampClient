@@ -2,16 +2,12 @@
 chess room class and chess clocks for the server
 """
 
-import os
-import stat
 from time import time
 from random import shuffle
 import chess
 from stockfish import Stockfish
 
 STOCKFISH_PATH: str = r'src/stockfish_15_win_x64_avx2/stockfish_15_x64_avx2.exe'
-st = os.stat(STOCKFISH_PATH)
-os.chmod(STOCKFISH_PATH, st.st_mode | stat.S_IEXEC)
 
 START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 WHITE = 0
