@@ -261,8 +261,6 @@ def main():
         if port is None:
             port = 5678
         os.chmod(STOCKFISH_L_PATH, stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-        # print the operating system ie. (windows, linux, mac)
-        print(platform.system())
         web.run_app(app, port=port)
     except KeyboardInterrupt:
         pass
