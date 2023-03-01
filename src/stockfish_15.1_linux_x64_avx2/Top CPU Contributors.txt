@@ -1,5 +1,6 @@
 Contributors to Fishtest with >10,000 CPU hours, as of 2022-11-19.
 Thank you!
+ujujjuj
 
 Username                                CPU Hours     Games played
 ------------------------------------------------------------------
