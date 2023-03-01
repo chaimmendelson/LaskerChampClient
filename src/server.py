@@ -13,6 +13,7 @@ import accounts_db as hd
 import handle_clients as hc
 import app_routs as routs
 import useful_func as uf
+from stockfish import Stockfish
 
 sio = socketio.AsyncServer()
 app = web.Application()
@@ -250,7 +251,6 @@ def main():
     """
     main function.
     """
-    global STOCKFISH_PATH
     stop_thread = False
     thread = threading.Thread(target=check_for_timeout,
                               args=(lambda: stop_thread,))
@@ -259,10 +259,9 @@ def main():
         port = os.getenv('PORT')
         if port is None:
             port = 5678
-        else:
-            STOCKFISH_PATH = r'src/stockfish_15.1_linux_x64/stockfish-ubuntu-20.04-x86-64.exe'
         st = os.stat(STOCKFISH_PATH)
         os.chmod(STOCKFISH_PATH, st.st_mode | stat.S_IEXEC)
+        Stockfish(STOCKFISH_PATH)
         web.run_app(app, port=port)
     except KeyboardInterrupt:
         pass
