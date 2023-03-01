@@ -7,7 +7,7 @@ import asyncio
 from time import sleep
 import socketio
 from aiohttp import web
-from chess_rooms import EngineRoom, PlayerRoom
+from chess_rooms import EngineRoom, PlayerRoom, STOCKFISH_PATH
 import accounts_db as hd
 import handle_clients as hc
 import app_routs as routs
@@ -252,9 +252,9 @@ def main():
     stop_thread = False
     thread = threading.Thread(target=check_for_timeout,
                               args=(lambda: stop_thread,))
+    os.chmod(STOCKFISH_PATH, 0o777)
     try:
         thread.start()
-        # put the heroku port here
         port = os.getenv('PORT')
         if port is None:
             port = 5678
