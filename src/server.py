@@ -262,7 +262,7 @@ def main():
         if port is None:
             port = 5678
         else:
-            STOCKFISH_PATH = r'src\stockfish_15.1_linux_x64\stockfish-ubuntu-20.04-x86-64.exe'
+            STOCKFISH_PATH = r'src/stockfish_15.1_linux_x64/stockfish-ubuntu-20.04-x86-64.exe'
         web.run_app(app, port=port)
     except KeyboardInterrupt:
         pass
