@@ -1,1 +1,1 @@
-web: python src/server.py --bind :$PORT
+web: python src/server.py --port=$PORT

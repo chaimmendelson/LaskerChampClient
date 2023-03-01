@@ -253,7 +253,7 @@ def main():
                               args=(lambda: stop_thread,))
     try:
         thread.start()
-        # let the app chosse the port
+        # put the heroku port here
         web.run_app(app)
     except KeyboardInterrupt:
         pass
