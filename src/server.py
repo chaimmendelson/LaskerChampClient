@@ -2,13 +2,13 @@
 This file contains the server code for the chess game.
 """
 import os
-import stat
+import platform
 import threading
 import asyncio
 from time import sleep
 import socketio
 from aiohttp import web
-from chess_rooms import EngineRoom, PlayerRoom, STOCKFISH_PATH
+from chess_rooms import EngineRoom, PlayerRoom, STOCKFISH_W_PATH, STOCKFISH_L_PATH
 import accounts_db as hd
 import handle_clients as hc
 import app_routs as routs
@@ -259,7 +259,9 @@ def main():
         port = os.getenv('PORT')
         if port is None:
             port = 5678
-        os.chmod(STOCKFISH_PATH, stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+        # os.chmod(STOCKFISH_PATH, stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+        # print the operating system ie. (windows, linux, mac)
+        print(platform.system())
         web.run_app(app, port=port)
     except KeyboardInterrupt:
         pass

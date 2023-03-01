@@ -2,12 +2,14 @@
 chess room class and chess clocks for the server
 """
 
+import platform
 from time import time
 from random import shuffle
 import chess
 from stockfish import Stockfish
 
-STOCKFISH_PATH: str = r'./src/stockfish_15_win_x64_avx2/stockfish_15_x64_avx2.exe'
+STOCKFISH_W_PATH: str = r'./src/stockfish_15.1_win_x64_avx2/stockfish-windows-2022-x86-64-avx2.exe'
+STOCKFISH_L_PATH: str = r'./src/stockfish_15.1_linux_x64_avx2/stockfish-ubuntu-20.04-x86-64-avx2'
 START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 WHITE = 0
 BLACK = 1
@@ -192,7 +194,7 @@ class EngineRoom(ChessRoom):
 
     def __init__(self, player1: str, level: int = 10, time_limit: int = 10, bonus_time: int = 0):
         super().__init__(player1, 'stockfish', time_limit, bonus_time)
-        self.stockfish = Stockfish(STOCKFISH_PATH)
+        self.stockfish = Stockfish(STOCKFISH_W_PATH if platform.system() == 'Windows' else STOCKFISH_L_PATH)
         self.stockfish.set_skill_level(level)
 
     def make_stockfish_move(self) -> str:
