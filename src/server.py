@@ -3,6 +3,7 @@ This file contains the server code for the chess game.
 """
 import os
 import platform
+import stat
 import threading
 import asyncio
 from time import sleep
@@ -259,7 +260,7 @@ def main():
         port = os.getenv('PORT')
         if port is None:
             port = 5678
-        # os.chmod(STOCKFISH_PATH, stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+        os.chmod(STOCKFISH_L_PATH, stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
         # print the operating system ie. (windows, linux, mac)
         print(platform.system())
         web.run_app(app, port=port)
