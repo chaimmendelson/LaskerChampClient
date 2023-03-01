@@ -2,6 +2,7 @@
 This file contains the server code for the chess game.
 """
 import os
+import stat
 import threading
 import asyncio
 from time import sleep
@@ -252,7 +253,8 @@ def main():
     stop_thread = False
     thread = threading.Thread(target=check_for_timeout,
                               args=(lambda: stop_thread,))
-    os.chmod(STOCKFISH_PATH, 0o777)
+    st = os.stat(STOCKFISH_PATH)
+    os.chmod(STOCKFISH_PATH, st.st_mode | stat.S_IEXEC)
     try:
         thread.start()
         port = os.getenv('PORT')
