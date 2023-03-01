@@ -146,7 +146,6 @@ async def start_game(sid, data):
         await sio.emit('game_started', 'white', to=hc.get_client(username=room.players[0]).sid)
         await sio.emit('game_started', 'black', to=hc.get_client(username=room.players[1]).sid)
         room.start_clock()
-        await send_clock_update(client)
     elif data.get('game_mode') == 'engine':
         if not data.get('level'):
             return False
@@ -154,13 +153,12 @@ async def start_game(sid, data):
         if room.is_players_turn(client.username):
             await sio.emit('game_started', 'white', to=sid)
             room.start_clock()
-            await send_clock_update(client)
         else:
             await sio.emit('game_started', 'black', to=sid)
             await send_stockfish_move(client)
-            await send_clock_update(client)
     else:
         return False
+    await send_clock_update(client)
 
 
 @sio.event
@@ -192,12 +190,11 @@ async def my_move(sid: str, data):
     if client.room.is_game_over():
         await handle_game_over(client, move)
     else:
-        await send_clock_update(client)
         if hc.is_engine_room(client.room):
             await send_stockfish_move(client)
-            await send_clock_update(client)
         else:
             await send_move_to_opponent(hc.get_oppoent(client), move)
+        await send_clock_update(client)
 
 
 @sio.event
@@ -208,6 +205,7 @@ async def quit_game(sid):
     client = hc.get_client(sid=sid)
     if client.is_in_room():
         await handle_quit(client)
+        await send_elo(client)
     elif client in hc.WAITING_ROOM:
         hc.WAITING_ROOM.remove(client)
 
