@@ -1,2 +1,3 @@
 # ignore the __pychache__ directory
 __pycache__/
+stockfish-ubuntu-20.04-x86-64-avx2
