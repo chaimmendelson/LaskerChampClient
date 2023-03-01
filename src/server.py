@@ -253,7 +253,7 @@ def main():
                               args=(lambda: stop_thread,))
     try:
         thread.start()
-        web.run_app(app, port=80)
+        web.run_app(app, port=5678)
     except KeyboardInterrupt:
         pass
     stop_thread = True
