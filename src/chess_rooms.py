@@ -7,7 +7,7 @@ from random import shuffle
 import chess
 from stockfish import Stockfish
 
-STOCKFISH_PATH: str = r'/src/stockfish_15_win_x64_avx2/stockfish_15_x64_avx2.exe'
+STOCKFISH_PATH: str = r'.\src\stockfish_15_win_x64_avx2\stockfish_15_x64_avx2.exe'
 START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 WHITE = 0
 BLACK = 1
