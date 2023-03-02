@@ -49,11 +49,11 @@ SQL_CURRENT_TIME: str = 'current_timestamp'
 
 # error codes.
 INVALID_USERNAME: int = 471
-INVALID_PASSWORD: int = 472
-INVALID_EMAIL: int = 473
+INVALID_PASSWORD: int = 473
+INVALID_EMAIL: int = 472
 
 USERNAME_EXISTS: int = 481
-EMAIL_EXISTS: int = 483
+EMAIL_EXISTS: int = 482
 
 
 def var(string):

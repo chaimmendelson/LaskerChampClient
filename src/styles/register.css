@@ -2,6 +2,11 @@ body{
     overflow: hidden;
     background-color: darkslategray;
     padding: 5px;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 #form-container{
@@ -20,12 +25,18 @@ body{
 }
 
 .form_input{
-    width: 95%;
+    width: 100%;
     height: 20px;
-    border: 1px solid #ccc;
     padding: 5px;
+    border-radius: 10px;
+    border: 3px solid black;
 }
 
+.help{
+    font-size: x-small;
+    margin: 0;
+    margin-left: 5px;
+}
 .form_button{
     width: 100%;
     height: 30px;
