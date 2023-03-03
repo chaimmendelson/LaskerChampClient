@@ -4,42 +4,35 @@ document.querySelector('.form').addEventListener('submit', async (e) => {
     const username = document.querySelector('#username').value;
     const email = document.querySelector('#email').value;
     const password = document.querySelector('#password').value;
-    console.log(checkUsername())
-    if (!(checkUsername() && checkPassword())) {
-        return;
-    }
-    let user = {username: username, password: password, email: email};
+    if (!(checkUsername() && checkPassword())) return;
+    // make the page unclicable
+    document.body.style.pointerEvents = 'none';
+    document.getElementById("loader").style.display = "block";
     const response  = await fetch('/sign_up', {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(user),
+        body: JSON.stringify(
+            {username: username, password: password, email: email}
+        ),
     });
     //extract the json from the response
     const json = await response.json();
-    const status = json.status;
+    let status = json.status;
     if (status === 200) {
         window.location.href = '/';
         return;
     }
-    let type = status % 10;
-    switch (type) {
-        case 1:
-            displayError("username");
-            alert("Username already exists");
-            break;
-        case 2:
-            displayError("email");
-            alert("Email already exists");
-            break;
-        case 3:
-            displayError("password")
-            break;
-        default:
-            break;
-    }
+    slotL = ['username', 'email', 'password']
+    let errorSlot = status%10;
+    displayError(slotL[errorSlot-1]);
+    let errorType = Math.floor((status%100)/10);
+    if (errorType === 8)
+        alert(slotL[errorSlot-1] + " already exists");
+    document.getElementById("loader").style.display = "none";
+    document.body.style.pointerEvents = 'auto';
 });
 
 
