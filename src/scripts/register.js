@@ -5,10 +5,9 @@ document.querySelector('.form').addEventListener('submit', async (e) => {
     const email = document.querySelector('#email').value;
     const password = document.querySelector('#password').value;
     if (!(checkUsername() && checkPassword())) return;
-    // make the page unclicable
     document.body.style.pointerEvents = 'none';
-    document.getElementById("loader").style.display = "block";
-    const response  = await fetch('/sign_up', {
+    document.getElementById('loader').style.display = 'block';
+    const response = await fetch('/sign_up', {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -18,8 +17,12 @@ document.querySelector('.form').addEventListener('submit', async (e) => {
             {username: username, password: password, email: email}
         ),
     });
-    //extract the json from the response
-    const json = await response.json();
+    await handleResponse(response);
+    
+});
+
+async function handleResponse(response) {
+    let json = await response.json();
     let status = json.status;
     if (status === 200) {
         window.location.href = '/';
@@ -30,10 +33,10 @@ document.querySelector('.form').addEventListener('submit', async (e) => {
     displayError(slotL[errorSlot-1]);
     let errorType = Math.floor((status%100)/10);
     if (errorType === 8)
-        alert(slotL[errorSlot-1] + " already exists");
-    document.getElementById("loader").style.display = "none";
+        alert(slotL[errorSlot-1] + ' already exists');
+    document.getElementById('loadar').style.display = 'none';
     document.body.style.pointerEvents = 'auto';
-});
+}
 
 
 
@@ -46,10 +49,6 @@ function removeError(box) {
 }
 
 function checkUsername() {
-    // check if the username is valid by the rules specified:
-    // 1 - username must be at least 3 characters and at most the length specified.
-    // 2 - username must contain only letters and numbers.
-    // 3 - the first character must be a letter.
     let username = document.getElementById("username").value;
     let usernameRegex = /^[a-zA-Z]\w{2,31}$/;
     let is_valid = usernameRegex.test(username);
@@ -58,9 +57,6 @@ function checkUsername() {
 }
 
 function checkPassword(){
-    // 1 - password must be at least 8 characters long and at most 32.
-    // 2 - password must contain only letters and numbers.
-    // 3 - password must containe at least one number and one lower case letter.
     let password = document.getElementById("password").value;
     let passwordRegex = /^(?=.*[a-z])(?=.*[0-9])\w{8,32}$/;
     let is_valid = passwordRegex.test(password);
@@ -73,12 +69,11 @@ function showPassword() {
     let password = document.getElementById("password");
     password.type = password.type === "password" ? "text" : "password";
 }
+
 document.getElementById("show_password").addEventListener("click", showPassword);
 
 document.getElementById("password").addEventListener("input", checkPassword);
 
 document.getElementById("username").addEventListener("input", checkUsername);
 
-document.getElementById("email").addEventListener("input", function() {
-    removeError("email");
-});
+document.getElementById("email").addEventListener("input", removeError("email"));
