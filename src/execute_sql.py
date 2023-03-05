@@ -8,9 +8,9 @@ def execute_query(query: str, args: tuple = None) -> psycopg.cursor:
     """
     Execute a SQL query on the database and return the cursor object.
     """
-    use_local = False
+    use_local = True
     if use_local:
-        conn_str = "dbname=chess_users user=postgres password=132005"
+        conn_str = "dbname=laskerchamp user=postgres password=132005"
     else:
         conn_str = "host=rogue.db.elephantsql.com dbname=cqscdcwf\
         user=cqscdcwf password=5lgP45vTxWWrFN5d1nWiH98vnfaWgZ95"
