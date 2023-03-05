@@ -1,4 +1,3 @@
-// get the data from the form when the user clicks the submit button
 document.querySelector('.form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const username = document.querySelector('#username').value;
@@ -22,8 +21,7 @@ document.querySelector('.form').addEventListener('submit', async (e) => {
 });
 
 async function handleResponse(response) {
-    let json = await response.json();
-    let status = json.status;
+    let status = response.status;
     if (status === 200) {
         window.location.href = '/';
         return;
@@ -34,7 +32,7 @@ async function handleResponse(response) {
     let errorType = Math.floor((status%100)/10);
     if (errorType === 8)
         alert(slotL[errorSlot-1] + ' already exists');
-    document.getElementById('loadar').style.display = 'none';
+    document.getElementById('loader').style.display = 'none';
     document.body.style.pointerEvents = 'auto';
 }
 

@@ -1,219 +1,67 @@
-.center{
-    display:block;
-    margin-left:auto;
-    margin-right:auto;
-    width:fit-content;
-}
-:root{
-    --speed_of_skew: 1s;
-
-}
-
-
 body{
     overflow: hidden;
     background-color: darkslategray;
     padding: 5px;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
-#user_log_info{
-    font-family: 'Courier New', Courier, monospace;
-    float:right;
-    background-color: aquamarine;
-    /* border: 1px black solid; */
-    /* background-image: linear-gradient(35deg, darkred, orange, darkkhaki, green, blue, teal, purple); */
-    /* animation: spinningBackgroundLog 3s infinite alternate; */
+#form-container{
+    width: 30%;
+    max-width: 500px;
+    margin: auto;
+    margin-top: 100px;
+    background-color: dimgray;
+    padding: 15px;
+    border-radius: 30px;
+    position: relative;
 }
 
-#user_image{
-    height:25px;
-    width:auto;
+.form_group{
+    width: 80%;
+    margin: 20px auto;
 }
 
+.form_input{
+    width: 100%;
+    height: 20px;
+    padding: 5px;
+    border-radius: 10px;
+    border: 3px solid black;
+}
 
-
-.alert {
-    padding: 20px;
-    color: white;
-    opacity: 0.5;
-    width:fit-content;
-  }
-  #error_alert {
-    background-color: red;
-  }
-  .closebtn {
-    margin-left: 15px;
-    color: white;
-    font-weight: bold;
-    float: right;
-    font-size: 22px;
-    line-height: 20px;
+.form_button{
+    width: 100%;
+    height: 30px;
+    background-color: green;
+    border: 1px solid lightgreen;
+    border-radius: 5px;
     cursor: pointer;
-    transition: 0.3s;
+}
+
+a{
+    color: blue;
+}
+
+#loader {
+    position: absolute;
+    top: 100px;
+    left: 80px;
+    border-top: 16px solid blue;
+    border-right: 16px solid green;
+    border-bottom: 16px solid red;
+    border-left: 16px solid pink;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    animation: spin 2s linear infinite;
+    display: none;
   }
   
-  .closebtn:hover {
-    color: black;
-  }
-
-
-@keyframes spinningBackgroundLog {
-    0%{background-image: linear-gradient(35deg, darkred, darkorange, rgb(107, 107, 0), green, blue, teal, purple);}
-    50%{background-image: linear-gradient(35deg, rgb(188, 0, 0), orange, rgb(186, 186, 1), lime, deepskyblue, turquoise, blueviolet);}
-    100%{background-image: linear-gradient(35deg, red, gold, yellow, lawngreen, lightskyblue, aqua, magenta);}
-    /* 100%{background-image: linear-gradient(35deg, darkred, darkorange, rgb(107, 107, 0), green, blue, teal, purple);} */
-}
-
-.center {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-#slogan{
-    color:black;
-    text-shadow:
-        0 0 7px #fff,
-        0 0 10px #fff,
-        0 0 21px #fff,
-        0 0 42px #0fa,
-        0 0 82px #0fa,
-        0 0 92px #0fa,
-        0 0 102px #0fa,
-        0 0 151px #0fa;
-    font-family: "Apple Chancery";
-    float:none;
-}
-h2 {
-    text-align: center;
-    font-weight: 400;
-    font-size: 1.8rem;
-  }
-
-
-
-#login{
-    width: fit-content;
-}
-#LaskerChamp_txt{
-    background: linear-gradient(30deg, silver, gold, white, black, );
-     background-size: cover;
-     -webkit-text-fill-color: transparent;
-     -webkit-background-clip: text;
-     -moz-background-clip:text;
-     background-clip:text;
-     text-align:center;
-     /* -webkit-text-stroke: 3px #ffaa00; */
-}
-
-#chess_game_txt{
-    font-size: 3cm;
-    text-align: center;
-    letter-spacing: 15px;
-    color:black;
-    transform: skew(-25deg);
-    /* flip the order that way it goes down from the black to the near white */
-    text-shadow: 1px 1px rgb(250, 250, 250),
-                 2px 2px rgb(225, 225, 225),
-                 3px 3px rgb(200, 200, 200),
-                 4px 4px rgb(175, 175, 175),
-                 5px 5px rgb(150, 150, 150),
-                 6px 6px rgb(125, 125, 125),
-                 7px 7px rgb(100, 100, 100),
-                 8px 8px rgb(075, 075, 075),
-                 9px 9px rgb(050, 050, 050),
-                 10px 10px rgb(025, 25, 25),
-                 10px 10px 30px rgba(0,0,0,.7);
-
-    -webkit-animation:spin_txt var(--speed_of_skew) linear infinite alternate;
-    -moz-animation:spin_txt var(--speed_of_skew) linear infinite alternate;
-    animation:spin_txt var(--speed_of_skew) linear infinite alternate;
-}
-
-@-moz-keyframes spin_txt { 
-    100% { -moz-transform: skew(25deg); } 
-}
-@-webkit-keyframes spin_txt { 
-    100% { -webkit-transform: skew(25deg); } 
-}
-@keyframes spin_txt { 
-    100% { 
-        -webkit-transform: skew(25deg); 
-        transform:skew(25deg); 
-    } 
-}
-
-#showPassword{
-    border:1px solid black;
-    border-radius: 50%;
-    background-color: transparent;
-}
-
-@import url('https://fonts.googleapis.com/css?family=Bangers&display=swap');
-@keyframes rotation {
-  to {
-    transform: rotate(360deg) translateX(-50%) translateY(-50%);
-  }
-}
-h1 {
-    font-size: 8em;
-    letter-spacing: 15px;
-    transform: rotate(-10deg);
-    text-shadow: 1px 1px hsl(50, 50%, 45%),
-                 2px 2px hsl(50, 50%, 40%),
-                 3px 3px hsl(50, 50%, 35%),
-                 4px 4px hsl(50, 50%, 34%),
-                 5px 5px hsl(50, 50%, 33%),
-                 6px 6px hsl(50, 50%, 32%),
-                 7px 7px hsl(50, 50%, 31%),
-                 8px 8px hsl(50, 50%, 30%),
-                 9px 9px hsl(50, 50%, 29%),
-                 10px 10px hsl(50, 50%, 28%),
-                 10px 10px 30px rgba(0,0,0,.7);
-  }
-
-input{
-    border: 2px solid black;
-}
-#back_top_line{
-    position: absolute;
-    top:0;
-    left:-3px;
-    height:15%;
-    width:105%;
-    /* animation: spinTopLine 3s infinite alternate; */
-    background-color: snow;
-    z-index:-3;
-}
-@keyframes spinTopLine {
-    0%{background-image:linear-gradient(7deg, crimson, khaki, palegreen, powderblue pink);}
-    20%{background-image:linear-gradient(7deg, khaki, palegreen, powderblue, pink,  crimson);}
-    40%{background-image:linear-gradient(7deg, palegreen, powderblue, pink, crimson, khaki);}
-    60%{background-image:linear-gradient(7deg, powderblue, pink, crimson, khaki, palegreen);}
-    80%{background-image:linear-gradient(7deg, pink, crimson, khaki, palegreen, powderblue);}
-    100%{background-image:linear-gradient(7deg, crimson, khaki, palegreen, powderblue, pink);}
-}
-
-#game_over{
-        -ms-transform: rotate(20deg); /* IE 9 */
-        transform: rotate(20deg);
-}
-
-#chess_game{
-    display: none;
-}
-
-#switch_to_game{
-    transform: translate(-50%, -50%);
-}
-@-moz-keyframes spin { 
-    100% { -moz-transform: rotate(360deg); } 
-}
-@-webkit-keyframes spin { 
-    100% { -webkit-transform: rotate(360deg); } 
-}
-@keyframes spin { 
-    100% { 
-        -webkit-transform: rotate(360deg); 
-        transform:rotate(360deg); 
-    } 
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
