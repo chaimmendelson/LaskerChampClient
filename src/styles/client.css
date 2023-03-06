@@ -67,16 +67,19 @@ body{
 
 
 #user_data{
-    width: 15%;
-    min-width: 150px;
+    width: 150px;
     border-radius: 20px;
     padding: 10px;
     background-color: gray;
+    display: flex;
+    flex-direction: column;
 }
 
 #game_container{
     width: 35%;
     min-width: 300px;
+    flex-grow: 2;
+    max-width: 500px;
 }
 
 #game_controls{
@@ -97,15 +100,11 @@ body{
     border: 5px brown solid;
 }
 
-#game_control_buttons{
-    margin-top: 30px;
-    width: 100%;
-}
-
 #user_info{
     padding: 5px;
     border: 1px solid black;
     background-color: palevioletred;
+    text-align: start;
 }
 
 #chess-clock{
@@ -118,7 +117,8 @@ body{
     display: None;
 }
 #pgnDisplay{
-    height: 600px;
+    height: 400px;
+    width: 100%;
     border:5px gray solid;
     padding: 5px;
     overflow-y:auto;
@@ -131,9 +131,11 @@ body{
 
 
 #StatusDisplay{
+    width: 100%;
+    border-radius: 20px;
     padding:6px;
     border:5px black solid;
-    min-height: 50px;
+    height: 50px;
     font-size: small;
     font-family: 'Courier New', Courier, monospace;
     background-color: lightseagreen;
@@ -197,15 +199,11 @@ body{
     margin: auto;
 }
 
-#game_mode{
-    width: fit-content;
-    margin: 10px auto;
-}
-
 
 #settings{
-    width: fit-content;
     margin: 10px auto;
+    width: fit-content;
+    margin: 0 auto;
 }
 
 /* The switch - the box around the settingsSlider */
@@ -271,52 +269,47 @@ body{
     border-radius: 50%;
   }
 
-  @media only screen and (max-width: 600px) {
+.data_item{
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+@media only screen and (max-width: 1000px){
     #container{
+        display: flex;
         flex-direction: column;
+        align-items: center;
     }
     #user_data{
+        width: 500px;
+        height: 180px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-around;
+    }
+    .data_item{
+        width: 150px;
+    }
+    #user_info{
         width: 100%;
-        margin-bottom: 10px;
     }
     #game_container{
+        width: 70%;
+        max-width: 400px;
+    }
+    #myBoard{
         width: 100%;
-        margin-bottom: 10px;
     }
     #game_controls{
-        width: 100%;
-    }
-    #engine_box{
-        width: 100%;
-        margin-left: 0;
-        margin-bottom: 10px;
-    }
-    #engine_level{
-        width: 100%;
-    }
-    #level_display{
-        width: 100%;
-    }
-    #game_mode{
-        width: 100%;
-    }
-    #settings{
-        width: 100%;
+        display: flex;
+        flex-direction: column;
+        width: 80%;
     }
     #pgnDisplay{
-        height: 300px;
+        height: 200px;
     }
-    #pgnBtn{
-        display: block;
+    #StatusDisplay{
+        height: 25px;
     }
-    #quitBtn{
-        display: block;
-    }
-    #logoutBtn{
-        width: 100%;
-        margin-top: 15px;
-        padding: 5px;
-        border-radius: 5px;
-        background-color: green
-    }
-  }
+}

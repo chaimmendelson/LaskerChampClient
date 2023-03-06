@@ -145,7 +145,8 @@ def is_email_valid(email: str) -> bool:
         if response.status_code == 429:
             time.sleep(1)
             continue
-        print(response)
+        if response.status_code == 403:
+            return True
         return response.json().get('status') == "valid"
 
 
