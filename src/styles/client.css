@@ -270,3 +270,53 @@ body{
   .settingsSlider.round:before {
     border-radius: 50%;
   }
+
+  @media only screen and (max-width: 600px) {
+    #container{
+        flex-direction: column;
+    }
+    #user_data{
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    #game_container{
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    #game_controls{
+        width: 100%;
+    }
+    #engine_box{
+        width: 100%;
+        margin-left: 0;
+        margin-bottom: 10px;
+    }
+    #engine_level{
+        width: 100%;
+    }
+    #level_display{
+        width: 100%;
+    }
+    #game_mode{
+        width: 100%;
+    }
+    #settings{
+        width: 100%;
+    }
+    #pgnDisplay{
+        height: 300px;
+    }
+    #pgnBtn{
+        display: block;
+    }
+    #quitBtn{
+        display: block;
+    }
+    #logoutBtn{
+        width: 100%;
+        margin-top: 15px;
+        padding: 5px;
+        border-radius: 5px;
+        background-color: green
+    }
+  }

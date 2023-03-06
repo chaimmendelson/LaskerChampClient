@@ -53,13 +53,13 @@ async def login_validation(request: web.Request):
             if hd.does_exist(hd.USERNAME, username):
                 if hd.check_password(username, password):
                     if not hc.get_client(username=username):
-                        response = web.Response(status=200)
+                        response = web.json_response({'status': 200})
                         response.set_cookie(
                             COOKIE_NAME, hd.get_value(username, hd.COOKIE))
                         return response
-                    return web.Response(status=USER_lOGGED_IN)
-                return web.Response(status=INVALID_PASSWORD)
-    return web.Response(status=INVALID_USERNAME)
+                    return web.json_response({'status': USER_lOGGED_IN})
+                return web.json_response({'status': INVALID_PASSWORD})
+    return web.json_response({'status': INVALID_USERNAME})
 
 
 async def sign_up(request: web.Request):
@@ -72,8 +72,9 @@ async def sign_up(request: web.Request):
             username = data.get('username')
             password = data.get('password')
             email = data.get('email')
-            return web.Response(status=hd.create_new_user(username, password, email))
-    return web.Response(status=400)
+            return web.json_response({'status': hd.create_new_user(username, password, email)})
+    return web.json_response({'status': 400})
+
 
 
 async def pong(request: web.Request):

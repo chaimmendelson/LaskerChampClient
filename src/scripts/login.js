@@ -19,7 +19,8 @@ document.querySelector('.form').addEventListener('submit', async (e) => {
 });
 
 async function handleResponse(response) {
-    let status = response.status;
+    const json = await response.json()
+    let status = json.status;
     switch (status) {
         case 200:
             window.location.href = '/';

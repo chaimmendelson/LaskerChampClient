@@ -21,7 +21,8 @@ document.querySelector('.form').addEventListener('submit', async (e) => {
 });
 
 async function handleResponse(response) {
-    let status = response.status;
+    const json = await response.json()
+    let status = json.status;
     if (status === 200) {
         window.location.href = '/';
         return;
