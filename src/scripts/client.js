@@ -89,6 +89,10 @@ socket.on('game_started', (data) => {
     document.getElementById('startBtn').style.display = 'none';
     document.getElementById('quitBtn').style.display = 'block';
     startGame(data);
+    if (playerColor === WHITE)
+        document.getElementById('player1-clock').style.backgroundColor = 'white';
+    else
+        document.getElementById('player2-clock').style.backgroundColor = 'white';
     startClock();
 })
 
@@ -174,6 +178,8 @@ function resetClock() {
     player2TimeRemaining = player2Time;
     currentPlayer = 0;
     formatClock();
+    document.getElementById('player1-clock').style.backgroundColor = 'grey';
+    document.getElementById('player2-clock').style.backgroundColor = 'grey';
 }
 
 
@@ -234,5 +240,6 @@ document.getElementById('autoQueen').addEventListener('change', function() {
 window.onload = (e) => {
     formatClock();
     resetSquareColor();
+    document.body.style.display = 'block';
     resizeBoard();
 };

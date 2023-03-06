@@ -148,7 +148,6 @@ function resetBoard(){
     stopClock();
     move_stack = [];
     resetPosition();
-    moveToHighlight = null;
     $status.html('');
 }
 
@@ -157,6 +156,7 @@ function startGame(color){
     board = ChessBoard('myBoard', config);
     if (playerColor == BLACK) board.flip();
     game = new Chess();
+    moveToHighlight = null;
     updateTurn();
     resetPosition();
     GameOver = false;

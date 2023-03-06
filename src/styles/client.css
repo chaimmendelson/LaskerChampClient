@@ -54,6 +54,7 @@ body{
     overflow: hidden;
     background-color: darkslategray;
     padding: 5px;
+    display: none;
 }
 
 #container{
