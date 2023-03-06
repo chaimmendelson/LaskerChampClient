@@ -77,9 +77,9 @@ body{
 
 #game_container{
     width: 35%;
+    max-width: 500px;
     min-width: 300px;
     flex-grow: 2;
-    max-width: 500px;
 }
 
 #game_controls{
@@ -154,14 +154,17 @@ body{
     display: none;
 }
 
+#clocks{
+    width: fit-content;
+    margin: 2px auto;
+}
 .clock{
     width: fit-content;
-    margin: 10px auto;
-    padding: 10px;
+    padding: 2px;
     border: 1px black solid;
-    border-radius: 10px;
-    background-color: lightcoral;
+    background-color: gray;
     font-family: cursive;
+    display: inline;
 }
 
 #logoutBtn{
@@ -282,11 +285,12 @@ body{
     }
     #user_data{
         width: 500px;
-        height: 180px;
+        height: 200px;
         flex-direction: row;
         flex-wrap: wrap;
         align-items: center;
         justify-content: space-around;
+        margin-bottom: 10px;
     }
     .data_item{
         width: 150px;
@@ -295,16 +299,13 @@ body{
         width: 100%;
     }
     #game_container{
-        width: 70%;
-        max-width: 400px;
-    }
-    #myBoard{
-        width: 100%;
+        max-width: none;
     }
     #game_controls{
         display: flex;
         flex-direction: column;
         width: 80%;
+        display: none;
     }
     #pgnDisplay{
         height: 200px;

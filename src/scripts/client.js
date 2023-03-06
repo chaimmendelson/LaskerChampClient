@@ -201,6 +201,13 @@ document.getElementById('logoutBtn').addEventListener('click', function() {
 });
 
 function resizeBoard(){
+    if (screen.width < 1000){
+        let screen_height = screen.height - 100;
+        let screen_width = screen.width;
+        let board_size = (Math.min(screen_height, screen_width)) / screen_width * 100 - 5;
+        console.log(board_size);
+        document.getElementById('game_container').style.width = board_size + '%';
+    }
     board.resize();
 };
 
@@ -223,9 +230,9 @@ document.getElementById('autoQueen').addEventListener('change', function() {
     if (waitingForCrowning) crowning('q');
 });
 
+
 window.onload = (e) => {
     formatClock();
     resetSquareColor();
     resizeBoard();
-
 };
