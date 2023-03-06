@@ -164,6 +164,7 @@ body{
     border: 1px black solid;
     background-color: gray;
     font-family: cursive;
+    font-size: xx-large;
     display: inline;
 }
 
@@ -284,7 +285,8 @@ body{
         align-items: center;
     }
     #user_data{
-        width: 500px;
+        width: 70%;
+        min-width: 300px;
         height: 200px;
         flex-direction: row;
         flex-wrap: wrap;
@@ -293,7 +295,7 @@ body{
         margin-bottom: 10px;
     }
     .data_item{
-        width: 150px;
+        width: 30%;
     }
     #user_info{
         width: 100%;
