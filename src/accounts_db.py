@@ -150,10 +150,19 @@ def is_email_valid(email: str) -> bool:
         return response.json().get('status') == "valid"
 
 
-def create_new_user(username: str, password: str, email: str) -> int:
+def is_cookie_valid(cookie: str) -> bool:
     """
-    add a new user to the database after verifying the username and password
-    (the email will be verfied later).
+    check if the given cookie is valid.
+    """
+    if len(cookie) != COOKIE_L:
+        return False
+    if not cookie.isalnum():
+        return False
+    return True
+
+def validate_credentials(username: str, password: str, email: str) -> int:
+    """
+    validate the given credentials and return the appropriate error code.
     """
     if not is_username_valid(username):
         return INVALID_USERNAME
@@ -165,6 +174,13 @@ def create_new_user(username: str, password: str, email: str) -> int:
         return INVALID_EMAIL
     if does_exist(EMAIL, email):
         return EMAIL_EXISTS
+    return 200
+
+def create_new_user(username: str, password: str, email: str) -> int:
+    """
+    add a new user to the database after verifying the username and password
+    (the email will be verfied later).
+    """
     db.insert_row(TABLE_NAME, {
         USERNAME: username,
         PASSWORD: hash_pass(password),
@@ -172,7 +188,6 @@ def create_new_user(username: str, password: str, email: str) -> int:
         COOKIE: create_cookie(username),
         ELO: '1200'
     })
-    return 200
 
 
 def delete_user(username: str) -> None:

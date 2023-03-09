@@ -1,6 +1,7 @@
 """
 function to handle the routes of the app
 """
+from datetime import datetime, timedelta
 from aiohttp import web
 import accounts_db as hd
 import handle_clients as hc
@@ -8,8 +9,7 @@ import handle_clients as hc
 COOKIE_NAME: str = 'chess-cookie'
 
 USER_lOGGED_IN: int = 490
-INVALID_PASSWORD: int = 491
-INVALID_USERNAME: int = 492
+INVALID_CREDENTIALS: int = 491
 
 async def game_page(request: web.Request):
     """
@@ -18,7 +18,7 @@ async def game_page(request: web.Request):
     cookies = request.cookies
     if COOKIE_NAME in cookies:
         cookie = cookies[COOKIE_NAME]
-        if hd.does_exist(hd.COOKIE, cookie):
+        if hd.is_cookie_valid(cookie) and hd.does_exist(hd.COOKIE, cookie):
             if not hc.get_client(username=hd.get_username_by_cookie(cookie)):
                 with open('src/pages/client.html', encoding='utf-8') as main_page:
                     return web.Response(text=main_page.read(), content_type='text/html')
@@ -39,41 +39,46 @@ async def register(request: web.Request):
     """
     with open('src/pages/register.html', encoding='utf-8') as register_page:
         return web.Response(text=register_page.read(), content_type='text/html')
-
-
+    
+    
 async def login_validation(request: web.Request):
     """
     validate login.
     """
-    if request.body_exists:
-        data = await request.json()
-        if 'username' in data and 'password' in data:
-            username = data.get('username')
-            password = data.get('password')
-            if hd.does_exist(hd.USERNAME, username):
-                if hd.check_password(username, password):
-                    if not hc.get_client(username=username):
-                        response = web.json_response({'status': 200})
-                        response.set_cookie(
-                            COOKIE_NAME, hd.get_value(username, hd.COOKIE))
-                        return response
-                    return web.json_response({'status': USER_lOGGED_IN})
-                return web.json_response({'status': INVALID_PASSWORD})
-    return web.json_response({'status': INVALID_USERNAME})
+    if not request.body_exists:
+        return web.json_response({'status': 400})
+    data = await request.json()
+    if not ('username' in data and 'password' in data):
+        return web.json_response({'status': 400})
+    username, password = data.get('username'), data.get('password')
+    if not (hd.is_username_valid(username) and hd.is_password_valid(password)):
+        return web.json_response({'status': 400})
+    if hd.does_exist(hd.USERNAME, username):
+        if hd.check_password(username, password):
+            if not hc.get_client(username=username):
+                response = web.json_response({'status': 200})
+                expires = datetime.now() + timedelta(days=365*10)
+                expires = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
+                response.set_cookie(
+                    COOKIE_NAME, hd.get_cookie(username), expires=expires)
+                return response
+            return web.json_response({'status': USER_lOGGED_IN})
+    return web.json_response({'status': INVALID_CREDENTIALS})
 
 
 async def sign_up(request: web.Request):
     """
     sign up.
     """
+    code = 400
     if request.body_exists:
         data = await request.json()
         if 'username' in data and 'password' in data and 'email' in data:
-            username = data.get('username')
-            password = data.get('password')
-            email = data.get('email')
-            return web.json_response({'status': hd.create_new_user(username, password, email)})
-    return web.json_response({'status': 400})
+            username, password, email = data.get('username'), data.get('password'), data.get('email')
+            code = hd.validate_credentials(username, password, email)
+            if code == 200:
+                hd.create_new_user(username, password, email)
+    return web.json_response({'status': code})
 
 
 

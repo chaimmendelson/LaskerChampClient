@@ -10,6 +10,7 @@ from stockfish import Stockfish
 
 STOCKFISH_W_PATH: str = r'./src/stockfish-windows-2022-x86-64-avx2.exe'
 STOCKFISH_L_PATH: str = r'./src/stockfish-ubuntu-20.04-x86-64-avx2'
+NEPO_L_PATH: str = r'./src/NepoChess'
 START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 WHITE = 0
 BLACK = 1
