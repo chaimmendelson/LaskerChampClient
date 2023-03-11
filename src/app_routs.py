@@ -60,7 +60,7 @@ async def login_validation(request: web.Request):
                 expires = datetime.now() + timedelta(days=365*10)
                 expires = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
                 response.set_cookie(
-                    COOKIE_NAME, hd.get_cookie(username), expires=expires)
+                    COOKIE_NAME, hd.get_value(username, hd.COOKIE), expires=expires)
                 return response
             return web.json_response({'status': USER_lOGGED_IN})
     return web.json_response({'status': INVALID_CREDENTIALS})
