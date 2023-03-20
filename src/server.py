@@ -47,6 +47,7 @@ async def handle_game_over(client: hc.Client, move: dict[str, str]):
     resaults = client.room.get_game_results()
     await sio.emit('game_over', resaults.get(client.username), to=client.sid)
     if not hc.is_engine_room(client.room):
+        move['game_over'] = True
         opponent = hc.get_oppoent(client)
         hc.update_elo({client: resaults.get(client.username),
                         opponent: resaults.get(opponent.username)})
@@ -123,6 +124,7 @@ async def connect(sid, environ, auth):
                 data_d = {'username': username,
                           'elo': round(hc.get_client(username=username).elo)}
                 await sio.emit('user_data', data_d, to=sid)
+                hd.update_entry(username)
                 return True
     return False
 
@@ -249,6 +251,9 @@ def main():
     """
     main function.
     """
+    # import stat
+    # from chess_rooms import STOCKFISH_L_PATH
+    # os.chmod(STOCKFISH_L_PATH, stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
     stop_thread = False
     thread = threading.Thread(target=check_for_timeout,
                               args=(lambda: stop_thread,))

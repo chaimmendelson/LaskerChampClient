@@ -2,10 +2,10 @@
 send and receive data from the database.
 """
 import psycopg
+from psycopg import sql
 import platform
 
-
-def execute_query(query: str, args: tuple = None) -> psycopg.cursor:
+def execute_query(query: sql.Composed, *args: str|tuple) -> psycopg.Cursor:
     """
     Execute a SQL query on the database and return the cursor object.
     """
@@ -15,16 +15,20 @@ def execute_query(query: str, args: tuple = None) -> psycopg.cursor:
         conn_str = "host=rogue.db.elephantsql.com dbname=cqscdcwf\
         user=cqscdcwf password=5lgP45vTxWWrFN5d1nWiH98vnfaWgZ95"
     conn: psycopg.Connection = psycopg.connect(conn_str, autocommit=True)
+    print(args)
     cursor = conn.execute(query, args)
     conn.close()
     return cursor
 
 
-def create_table(table_name: str, columns: list) -> None:
+def create_table(table_name: str, columns: list[str]) -> None:
     """
     Create a new table with the given name and columns.
     """
-    query = f"CREATE TABLE IF NOT EXISTS {table_name}({', '.join(columns)});"
+    #query = f"CREATE TABLE IF NOT EXISTS {table_name}({', '.join(columns)});"
+    query = sql.SQL("CREATE TABLE IF NOT EXISTS {table_name}({columns_l});").format(
+        table_name=sql.Identifier(table_name),
+        columns_l=sql.SQL(', ').join([sql.Identifier(column) for column in columns]))
     execute_query(query)
 
 
@@ -32,7 +36,8 @@ def drop_table(table_name: str) -> None:
     """
     Drop the table with the given name if it exists.
     """
-    execute_query(f"DROP TABLE IF EXISTS {table_name};")
+    execute_query(sql.SQL("DROP TABLE IF EXISTS {table_name};").format(
+        table_name=sql.Identifier(table_name)))
 
 
 def reset_table(table_name: str, columns: list) -> None:
@@ -47,38 +52,61 @@ def insert_row(table_name: str, columns: dict) -> None:
     """
     Insert a new row into the table with the given name and columns.
     """
-    column_names = ', '.join(list(columns.keys()))
-    placeholders = ', '.join(['%s'] * len(columns))
-    query = f"INSERT INTO {table_name}({column_names}) VALUES({placeholders});"
+    names = list(columns.keys())
+    query = sql.SQL("INSERT INTO {table} ({keys}) VALUES ({values})").format(
+        table=sql.Identifier(table_name),
+        keys=sql.SQL(', ').join(map(sql.Identifier, names)),
+        values=sql.SQL(', ').join(sql.Placeholder() * len(names)))
     execute_query(query, tuple(columns.values()))
 
 
-def select_value(table_name: str, column: str, where: str) -> any:
-    """
-    Select a value from the table with the given name and columns where the where clause is true.
-    """
-    query = f"SELECT {column} FROM {table_name} WHERE {where};"
-    cursor = execute_query(query)
+def select_values(table_name: str, column: str, value, *columns: str) -> tuple:
+    query = sql.SQL("SELECT {columns} FROM {table} WHERE {c} = {v};").format(
+        columns=sql.SQL(', ').join(map(sql.Identifier, columns)),
+        table=sql.Identifier(table_name),
+        c=sql.Identifier(column),
+        v=sql.Placeholder())
+    cursor = execute_query(query, value)
     data = cursor.fetchone()
     cursor.close()
-    if data:
-        return data[0]
-    return None
+    return data # type: ignore
+   
+   
+def does_exist(table_name: str, column: str, value) -> bool:
+    """
+    Check if a row exists in the table with the given name where the where clause is true.
+    """
+    query = sql.SQL("SELECT EXISTS(SELECT 1 FROM {table} WHERE {c} = {v});").format(
+        table=sql.Identifier(table_name),
+        c=sql.Identifier(column),
+        v=sql.Placeholder())
+    cursor = execute_query(query, value)
+    data = cursor.fetchone()
+    cursor.close()
+    return False if data is None else data[0]
 
-
-def update_value(table_name: str, column: str, value: str, where: str) -> None:
+def update_value(table_name: str, s_column: str, s_value: str|None, column: str, value) -> None:
     """
     Update a row in the table with the given name and updates where the where clause is true.
     """
-    if value is None:
-        value = 'current_timestamp'
-    query = f"UPDATE {table_name} SET {column} = {value} WHERE {where};"
-    execute_query(query)
+    if s_value is None:
+        # set the value to current timestamp
+        s_value = 'current_timestamp'
+    query = sql.SQL("UPDATE {table} SET {s_c} = {s_v} WHERE {c} = {v};").format(
+        table=sql.Identifier(table_name),
+        s_c=sql.Identifier(s_column),
+        s_v=sql.Placeholder(),
+        c=sql.Identifier(column),
+        v=sql.Placeholder())
+    execute_query(query, s_value, value)
 
 
-def delete_row(table_name: str, where: str) -> None:
+def delete_row(table_name: str, column:str, value) -> None:
     """
     Delete a row from the table with the given name where the where clause is true.
     """
-    query = f"DELETE FROM {table_name} WHERE {where};"
-    execute_query(query)
+    query = sql.SQL("DELETE FROM {table} WHERE {c} = {v};").format(
+        table=sql.Identifier(table_name),
+        c=sql.Identifier(column),
+        v=sql.Placeholder())
+    execute_query(query, value)

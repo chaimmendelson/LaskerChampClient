@@ -10,7 +10,7 @@ from stockfish import Stockfish
 
 STOCKFISH_W_PATH: str = r'./src/engines/stockfish-windows-2022-x86-64-avx2.exe'
 STOCKFISH_L_PATH: str = r'./src/engines/stockfish-ubuntu-20.04-x86-64-avx2'
-NEPO_L_PATH: str = r'./src/engines/NepoChess'
+NEPO_L_PATH: str = r'./src/engines/NepoChessTests'
 START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 WHITE = 0
 BLACK = 1
@@ -205,8 +205,8 @@ class EngineRoom(ChessRoom):
         self.start_clock()
         self.stockfish.set_fen_position(self.fen())
         move = self.stockfish.get_best_move()
-        self.commit_move(move)
-        return move
+        self.commit_move(move) # type: ignore
+        return move # type: ignore
 
 
 class PlayerRoom(ChessRoom):

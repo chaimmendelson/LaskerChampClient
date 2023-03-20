@@ -63,25 +63,25 @@ def var(string):
     return f"'{string}'"
 
 
-def update_value(username: str, column: str, value: any) -> None:
+def update_value(username: str, column: str, value) -> None:
     """
     change the value of the given column for the given username.
     """
-    db.update_value(TABLE_NAME, column, value, f"{USERNAME} = '{username}'")
+    db.update_value(TABLE_NAME, column, value, USERNAME, username)
 
 
 def get_value(username: str, column: str) -> str:
     """
     get the value of the given column for the given username.
     """
-    return db.select_value(TABLE_NAME, column, f"{USERNAME} = '{username}'")
+    return db.select_values(TABLE_NAME, USERNAME, username, column)[0]
 
 
 def does_exist(column: str, value: str) -> bool:
     """
     true if the given value exists in the given column.
     """
-    return db.select_value(TABLE_NAME, '*', f"{column} = '{value}'") is not None
+    return db.does_exist(TABLE_NAME, column, value)
 
 
 def hash_pass(password: str) -> str:
@@ -135,6 +135,7 @@ def is_email_valid(email: str) -> bool:
     email_regex = r'^[\w.%+-]{1,64}@[A-Za-z\d.-]{1,253}\.[A-Z|a-z]{2,4}$'
     if not re.fullmatch(email_regex, email):
         return False
+    return True
     # make a do while loop.
     while True:
         response = requests.get(
@@ -154,11 +155,8 @@ def is_cookie_valid(cookie: str) -> bool:
     """
     check if the given cookie is valid.
     """
-    if len(cookie) != COOKIE_L:
-        return False
-    if not cookie.isalnum():
-        return False
-    return True
+    return len(cookie) == COOKIE_L and cookie.isalnum()
+        
 
 def validate_credentials(username: str, password: str, email: str) -> int:
     """
@@ -176,7 +174,7 @@ def validate_credentials(username: str, password: str, email: str) -> int:
         return EMAIL_EXISTS
     return 200
 
-def create_new_user(username: str, password: str, email: str) -> int:
+def create_new_user(username: str, password: str, email: str) -> None:
     """
     add a new user to the database after verifying the username and password
     (the email will be verfied later).
@@ -194,7 +192,7 @@ def delete_user(username: str) -> None:
     """
     calls delete_user to delete the user from the database
     """
-    db.delete_row(TABLE_NAME, f"{USERNAME} = {var(username)}")
+    db.delete_row(TABLE_NAME, USERNAME, username)
 
 
 def check_password(username: str, password: str) -> bool:
@@ -204,49 +202,11 @@ def check_password(username: str, password: str) -> bool:
     return hash_pass(password) == get_value(username, PASSWORD)
 
 
-def update_username(username: str, new_username: str) -> bool:
-    """
-    if the new username is valid, it will be updated
-    """
-    if is_username_valid(username):
-        update_value(username, USERNAME, var(new_username))
-        return True
-    return False
-
-
-def update_password(username: str, old_password: str, new_password: str) -> bool:
-    """
-    if the new password is valid, it will be updated
-    """
-    if check_password(username, old_password) and is_password_valid(new_password):
-        update_value(username, PASSWORD, var(hash_pass(new_password)))
-        return True
-    return False
-
-
-def update_email(username: str, password: str, new_email: str) -> bool:
-    """
-    if the new email is valid, it will be updated
-    """
-    if check_password(username, password):
-        update_value(username, EMAIL, var(new_email))
-        return True
-    return False
-
-
-def update_elo(username: str, new_elo: int) -> None:
-    """
-    if the new elo is valid, it will be updated
-    """
-    update_value(username, ELO, new_elo)
-
-
 def update_games_played(username: str) -> None:
     """
     add one to the games played value
     """
-    update_value(username, GAMES_PLAYED, int(
-        get_value(username, GAMES_PLAYED)) + 1)
+    update_value(username, GAMES_PLAYED, int(get_value(username, GAMES_PLAYED)) + 1)
 
 
 def update_entry(username: str) -> None:
@@ -260,10 +220,10 @@ def get_username_by_cookie(cookie: str) -> str:
     """
     get the username from the database by his cookie
     """
-    return db.select_value(TABLE_NAME, USERNAME, f'{COOKIE} = {var(cookie)}')
+    return db.select_values(TABLE_NAME, COOKIE, cookie, USERNAME)[0]
 
 
-def get_entry(username: str) -> datetime.strftime:
+def get_entry(username: str) -> str:
     """
     get the last entry time from the database and convert it from sql format to datetime format
     """
@@ -271,7 +231,7 @@ def get_entry(username: str) -> datetime.strftime:
     return entry.strftime("(%d/%m/%y, %H:%M:%S)")
 
 
-def get_creation_date(username: str) -> datetime.strftime:
+def get_creation_date(username: str) -> str:
     """
     get the user creation time from the database and convert it from sql format to datetime format
     """
@@ -279,11 +239,11 @@ def get_creation_date(username: str) -> datetime.strftime:
     return creation.strftime("(%d/%m/%y, %H:%M:%S)")
 
 
-def reset_password(username: str) -> bool:
+def reset_password(username: str) -> None:
     """
-    reset the password to 'default'
+    reset the password to 'password'
     """
-    return update_value(username, PASSWORD, hash_pass('default'))
+    update_value(username, PASSWORD, hash_pass('password'))
 
 
 def reset_table():
@@ -291,3 +251,19 @@ def reset_table():
     reset the table and insert default users
     """
     db.reset_table(TABLE_NAME, STRUCTURE)
+
+def test():
+    username, password, email = 'test', 'test1234', 'chaimm2005@gmail.com'
+    try:
+        assert validate_credentials(username, password, email) == 200
+        create_new_user(username, password, email)
+        assert get_value(username, PASSWORD) == hash_pass(password)
+        delete_user(username)
+        assert does_exist(USERNAME, username) == False
+    except AssertionError as e:
+        delete_user(username)
+        print(e)
+        
+
+if __name__ == '__main__':
+    test()
