@@ -104,11 +104,11 @@ async def handle_timeout(room: EngineRoom | PlayerRoom) -> None:
     hc.close_room(client)
 
 
-def check_for_timeout(stop_event: threading.Event):
+def check_for_timeout(stop_event: bool):
     """
     run endless loop to check for timeout.
     """
-    while not stop_event.is_set():
+    while not stop_event:
         sleep(0.1)
         for room in hc.CHESS_ROOMS:
             if room.is_timeout():

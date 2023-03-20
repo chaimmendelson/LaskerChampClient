@@ -64,6 +64,16 @@ def add_client(username: str, sid: str) -> None:
     CLIENTS.append(Client(username, sid))
 
 
+def is_client_connected(username: str) -> bool:
+    """
+    return True if the given username is connected.
+    """
+    for client in CLIENTS:
+        if client.username == username:
+            return True
+    return False
+
+
 def get_client(sid: str|None = None, username: str|None = None) -> Client:
     """
     get the client object of the given username or sid.

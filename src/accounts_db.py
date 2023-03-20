@@ -70,7 +70,7 @@ def update_value(username: str, column: str, value) -> None:
     db.update_value(TABLE_NAME, column, value, USERNAME, username)
 
 
-def get_value(username: str, column: str) -> str|int|datetime:
+def get_value(username: str, column: str) -> str|int|float|datetime:
     """
     get the value of the given column for the given username.
     """
@@ -188,7 +188,7 @@ def create_new_user(username: str, password: str, email: str) -> None:
     })
 
 
-def get_user_data(column: str, value, columns) -> dict[str, str|int|datetime]:
+def get_user_data(column: str, value, columns) -> dict[str, str|int|float|datetime]:
     """
     get the data of the user with the given value in the given column.
     """
@@ -243,12 +243,12 @@ def reset_table():
     """
     db.reset_table(TABLE_NAME, STRUCTURE)
 
-def parse_values(data: dict) -> dict[str, str|int|datetime]:
+def parse_values(data: dict) -> dict[str, str|int|float|datetime]:
     parsed_data = {}
     for key, value in data.items():
         if key == ELO:
             parsed_data[key] = float(value)
-        if key == GAMES_PLAYED:
+        elif key == GAMES_PLAYED:
             parsed_data[key] = int(value)
         elif key == LAST_ENTRY or key == CREATION_DATE:
             parsed_data[key] = datetime.fromisoformat(str(value))

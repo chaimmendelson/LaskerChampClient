@@ -66,8 +66,9 @@ socket.on('update_elo', (data) => {
 
 
 socket.on('user_data', (data) => {
-   document.getElementById('username').innerHTML = data['username'];
-   document.getElementById('elo').innerHTML = data['elo'];
+    console.log(data);
+    document.getElementById('username').innerHTML = data['username'];
+    document.getElementById('elo').innerHTML = data['elo'];
 });
 
 socket.on('opponent_move', (data) => {
