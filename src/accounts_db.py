@@ -45,7 +45,7 @@ STRUCTURE: list[str] = [
     f'{CREATION_DATE} timestamp not null default now()'
 ]
 
-SQL_CURRENT_TIME: str = 'current_timestamp'
+SQL_CURRENT_TIME: str = 'now()'
 
 # error codes.
 INVALID_USERNAME: int = 471
@@ -70,11 +70,11 @@ def update_value(username: str, column: str, value) -> None:
     db.update_value(TABLE_NAME, column, value, USERNAME, username)
 
 
-def get_value(username: str, column: str) -> str:
+def get_value(username: str, column: str) -> str|int|datetime:
     """
     get the value of the given column for the given username.
     """
-    return db.select_values(TABLE_NAME, USERNAME, username, column)[0]
+    return parse_values({column: db.select_values(TABLE_NAME, USERNAME, username, (column,))[0]})[column]
 
 
 def does_exist(column: str, value: str) -> bool:
@@ -188,6 +188,13 @@ def create_new_user(username: str, password: str, email: str) -> None:
     })
 
 
+def get_user_data(column: str, value, columns) -> dict[str, str|int|datetime]:
+    """
+    get the data of the user with the given value in the given column.
+    """
+    return parse_values(dict(zip(columns, db.select_values(TABLE_NAME, column, value, columns))))
+
+
 def delete_user(username: str) -> None:
     """
     calls delete_user to delete the user from the database
@@ -206,7 +213,7 @@ def update_games_played(username: str) -> None:
     """
     add one to the games played value
     """
-    update_value(username, GAMES_PLAYED, int(get_value(username, GAMES_PLAYED)) + 1)
+    update_value(username, GAMES_PLAYED, int(str(get_value(username, GAMES_PLAYED))) + 1)
 
 
 def update_entry(username: str) -> None:
@@ -220,23 +227,7 @@ def get_username_by_cookie(cookie: str) -> str:
     """
     get the username from the database by his cookie
     """
-    return db.select_values(TABLE_NAME, COOKIE, cookie, USERNAME)[0]
-
-
-def get_entry(username: str) -> str:
-    """
-    get the last entry time from the database and convert it from sql format to datetime format
-    """
-    entry = datetime.fromisoformat(str(get_value(username, LAST_ENTRY)))
-    return entry.strftime("(%d/%m/%y, %H:%M:%S)")
-
-
-def get_creation_date(username: str) -> str:
-    """
-    get the user creation time from the database and convert it from sql format to datetime format
-    """
-    creation = datetime.fromisoformat(str(get_value(username, LAST_ENTRY)))
-    return creation.strftime("(%d/%m/%y, %H:%M:%S)")
+    return db.select_values(TABLE_NAME, COOKIE, cookie, (USERNAME,))[0]
 
 
 def reset_password(username: str) -> None:
@@ -252,18 +243,77 @@ def reset_table():
     """
     db.reset_table(TABLE_NAME, STRUCTURE)
 
+def parse_values(data: dict) -> dict[str, str|int|datetime]:
+    parsed_data = {}
+    for key, value in data.items():
+        if key == ELO:
+            parsed_data[key] = float(value)
+        if key == GAMES_PLAYED:
+            parsed_data[key] = int(value)
+        elif key == LAST_ENTRY or key == CREATION_DATE:
+            parsed_data[key] = datetime.fromisoformat(str(value))
+        else:
+            parsed_data[key] = str(value)
+    return parsed_data
+            
+
+def test_validation():
+    # test username validation
+    assert is_username_valid('c' * (MAX_USERNAME_L + 1)) == False
+    assert is_username_valid('c' * (MIN_USERNAME_L - 1)) == False
+    assert is_username_valid('1' + 'c' * MIN_USERNAME_L) == False
+    assert is_username_valid('c'  + '#' * MIN_USERNAME_L) == False
+    assert is_username_valid('chaim') == True
+    
+    # test password validation
+    assert is_password_valid('c' * (MAX_PASSWORD_L + 1) + '1') == False
+    assert is_password_valid('c' * (MIN_PASSWORD_L - 2) + '1') == False
+    assert is_password_valid('A' * MIN_PASSWORD_L + '1') == False
+    assert is_password_valid('a' * MIN_PASSWORD_L) == False
+    assert is_password_valid('a' * MIN_PASSWORD_L + '1 ') == False
+    assert is_password_valid('a' * MIN_PASSWORD_L + '1') == True
+    
+    # test email validation
+    assert is_email_valid('chaimke2005@gmail.com') == True
+    
+    print('validation tests passed')
+     
+    
 def test():
     username, password, email = 'test', 'test1234', 'chaimm2005@gmail.com'
-    try:
-        assert validate_credentials(username, password, email) == 200
-        create_new_user(username, password, email)
-        assert get_value(username, PASSWORD) == hash_pass(password)
-        delete_user(username)
-        assert does_exist(USERNAME, username) == False
-    except AssertionError as e:
-        delete_user(username)
-        print(e)
+    delete_user(username)
+    
+    # test creation of new user
+    assert validate_credentials(username, password, email) == 200
+    create_new_user(username, password, email)
+    
+    # test getting values
+    assert get_value(username, PASSWORD) == hash_pass(password)
+    assert get_user_data(USERNAME, username, (GAMES_PLAYED,))[GAMES_PLAYED] == 0
+    
+    # test updating values
+    update_value(username, ELO, 1500)
+    assert get_value(username, ELO) == 1500
+    
+    # test update games played
+    update_games_played(username)
+    assert get_value(username, GAMES_PLAYED) == 1
+    
+    # test update entry
+    update_entry(username)
+    dates = get_user_data(USERNAME, username, (CREATION_DATE, LAST_ENTRY))
+    reg, ent = dates[CREATION_DATE], dates[LAST_ENTRY]
+    assert isinstance(reg, datetime) and isinstance(ent, datetime)
+    assert reg < ent
+    
+    # test deleting user
+    delete_user(username)
+    assert does_exist(USERNAME, username) == False
+    
+    # if we got here, all tests passed
+    print('all tests passed')
         
 
 if __name__ == '__main__':
     test()
+    test_validation()

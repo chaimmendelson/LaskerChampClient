@@ -15,7 +15,7 @@ def execute_query(query: sql.Composed, *args: str|tuple) -> psycopg.Cursor:
         conn_str = "host=rogue.db.elephantsql.com dbname=cqscdcwf\
         user=cqscdcwf password=5lgP45vTxWWrFN5d1nWiH98vnfaWgZ95"
     conn: psycopg.Connection = psycopg.connect(conn_str, autocommit=True)
-    print(args)
+    args = args[0] if len(args) == 1 and isinstance(args[0], tuple) else args
     cursor = conn.execute(query, args)
     conn.close()
     return cursor
@@ -60,7 +60,7 @@ def insert_row(table_name: str, columns: dict) -> None:
     execute_query(query, tuple(columns.values()))
 
 
-def select_values(table_name: str, column: str, value, *columns: str) -> tuple:
+def select_values(table_name: str, column: str, value, columns: tuple) -> tuple:
     query = sql.SQL("SELECT {columns} FROM {table} WHERE {c} = {v};").format(
         columns=sql.SQL(', ').join(map(sql.Identifier, columns)),
         table=sql.Identifier(table_name),

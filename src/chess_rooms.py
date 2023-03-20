@@ -158,7 +158,7 @@ class ChessRoom:
         """
         return self.board.result() != '*'
 
-    def get_game_results(self) -> dict:
+    def get_game_results(self) -> dict[str, str]:
         """
         return the game results as a dictionary
         """
@@ -167,7 +167,7 @@ class ChessRoom:
             resault = self.board.result().split('-')
             if resault[0] == '1/2':
                 resault = ['0.5', '0.5']
-        return {self.players[0]: float(resault[0]), self.players[1]: float(resault[1])}
+        return {self.players[0]: resault[0], self.players[1]: resault[1]}
 
     def is_players_turn(self, player: str) -> bool:
         """
