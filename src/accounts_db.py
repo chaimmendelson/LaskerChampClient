@@ -21,6 +21,7 @@ ELO = 'elo'
 GAMES_PLAYED = 'games_played'
 LAST_ENTRY = 'last_entry'
 CREATION_DATE = 'creation_date'
+ROLL = 'roll'
 
 # length settings.
 MAX_USERNAME_L = 32
@@ -33,6 +34,12 @@ MIN_PASSWORD_L = 8
 
 HASH_LEN = 128
 
+USER = 'user'
+ADMIN = 'admin'
+BLOCKED = 'blocked'
+ROLLS = [USER, ADMIN, BLOCKED]
+MAX_ROLL_L = max([len(roll) for roll in ROLLS])
+
 # table structure.
 STRUCTURE: list[str] = [
     f'{USERNAME} varchar({MAX_USERNAME_L}) unique not null primary key',
@@ -41,6 +48,7 @@ STRUCTURE: list[str] = [
     f'{COOKIE} varchar({COOKIE_L}) not null unique',
     f'{ELO} decimal not null',
     f'{GAMES_PLAYED} integer not null default 0',
+    f'{ROLL} varchar({MAX_ROLL_L}) not null',
     f'{LAST_ENTRY} timestamp not null default now()',
     f'{CREATION_DATE} timestamp not null default now()'
 ]
@@ -174,7 +182,7 @@ def validate_credentials(username: str, password: str, email: str) -> int:
         return EMAIL_EXISTS
     return 200
 
-def create_new_user(username: str, password: str, email: str) -> None:
+def create_new_user(username: str, password: str, email: str, elo: int=1200, roll: str=USER) -> None:
     """
     add a new user to the database after verifying the username and password
     (the email will be verfied later).
@@ -184,7 +192,8 @@ def create_new_user(username: str, password: str, email: str) -> None:
         PASSWORD: hash_pass(password),
         EMAIL: email,
         COOKIE: create_cookie(username),
-        ELO: '1200'
+        ELO: elo,
+        ROLL: roll
     })
 
 
@@ -312,8 +321,11 @@ def test():
     
     # if we got here, all tests passed
     print('all tests passed')
-        
 
-if __name__ == '__main__':
+def main():
+    reset_table()
     test()
     test_validation()
+
+if __name__ == '__main__':
+    main()

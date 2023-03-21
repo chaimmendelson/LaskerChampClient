@@ -5,6 +5,7 @@ let $pgn = $('#pgnText')
 let board = ChessBoard('myBoard', 'start')
 let game = null
 let usePreGame = true;
+let clickToMove = true;
 let autoQueen = true;
 
 let playerColor = null
@@ -13,6 +14,7 @@ let GameOver = true;
 let waitingForCrowning = false;
 
 let crowningMove = null;
+let srcSquare = null;
 let moveToHighlight = null
 let move_stack = [];
 
@@ -31,6 +33,9 @@ const blackSquareHighlight = 'gold'
 const squareClass = 'square-55d63'
 const whiteSquareClass = 'white-1e1d7'
 const blackSquareClass = 'black-3c85d'
+
+const whiteSquareSrcHighlight = 'lightblue'
+const blackSquareSrcHighlight = 'deepskyblue'
 
 function specificSquareClass(square){
     return '.square-' + square;
@@ -61,6 +66,12 @@ function highlightPreMoves(){
     }
 }
 
+function highlightSrcSquare(){
+    if (!srcSquare) return;
+    let background = isWhiteSquare(srcSquare) ? whiteSquareSrcHighlight : blackSquareSrcHighlight;
+    $board.find(specificSquareClass(srcSquare)).css('background', background)
+}
+
 function highlightMove() {
     if (moveToHighlight) {
         highlightSquare(moveToHighlight.from);
@@ -79,6 +90,7 @@ function resetSquareColor(){
     highlightMove();
     if (usePreGame) highlightPreMoves();
     if (waitingForCrowning) showCrowningOptions();
+    highlightSrcSquare();
 }
 
 function resetPosition(){
