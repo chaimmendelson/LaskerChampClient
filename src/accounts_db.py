@@ -50,7 +50,7 @@ STRUCTURE: list[str] = [
     f'{GAMES_PLAYED} integer not null default 0',
     f'{ROLL} varchar({MAX_ROLL_L}) not null',
     f'{LAST_ENTRY} timestamp not null default now()',
-    f'{CREATION_DATE} timestamp not null default now()'
+    f'{CREATION_DATE} timestamp not null default now()',
 ]
 
 SQL_CURRENT_TIME: str = 'now()'
@@ -251,6 +251,7 @@ def reset_table():
     reset the table and insert default users
     """
     db.reset_table(TABLE_NAME, STRUCTURE)
+    create_new_user('admin13', '123admin456', 'chaimke2005@gmail.com', 1200, ADMIN)
 
 def parse_values(data: dict) -> dict[str, str|int|float|datetime]:
     parsed_data = {}
@@ -323,7 +324,6 @@ def test():
     print('all tests passed')
 
 def main():
-    reset_table()
     test()
     test_validation()
 

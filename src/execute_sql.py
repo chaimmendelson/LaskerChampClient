@@ -25,10 +25,9 @@ def create_table(table_name: str, columns: list[str]) -> None:
     """
     Create a new table with the given name and columns.
     """
-    #query = f"CREATE TABLE IF NOT EXISTS {table_name}({', '.join(columns)});"
-    query = sql.SQL("CREATE TABLE IF NOT EXISTS {table_name}({columns_l});").format(
+    query = sql.SQL("CREATE TABLE IF NOT EXISTS {table_name} ({columns_l})").format(
         table_name=sql.Identifier(table_name),
-        columns_l=sql.SQL(', ').join([sql.Identifier(column) for column in columns]))
+        columns_l=sql.SQL(', ').join([sql.SQL(column) for column in columns])) # type: ignore
     execute_query(query)
 
 

@@ -16,9 +16,10 @@ class Client():
         self.sid: str = sid
         # the room that the user is in.
         self.room: EngineRoom | PlayerRoom | None = None
-        user_data = hd.get_user_data(hd.USERNAME, username, (hd.ELO, hd.GAMES_PLAYED))
+        user_data = hd.get_user_data(hd.USERNAME, username, (hd.ELO, hd.GAMES_PLAYED, hd.ROLL))
         self.elo: float = user_data[hd.ELO] # type: ignore
         self.games_played: int = user_data[hd.GAMES_PLAYED] # type: ignore
+        self.roll: str = user_data[hd.ROLL] # type: ignore
 
     def update_elo(self, opponent_elo, player_score):
         """
