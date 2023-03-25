@@ -194,7 +194,7 @@ async def my_move(sid: str, data):
     handle the given move from the given sid.
     """
     client = hc.get_client(sid=sid)
-    if not client.room or not client.room.is_players_turn(client.username):
+    if (client.room is None) or (not client.room.is_players_turn(client.username)):
         return False
     move = uf.validate_move(data.get('move'))
     if move is None:
