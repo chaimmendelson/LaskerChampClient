@@ -25,3 +25,449 @@ Other:
 - stone of fear
 - tome of dungeon mastery
 
+--- floor 2 ---
+
+Scrolls:
+- scroll of terror
+- scroll of upgrade
+
+Potions:
+- potion of mind vision
+- potion of strength
+
+Equipment:
+- scale armor of displacement +2 (tomb)
+
+Other:
+- arcane stylus
+- ration of food
+- tomahawk x2
+
+--- floor 3 ---
+
+Ghost quest rewards:
+- leather armor +2
+- spear +2
+
+Scrolls:
+- scroll of recharging
+- scroll of recharging (mimic)
+
+Potions:
+- potion of liquid flame
+- potion of levitation
+- potion of strength
+
+Equipment:
+- leather armor +1 (chest)
+- leather armor +1 (chest)
+- polarized shortsword (mimic)
+
+Other:
+- ration of food
+- pasty
+
+--- floor 4 ---
+
+Scrolls:
+- scroll of upgrade
+- scroll of identify (skeletal remains)
+
+Potions:
+- potion of liquid flame
+- potion of paralytic gas
+- potion of experience
+
+Equipment:
+- leather armor of stench (skeletal remains)
+
+Other:
+- pasty
+- ration of food
+- chargrilled meat
+- ration of food
+
+--- floor 5 ---
+
+--- floor 6 ---
+
+Scrolls:
+- scroll of magic mapping
+- scroll of identify
+- scroll of upgrade
+- scroll of mirror image (chest)
+
+Potions:
+- potion of haste
+- potion of purity
+- potion of frost
+- potion of healing
+- potion of healing
+- potion of frost
+
+Equipment:
+- shortsword (locked chest)
+
+Rings:
+- ring of evasion (chest)
+
+Other:
+- honeypot
+- stone of enchantment
+- ration of food
+- ration of food
+
+--- floor 7 ---
+
+Scrolls:
+- scroll of upgrade
+
+Potions:
+- potion of healing
+- potion of strength
+
+Equipment:
+- leather armor
+
+Rings:
+- ring of elements (crystal chest)
+
+Wands:
+- cursed wand of prismatic light (crystal chest)
+
+Other:
+- ration of food
+- kunai x3
+- seed of earthroot
+
+--- floor 8 ---
+
+Wandmaker quest item: rotberry seed
+
+Wandmaker quest rewards:
+- wand of fireblast +2
+- wand of lightning +1
+
+Scrolls:
+- scroll of recharging
+- scroll of remove curse (locked chest)
+- scroll of transmutation
+- scroll of rage (locked chest)
+- scroll of lullaby
+
+Potions:
+- potion of levitation
+- potion of strength
+- potion of healing
+- potion of frost (locked chest)
+- potion of haste
+
+Equipment:
+- polarized assassin's blade
+- scale armor (chest)
+
+Rings:
+- cursed ring of haste (chest)
+
+Other:
+- ration of food
+- arcane stylus
+
+--- floor 9 ---
+
+Scrolls:
+- scroll of upgrade
+
+Potions:
+- potion of purity
+
+Equipment:
+- scale armor (chest)
+- longsword +2
+- blazing whip +1 (statue)
+
+Other:
+- stone of blast
+- ration of food
+
+--- floor 10 ---
+
+--- floor 11 ---
+
+Scrolls:
+- scroll of retribution (skeletal remains)
+- scroll of mirror image
+- scroll of upgrade
+
+Potions:
+- potion of levitation (chest)
+- potion of liquid flame
+- potion of invisibility
+
+Equipment:
+- mail armor of metabolism +1 (tomb)
+- sai (chest)
+
+Other:
+- ration of food
+- stone of intuition
+- stone of fear
+
+--- floor 12 ---
+
+Scrolls:
+- scroll of upgrade
+- scroll of magic mapping
+
+Potions:
+- potion of strength (chest)
+- potion of levitation
+
+Equipment:
+- scale armor of corrosion +2 (mimic)
+
+Other:
+- ration of food
+- stone of blast
+- throwing spear x4 (golden mimic)
+- kunai x2 (golden mimic)
+
+--- floor 13 ---
+
+Scrolls:
+- scroll of identify (skeletal remains)
+
+Potions:
+- potion of experience
+- potion of toxic gas
+- potion of strength
+- potion of liquid flame
+
+Equipment:
+- scale armor +1
+
+Artifacts:
+- master thieves' armband (tomb)
+
+Other:
+- seed of sungrass
+- ration of food
+- arcane stylus
+- kunai x3
+
+--- floor 14 ---
+
+Scrolls:
+- scroll of lullaby
+- scroll of terror
+- scroll of remove curse
+- scroll of remove curse
+- scroll of upgrade
+
+Potions:
+- potion of liquid flame
+
+Equipment:
+- mace (skeletal remains)
+
+Other:
+- ration of food
+- bolas x2
+- stone of clairvoyance (chest)
+- two bombs
+- tomahawk x2
+- heavy boomerang x2 (mimic)
+
+--- floor 15 ---
+
+--- floor 16 ---
+
+Scrolls:
+- scroll of upgrade
+- scroll of teleportation (tomb)
+
+Potions:
+- potion of strength
+- potion of frost
+- potion of paralytic gas (chest)
+- potion of invisibility (mimic)
+
+Equipment:
+- scale armor (chest)
+- assassin's blade
+
+Rings:
+- cursed ring of wealth +2 (crystal chest)
+
+Artifacts:
+- horn of plenty (crystal chest)
+
+Other:
+- arcane stylus
+- tomahawk x4
+- ration of food
+- ration of food
+- bomb
+- pasty
+- javelin x2 (mimic)
+
+--- floor 17 ---
+
+Scrolls:
+- scroll of identify (chest)
+- scroll of teleportation
+- scroll of upgrade
+- scroll of teleportation
+- scroll of mirror image
+
+Potions:
+- potion of haste
+- potion of mind vision
+- potion of invisibility
+
+Equipment:
+- plate armor (chest)
+- plate armor of repulsion +1 (locked chest)
+
+Other:
+- ration of food
+
+--- floor 18 ---
+
+Imp quest reward:
+- cursed ring of sharpshooting +3
+
+Scrolls:
+- scroll of remove curse
+- scroll of remove curse
+- scroll of upgrade
+
+Potions:
+- potion of levitation (chest)
+- potion of purity
+- potion of healing
+
+Equipment:
+- kinetic crossbow +1 (statue)
+
+Rings:
+- cursed ring of arcana +1 (chest)
+
+Other:
+- ration of food
+
+--- floor 19 ---
+
+Scrolls:
+- scroll of identify
+
+Potions:
+- potion of healing
+- potion of toxic gas
+- potion of strength
+- potion of liquid flame
+
+Other:
+- throwing hammer x2
+- ration of food (chest)
+
+--- floor 20 ---
+
+--- floor 21 ---
+
+Scrolls:
+- scroll of upgrade
+- scroll of identify
+
+Potions:
+- potion of invisibility
+
+Equipment:
+- plate armor +2 (chest)
+- plate armor (skeletal remains)
+
+Wands:
+- wand of blast wave
+
+Other:
+- stone of fear
+- torch
+- stone of aggression
+- torch
+- ration of food
+- stone of blink
+- torch
+
+--- floor 22 ---
+
+Scrolls:
+- scroll of upgrade
+
+Potions:
+- potion of strength
+- potion of haste
+- potion of purity
+
+Equipment:
+- scale armor of metabolism +1 (tomb)
+
+Rings:
+- ring of arcana +1 (golden mimic)
+
+Other:
+- throwing hammer x2 (skeletal remains)
+- pasty
+- torch
+- arcane stylus
+- chargrilled meat
+- chargrilled meat
+- torch
+- pasty
+- javelin x2 (golden mimic)
+
+--- floor 23 ---
+
+Scrolls:
+- scroll of identify (mimic)
+
+Potions:
+- potion of toxic gas
+- potion of frost (chest)
+- potion of strength
+- potion of levitation
+
+Equipment:
+- friendly greatshield
+
+Rings:
+- ring of accuracy +1 (mimic)
+
+Other:
+- torch
+- torch
+- torch
+- ration of food (chest)
+
+--- floor 24 ---
+
+Scrolls:
+- scroll of upgrade
+- scroll of retribution
+- scroll of mirror image
+
+Potions:
+- potion of frost
+- potion of mind vision
+- potion of frost (skeletal remains)
+
+Equipment:
+- plate armor +1 (skeletal remains)
+
+Other:
+- torch
+- honeypot
+- ration of food
+- torch
+
+--- floor 25 ---
+
