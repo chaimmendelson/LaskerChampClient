@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Seed Finder</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			font-family: Arial, sans-serif;
+		}
+
+		h1 {
+			text-align: center;
+			margin-top: 50px;
+		}
+
+		form {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin-top: 50px;
+			width: 25% 
+		}
+
+		input[type="text"],
+		input[type="number"] {
+			padding: 10px;
+			font-size: 16px;
+			border: none;
+			border-radius: 5px;
+			box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+			margin: 10px;
+			width: 300px;
+		}
+
+		input[type="submit"] {
+			background-color: #4CAF50;
+			color: white;
+			padding: 10px 20px;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+			box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+			margin-top: 20px;
+		}
+
+		input[type="submit"]:hover {
+			background-color: #3e8e41;
+		}
+
+		#container {
+			display: flex;
+			flex-direction: row;
+			align-items: top;
+			margin: 0 auto;
+			width: 80%;
+		}
+
+		#output {
+			padding: 10px;
+			font-size: 16px;
+			margin: 10px auto;
+			border: none;
+			border-radius: 5px;
+			box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+			width: 40%;
+			height: 500px;
+			overflow: auto;
+		}
+	</style>
+</head>
+<body>
+	<h1>Shattered Pixel Dungeon Seed Searcher</h1>
+	<div id="container">
+		<form onsubmit="searchSeed(event)" autocomplete="off">
+			<label for="seedInput">Seed ID:</label>
+			<input type="text" id="seedInput" placeholder="AAA-AAA-AAA" required>
+
+			<label for="depthInput">Depth:</label>
+			<input type="number" id="depthInput" min="1" max="25" value="25" required>
+
+			<input type="submit" value="Search Seed">
+		</form>
+
+		<div id="output"></div>
+	</div>
+
+	<script>
+		let prvSeedLen = 0;
+		function searchSeed(event) {
+			event.preventDefault();
+
+			const seed = document.getElementById("seedInput").value;
+			const depth = document.getElementById("depthInput").value;
+			prvSeedLen = 0;
+			document.getElementById("seedInput").value = '';
+			document.getElementById("depthInput").value = 25;
+			fetch('http://localhost:5678/items', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					seed: seed,
+					depth: depth
+				})
+			})
+				.then(response => response.text())
+				.then(output => {
+					writeOutput(output);
+				});
+		}
+
+		function writeOutput(output) {
+			const outputDiv = document.getElementById("output");
+			output = JSON.parse(output);
+			items = ''
+			items += `${output.settings}<br><br>`;
+			for (let i = 0; i < output.items.length; i++) {
+				items += `--- floor ${i + 1} ---<br>`;
+				keys = Object.keys(output.items[i]);
+				for (let j = 0; j < keys.length; j++) {
+					items += `<br>${keys[j]}:<br>`;
+					for (let k = 0; k < output.items[i][keys[j]].length; k++) {
+						items += `- ${output.items[i][keys[j]][k]}<br>`;
+					}
+				}
+				items += '<br>';
+			}
+			// search for ring of wealth in items
+			if (items.includes('ring of wealth')) {
+				for (let i = 0; i < output.items.length; i++) {
+					if (output.items[i].Rings){
+						for (let j = 0; j < output.items[i].Rings.length; j++) {
+							if (output.items[i].Rings[j].includes('ring of wealth')) {
+								items = `Found ring of wealth on floor ${i + 1}!<br>` + items;
+								break;
+							}
+						}
+					}
+				}
+			}
+			outputDiv.innerHTML = items;
+		}
+
+		document.getElementById("seedInput").oninput = function() {
+			// check if the last character not a letter and if so remove it
+			if (this.value.length > prvSeedLen){
+				if (this.value.length > 11)
+					this.value = this.value.slice(0, -1);
+
+				this.value = this.value.toUpperCase();
+				if (this.value[this.value.length - 1].match(/[^a-zA-Z]/))
+					this.value = this.value.slice(0, -1);
+
+				if (this.value.length === 3 || this.value.length === 7)
+					this.value += '-';
+			}
+			else{
+				if (this.value.length === 3 || this.value.length === 7)
+					this.value = this.value.slice(0, -1);
+			}
+			prvSeedLen = this.value.length;
+		}
+
+		document.getElementById("depthInput").oninput = function() {
+			// if the user goes above 25 remove the last character
+			if (this.value > 25)
+				this.value = this.value.slice(0, -1);
+		}
+	</script>
+</body>
+</html>

@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 from aiohttp import web
 import accounts_db as hd
 import handle_clients as hc
+from re import fullmatch
+from search import get_items
 
 COOKIE_NAME: str = 'chess-cookie'
 
@@ -38,6 +40,14 @@ async def register(request: web.Request):
     Serve the client-side application.
     """
     with open('src/pages/register.html', encoding='utf-8') as register_page:
+        return web.Response(text=register_page.read(), content_type='text/html')
+    
+
+async def dungeon(request: web.Request):
+    """
+    Serve the client-side application.
+    """
+    with open('src/pages/shatterd.html', encoding='utf-8') as register_page:
         return web.Response(text=register_page.read(), content_type='text/html')
     
     
@@ -87,3 +97,20 @@ async def pong(request: web.Request):
     Serve the client-side application.
     """
     return web.json_response(text='pong')
+
+async def items(request: web.Request) -> web.Response:
+    data: dict = await request.json()
+    seed, depth = data.get('seed'), data.get('depth')
+    if not seed or not depth:
+        return web.json_response({'error': 'missing seed or depth'})
+    seed = seed.upper()  # make the seed uppercase
+    # the seed is a 9 letter sequence
+    seed_regex_1 = r"^[a-zA-Z]{9}$"
+    seed_regex_2 = r"^[a-zA-Z]{3}-[a-zA-Z]{3}-[a-zA-Z]{3}$"
+    if fullmatch(seed_regex_1, seed):
+        seed = f'{seed[:3]}-{seed[3:6]}-{seed[6:]}'  # format the seed ID
+    else:
+        if not fullmatch(seed_regex_2, seed):
+            return web.json_response({'error': 'invalid seed'})
+    items = get_items(data['seed'], data['depth'])
+    return web.json_response(items)

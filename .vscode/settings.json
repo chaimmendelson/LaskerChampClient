@@ -6,5 +6,7 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
+    "CodeGPT.maxTokens": 4096,
+    "CodeGPT.model": "gpt-4",
     
 }
