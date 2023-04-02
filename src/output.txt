@@ -1,0 +1,27 @@
+[Controllers] added manager for application, 1 managers active
+[Controllers] removed manager for application, 0 managers active
+Items for seed AAA-AAA-AAA (0):
+
+--- floor 1 ---
+
+Scrolls:
+- scroll of rage
+- scroll of upgrade
+
+Potions:
+- potion of mind vision (chest)
+- potion of invisibility
+
+Equipment:
+- assassin's blade +2 (chest)
+
+Wands:
+- cursed wand of fireblast
+
+Other:
+- stone of intuition
+- pasty
+- stone of aggression
+- stone of fear
+- tome of dungeon mastery
+

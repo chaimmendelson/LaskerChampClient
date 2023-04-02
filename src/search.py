@@ -1,5 +1,5 @@
 import subprocess
-
+import os
 OUTPUT_FILE = 'src/output.txt'
 
 def parse_run() -> dict[str, list|dict|str]:
@@ -37,8 +37,7 @@ def search_seed(levels: int, seed: str):
     """
     write the items found in the seed to a file untill the level specified
     """
-    with open(OUTPUT_FILE, 'w') as output:
-        subprocess.call(f'java -jar src/seed-finder.jar {levels} {seed}', stdout=output)
+    os.system(f'java -jar src/seed-finder.jar {levels} {seed} > {OUTPUT_FILE}')
         
 def get_items(seed: str, levels: int) -> dict[str, list|dict|str]:
     search_seed(levels, seed)
