@@ -87,13 +87,11 @@
 	</div>
 
 	<script>
-		let prvSeedLen = 0;
 		function searchSeed(event) {
 			event.preventDefault();
 
 			const seed = document.getElementById("seedInput").value;
 			const depth = document.getElementById("depthInput").value;
-			prvSeedLen = 0;
 			document.getElementById("seedInput").value = '';
 			document.getElementById("depthInput").value = 25;
 			fetch('/items', {
@@ -145,29 +143,30 @@
 		}
 
 		document.getElementById("seedInput").oninput = function() {
-			// check if the last character not a letter and if so remove it
-			if (this.value.length > prvSeedLen){
-				if (this.value.length > 11)
-					this.value = this.value.slice(0, -1);
-
-				this.value = this.value.toUpperCase();
-				if (this.value[this.value.length - 1].match(/[^a-zA-Z]/))
-					this.value = this.value.slice(0, -1);
-
-				if (this.value.length === 3 || this.value.length === 7)
-					this.value += '-';
+			seed = '';
+			for (let i = 0; i < this.value.length; i++) {
+				if (this.value[i].match(/[a-zA-Z]/))
+					seed += this.value[i];
 			}
-			else{
-				if (this.value.length === 3 || this.value.length === 7)
-					this.value = this.value.slice(0, -1);
+			seed = seed.toUpperCase();
+			if (seed.length > 3) {
+				seed = seed.slice(0, 3) + '-' + seed.slice(3);
 			}
-			prvSeedLen = this.value.length;
+			if (seed.length > 7) {
+				seed = seed.slice(0, 7) + '-' + seed.slice(7);
+			}
+			if (seed.length > 11) {
+				seed = seed.slice(0, 11);
+			}
+			this.value = seed;
 		}
 
 		document.getElementById("depthInput").oninput = function() {
-			// if the user goes above 25 remove the last character
-			if (this.value > 25)
+			// build a regex to check if the input is a number between 1 and 25
+			if (this.value && !this.value.match(/^[1-9]$|^1[0-9]$|^2[0-5]$/))
 				this.value = this.value.slice(0, -1);
+			else
+				this.value = this.value;
 		}
 	</script>
 </body>
