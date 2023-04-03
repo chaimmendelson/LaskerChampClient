@@ -37,7 +37,7 @@ def search_seed(levels: int, seed: str):
     """
     write the items found in the seed to a file untill the level specified
     """
-    os.system(f'java -jar src/seed-finder.jar {levels} {seed} > {OUTPUT_FILE}')
+    os.system(f'java -Djava.awt.headless=true -jar src/seed-finder.jar {levels} {seed} > {OUTPUT_FILE}')
         
 def get_items(seed: str, levels: int) -> dict[str, list|dict|str]:
     search_seed(levels, seed)
@@ -45,3 +45,5 @@ def get_items(seed: str, levels: int) -> dict[str, list|dict|str]:
     return run
 
 rings = {'evasion': 'elements', 'elemnts': 'energy', 'furor': 'force'}
+
+search_seed(10, 'AAA-AAA-AAA')

@@ -149,27 +149,39 @@ async def start_game(sid, data):
     if data.get('game_mode') == 'online':
         if len(hc.WAITING_ROOM) == 0:
             hc.WAITING_ROOM.append(client)
+            await sio.emit('waiting_for_opponent', to=sid)
             return
         opponent = hc.WAITING_ROOM.pop(0)
-        room = hc.add_player_room(client, opponent)
-        await sio.emit('game_started', 'white', to=hc.get_client(username=room.players[0]).sid)
-        await sio.emit('game_started', 'black', to=hc.get_client(username=room.players[1]).sid)
-        room.start_clock()
+        await set_pvp_room(client, opponent)
     elif data.get('game_mode') == 'engine':
-        if not data.get('level'):
-            return False
-        room = hc.add_engine_room(client, data.get('level'))
-        if room.is_players_turn(client.username):
-            await sio.emit('game_started', 'white', to=sid)
-            room.start_clock()
-        else:
-            await sio.emit('game_started', 'black', to=sid)
-            await send_stockfish_move(client)
+        if data.get('level') is None:
+            data['level'] = 10
+        await set_engine_room(client, data['level'])
     else:
         return False
     await send_clock_update(client)
 
 
+async def set_pvp_room(client1, client2):
+    room = hc.add_player_room(client1, client2)
+    white, black = [hc.get_client(username=username) for username in room.players]
+    white_data = dict(color='white', username=black.username, elo=black.elo)
+    black_data = dict(color='black', username=white.username, elo=white.elo)
+    await sio.emit('game_started', white_data, to=white.sid)
+    await sio.emit('game_started', black_data, to=black.sid)
+    room.start_clock()
+    
+
+async def set_engine_room(client: hc.Client, level):
+    room = hc.add_engine_room(client, level)
+    if room.is_players_turn(client.username):
+            await sio.emit('game_started', 'white', to=client.sid)
+            room.start_clock()
+    else:
+        await sio.emit('game_started', 'black', to=client.sid)
+        room.start_clock()
+        await send_stockfish_move(client)
+    
 @sio.event
 async def send_stockfish_move(client: hc.Client):
     """

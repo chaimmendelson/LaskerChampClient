@@ -85,15 +85,13 @@ socket.on('opponent_move', (data) => {
 })
 
 socket.on('game_started', (data) => {
-    playerNum = data == 'white' ? 0 : 1;
+    playerNum = data.color == 'white' ? 0 : 1;
     currentPlayer = 0;
     document.getElementById('startBtn').style.display = 'none';
     document.getElementById('quitBtn').style.display = 'block';
     startGame(data);
-    if (playerColor === WHITE)
-        document.getElementById('player1-clock').style.backgroundColor = 'white';
-    else
-        document.getElementById('player2-clock').style.backgroundColor = 'white';
+    let element = playerColor === WHITE ? 'player1-clock' : 'player2-clock';
+    document.getElementById(element).style.backgroundColor = 'white';
     startClock();
 })
 
