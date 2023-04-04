@@ -45,5 +45,3 @@ def get_items(seed: str, levels: int) -> dict[str, list|dict|str]:
     return run
 
 rings = {'evasion': 'elements', 'elemnts': 'energy', 'furor': 'force'}
-
-search_seed(10, 'AAA-AAA-AAA')

@@ -20,6 +20,10 @@ class Client():
         self.elo: float = user_data[hd.ELO] # type: ignore
         self.games_played: int = user_data[hd.GAMES_PLAYED] # type: ignore
         self.roll: str = user_data[hd.ROLL] # type: ignore
+        self.choosen_clock: str = ''
+        
+    def set_chosen_clock(self, clock: str):
+        self.choosen_clock = clock
 
     def update_elo(self, opponent_elo, player_score):
         """

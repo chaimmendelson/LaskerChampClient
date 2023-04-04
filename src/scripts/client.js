@@ -6,7 +6,10 @@ document.getElementById('startBtn').addEventListener('click', async function() {
     let game_mode = document.querySelector('input[name="game_mode"]:checked').value;
     //get the selected level from the slider
     let level = document.getElementById('engine_level').value;
-    await socket.emit('start_game', {game_mode: game_mode, level: level});
+    //get the selected clock time from the select
+    let clock_time = document.getElementById('clock_options').value;
+    //send the game mode and level to the server
+    await socket.emit('start_game', {game_mode: game_mode, level: level, clock: clock_time});
 }); // start
 
 document.getElementById('quitBtn').addEventListener('click', function(){ 
@@ -92,6 +95,7 @@ socket.on('game_started', (data) => {
     startGame(data);
     let element = playerColor === WHITE ? 'player1-clock' : 'player2-clock';
     document.getElementById(element).style.backgroundColor = 'white';
+    document.getElementById('opponent').innerHTML = `${data.username} (${data.elo})`;
     startClock();
 })
 
@@ -236,8 +240,20 @@ document.getElementById('autoQueen').addEventListener('change', function() {
 });
 
 
+const clock_options_list = ['5|0', '3|2', '10|5', '15|10', '30|0']
+
+function addClockOptions(){
+    let clock_options = document.getElementById('clock_options');
+    let clock_options_html = '';
+    for (let i = 0; i < clock_options_list.length; i++){
+        clock_options_html += `<option value="${clock_options_list[i]}">${clock_options_list[i]}</option>`;
+    }
+    clock_options.innerHTML = clock_options_html;
+}
+
 window.onload = (e) => {
     formatClock();
+    addClockOptions();
     resetSquareColor();
     document.body.style.display = 'block';
     resizeBoard();

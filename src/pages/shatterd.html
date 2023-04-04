@@ -2,6 +2,7 @@
 <html>
 <head>
 	<meta charset="UTF-8">
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
 	<title>Seed Finder</title>
 	<style>
 		body {
@@ -68,11 +69,31 @@
 			height: 500px;
 			overflow: auto;
 		}
+		#loader {
+			position: absolute;
+			top: 30%;
+			left: 50%;
+			border-top: 16px solid blue;
+			border-right: 16px solid green;
+			border-bottom: 16px solid red;
+			border-left: 16px solid pink;
+			border-radius: 50%;
+			width: 200px;
+			height: 200px;
+			animation: spin 2s linear infinite;
+			display: none;
+		}
+		  
+		@keyframes spin {
+			0% { transform: rotate(0deg); }
+			100% { transform: rotate(360deg); }
+		}
 	</style>
 </head>
 <body>
 	<h1>Shattered Pixel Dungeon Seed Searcher</h1>
 	<div id="container">
+		<div id="loader"></div>
 		<form onsubmit="searchSeed(event)" autocomplete="off">
 			<label for="seedInput">Seed ID:</label>
 			<input type="text" id="seedInput" placeholder="AAA-AAA-AAA" required>
@@ -82,16 +103,20 @@
 
 			<input type="submit" value="Search Seed">
 		</form>
-
 		<div id="output"></div>
 	</div>
 
 	<script>
 		function searchSeed(event) {
 			event.preventDefault();
-
 			const seed = document.getElementById("seedInput").value;
 			const depth = document.getElementById("depthInput").value;
+			if (seed.length != 11) {
+				//alert('Seed must be 11 characters long');
+				return;
+			}
+			document.body.style.pointerEvents = 'none';
+    		document.getElementById('loader').style.display = 'block';
 			document.getElementById("seedInput").value = '';
 			document.getElementById("depthInput").value = 25;
 			fetch('/items', {
@@ -140,6 +165,9 @@
 				}
 			}
 			outputDiv.innerHTML = items;
+			document.getElementById('loader').style.display = 'none';
+    		document.body.style.pointerEvents = 'auto';
+			document.getElementById("seedInput").focus();
 		}
 
 		document.getElementById("seedInput").oninput = function() {
@@ -168,6 +196,8 @@
 			else
 				this.value = this.value;
 		}
+
+		document.getElementById("seedInput").focus();
 	</script>
 </body>
 </html>

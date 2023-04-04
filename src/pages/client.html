@@ -54,6 +54,10 @@
             <input type="radio" id="online" name="game_mode" value="online">
             <label for="online">Online</label>
           </div>
+          <div id="clock_opt">
+            <!-- let the user choose from a list of clock opt -->
+            <select id="clock_options"></select>
+          </div>
           <div id="level_display">
             Level: 10
           </div>
@@ -67,6 +71,9 @@
       </div>
       <!-- create board -->
       <div id="game_container">
+        <div id="opponent_info">
+          Opponent: <span id="opponent"></span>
+        </div>
         <div id="clocks">
           <div id="player2-clock" class="clock">
             <span id="player2-time"></span>

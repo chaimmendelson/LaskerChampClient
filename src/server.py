@@ -6,6 +6,7 @@ import threading
 import asyncio
 from time import sleep
 import socketio
+import re
 from aiohttp import web
 from chess_rooms import EngineRoom, PlayerRoom
 import accounts_db as hd
@@ -18,6 +19,7 @@ app = web.Application()
 sio.attach(app)
 
 
+chess_clocks = ['5|0', '3|2', '10|5', '15|10', '30|0']
 async def send_elo(client: hc.Client):
     """
     send the given username's elo to the client.
@@ -134,7 +136,6 @@ async def connect(sid, environ, auth):
                 return True
     return False
 
-
 @sio.event
 async def start_game(sid, data):
     """
@@ -146,41 +147,54 @@ async def start_game(sid, data):
     client = hc.get_client(sid=sid)
     if client.is_in_room() or client in hc.WAITING_ROOM or not data.get('game_mode'):
         return False
+    clock: str|None = data.get('clock')
+    if clock is None or not clock in chess_clocks:
+        clock = chess_clocks[0]
+    limit, bonus = [int(x) for x in clock.split('|')]
     if data.get('game_mode') == 'online':
-        if len(hc.WAITING_ROOM) == 0:
-            hc.WAITING_ROOM.append(client)
-            await sio.emit('waiting_for_opponent', to=sid)
-            return
-        opponent = hc.WAITING_ROOM.pop(0)
-        await set_pvp_room(client, opponent)
+        if len(hc.WAITING_ROOM) != 0:
+            for opponent in hc.WAITING_ROOM:
+                if opponent.choosen_clock == clock:
+                    hc.WAITING_ROOM.remove(opponent)
+                    room = hc.add_player_room(client, opponent, limit, bonus)
+                    await set_pvp_room(room)
+                    return
+        client.set_chosen_clock(clock)
+        hc.WAITING_ROOM.append(client)
+        await sio.emit('searching', to=sid)
+        return
     elif data.get('game_mode') == 'engine':
         if data.get('level') is None:
             data['level'] = 10
-        await set_engine_room(client, data['level'])
+        room = hc.add_engine_room(client, data['level'], limit, bonus)
+        await set_engine_room(room)
     else:
         return False
-    await send_clock_update(client)
 
 
-async def set_pvp_room(client1, client2):
-    room = hc.add_player_room(client1, client2)
+async def set_pvp_room(room: PlayerRoom):
     white, black = [hc.get_client(username=username) for username in room.players]
     white_data = dict(color='white', username=black.username, elo=black.elo)
     black_data = dict(color='black', username=white.username, elo=white.elo)
     await sio.emit('game_started', white_data, to=white.sid)
     await sio.emit('game_started', black_data, to=black.sid)
     room.start_clock()
+    await send_clock_update(white)
     
 
-async def set_engine_room(client: hc.Client, level):
-    room = hc.add_engine_room(client, level)
+async def set_engine_room(room: EngineRoom):
+    client = hc.get_client(username=room.opponent('stockfish'))
+    data = dict(color='black', username='stockfish', elo=0)
     if room.is_players_turn(client.username):
-            await sio.emit('game_started', 'white', to=client.sid)
-            room.start_clock()
-    else:
-        await sio.emit('game_started', 'black', to=client.sid)
+        data['color'] = 'white'
+        await sio.emit('game_started', data, to=client.sid)
         room.start_clock()
+    else:
+        await sio.emit('game_started', data, to=client.sid)
+        room.start_clock()
+        await send_clock_update(client)
         await send_stockfish_move(client)
+    await send_clock_update(client)
     
 @sio.event
 async def send_stockfish_move(client: hc.Client):

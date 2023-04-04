@@ -27,6 +27,7 @@ button:active{
 }
 
 
+
 .crownBtn{
     width: fit-content;
     float: left;
@@ -55,6 +56,11 @@ body{
     background-color: darkslategray;
     padding: 5px;
     display: none;
+}
+
+#clock_options{
+    margin: 10px auto;
+    background-color: rgb(124, 124, 153);
 }
 
 #container{
@@ -158,6 +164,13 @@ body{
 #clocks{
     width: fit-content;
     margin: 2px auto;
+}
+#opponent_info{
+    padding: 5px;
+    border: 1px solid black;
+    width: 50%;
+    margin: 5px auto;
+    background-color: palevioletred;
 }
 .clock{
     width: fit-content;

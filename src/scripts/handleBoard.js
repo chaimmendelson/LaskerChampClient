@@ -177,6 +177,7 @@ function startGame(color){
 function clear_game(message){
     resetBoard();
     $status.html(message);
+    document.getElementById('opponent').innerHTML = '';
     document.getElementById('startBtn').style.display = 'block';
     document.getElementById('quitBtn').style.display = 'none';
     document.getElementById('startBtn').disabled = false;
