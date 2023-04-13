@@ -263,7 +263,7 @@ async def disconnect(sid):
     handle the disconnect event.
     """
     client = hc.get_client(sid=sid)
-    hc.CLIENTS.remove(client)
+    hc.remove_client(sid)
     if client in hc.WAITING_ROOM:
         hc.WAITING_ROOM.remove(client)
     if client.is_in_room():
@@ -274,11 +274,11 @@ app.add_routes([
     web.get('/', routs.game_page),
     web.get('/login', routs.login),
     web.get('/register', routs.register),
-    web.get('/dungeon', routs.dungeon),
+    web.get('/admin', routs.admin),
     web.get('/ping', routs.pong),
     web.post('/validate', routs.login_validation),
     web.post('/sign_up', routs.sign_up),
-    web.post('/items', routs.items),
+    web.post('/stats', routs.get_stats),
     web.static('/scripts', 'src/scripts'),
     web.static('/styles', 'src/styles'),
     web.static('/images', 'src/images'),

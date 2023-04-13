@@ -1,18 +1,35 @@
 """
 function to handle the routes of the app
 """
+import sys
+sys.path.append('./')
 from datetime import datetime, timedelta
 from aiohttp import web
 import accounts_db as hd
 import handle_clients as hc
-from re import fullmatch
-from search import get_items
-
+import stats
 COOKIE_NAME: str = 'chess-cookie'
 
 USER_lOGGED_IN: int = 490
 INVALID_CREDENTIALS: int = 491
 
+async def get_stats(request: web.Request) -> web.Response:
+    return web.json_response(dict(stats=stats.get_stats()))
+
+
+async def admin(request: web.Request) -> web.Response:
+    # print the cookie
+    cookie = request.cookies.get(COOKIE_NAME)
+    if cookie is None:
+        return web.Response(status=302, headers={'Location': '/'})
+    roll = hd.get_value(hd.get_username_by_cookie(cookie), hd.ROLL)
+    print(roll)
+    if roll != hd.ADMIN:
+        return web.Response(status=302, headers={'Location': '/'})
+    with open('src/pages/admin.html', encoding='utf-8') as admin_page:
+        return web.Response(text=admin_page.read(), content_type='text/html')
+    
+    
 async def game_page(request: web.Request):
     """
     Serve the client-side application.
@@ -43,13 +60,6 @@ async def register(request: web.Request):
         return web.Response(text=register_page.read(), content_type='text/html')
     
 
-async def dungeon(request: web.Request):
-    """
-    Serve the client-side application.
-    """
-    with open('src/pages/shatterd.html', encoding='utf-8') as register_page:
-        return web.Response(text=register_page.read(), content_type='text/html')
-    
     
 async def login_validation(request: web.Request):
     """
@@ -88,6 +98,7 @@ async def sign_up(request: web.Request):
             code = hd.validate_credentials(username, password, email)
             if code == 200:
                 hd.create_new_user(username, password, email)
+                stats.update_counter(stats.ACCOUNTS_COUNT)
     return web.json_response({'status': code})
 
 
@@ -97,20 +108,3 @@ async def pong(request: web.Request):
     Serve the client-side application.
     """
     return web.json_response(text='pong')
-
-async def items(request: web.Request) -> web.Response:
-    data: dict = await request.json()
-    seed, depth = data.get('seed'), data.get('depth')
-    if not seed or not depth:
-        return web.json_response({'error': 'missing seed or depth'})
-    seed = seed.upper()  # make the seed uppercase
-    # the seed is a 9 letter sequence
-    seed_regex_1 = r"^[a-zA-Z]{9}$"
-    seed_regex_2 = r"^[a-zA-Z]{3}-[a-zA-Z]{3}-[a-zA-Z]{3}$"
-    if fullmatch(seed_regex_1, seed):
-        seed = f'{seed[:3]}-{seed[3:6]}-{seed[6:]}'  # format the seed ID
-    else:
-        if not fullmatch(seed_regex_2, seed):
-            return web.json_response({'error': 'invalid seed'})
-    items = get_items(data['seed'], data['depth'])
-    return web.json_response(items)

@@ -3,6 +3,7 @@ handle the connected users.
 """
 from chess_rooms import PlayerRoom, EngineRoom
 import accounts_db as hd
+import stats
 CHESS_ROOMS: list[PlayerRoom | EngineRoom] = []
 
 
@@ -65,9 +66,19 @@ CLIENTS: list[Client] = []
 def add_client(username: str, sid: str) -> None:
     """
     add a new client to the CLIENTS list.
-    """
+    """ 
     CLIENTS.append(Client(username, sid))
+    stats.update_counter(stats.ONLINE_PLAYERS)
 
+def remove_client(sid: str) -> None:
+    """
+    remove the client with the given sid from the CLIENTS list.
+    """
+    for client in CLIENTS:
+        if client.sid == sid:
+            CLIENTS.remove(client)
+            stats.update_counter(stats.ONLINE_PLAYERS, -1)
+            break
 
 def is_client_connected(username: str) -> bool:
     """
@@ -110,8 +121,10 @@ def close_room(client: Client) -> None:
     if client.room is not None:
         if not is_engine_room(client.room):
             get_oppoent(client).exit_room()
+            stats.update_counter(stats.PVP_ROOMS, -1)
         CHESS_ROOMS.remove(client.room)
         client.exit_room()
+        
 
 
 def is_engine_room(room: EngineRoom | PlayerRoom) -> bool:
@@ -142,6 +155,8 @@ def add_player_room(player1: Client, player2: Client, limit: int = 10, bonus:int
     player2.update_games_played()
     player1.enter_room(room)
     player2.enter_room(room)
+    stats.update_counter(stats.PVP_ROOMS)
+    stats.update_counter(stats.PVP_PLAYED)
     return room
 
 

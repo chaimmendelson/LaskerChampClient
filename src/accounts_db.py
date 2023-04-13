@@ -251,7 +251,8 @@ def reset_table():
     reset the table and insert default users
     """
     db.reset_table(TABLE_NAME, STRUCTURE)
-    create_new_user('admin13', '123admin456', 'chaimke2005@gmail.com', 1200, ADMIN)
+    create_new_user('chaim', 'test1234', 'chaimke2005@gmail.com', 1200, ADMIN)
+
 
 def parse_values(data: dict) -> dict[str, str|int|float|datetime]:
     parsed_data = {}
@@ -266,6 +267,13 @@ def parse_values(data: dict) -> dict[str, str|int|float|datetime]:
             parsed_data[key] = str(value)
     return parsed_data
             
+
+def get_user_count() -> int:
+    """
+    get the number of users in the database
+    """
+    return db.row_count(TABLE_NAME)
+
 
 def test_validation():
     # test username validation
@@ -324,6 +332,7 @@ def test():
     print('all tests passed')
 
 def main():
+    reset_table()
     test()
     test_validation()
 

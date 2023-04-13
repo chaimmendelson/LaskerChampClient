@@ -109,3 +109,15 @@ def delete_row(table_name: str, column:str, value) -> None:
         c=sql.Identifier(column),
         v=sql.Placeholder())
     execute_query(query, value)
+
+
+def row_count(table_name: str) -> int:
+    """
+    Get the number of users in the table with the given name.
+    """
+    query = sql.SQL("SELECT COUNT(*) FROM {table};").format(
+        table=sql.Identifier(table_name))
+    cursor = execute_query(query)
+    data = cursor.fetchone()
+    cursor.close()
+    return 0 if data is None else data[0]
