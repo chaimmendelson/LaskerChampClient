@@ -111,7 +111,7 @@ def check_for_timeout(stop_event: bool):
     run endless loop to check for timeout.
     """
     while not stop_event:
-        sleep(0.1)
+        sleep(0.1) # type: ignore
         for room in hc.CHESS_ROOMS:
             if room.is_timeout():
                 asyncio.run(handle_timeout(room))
@@ -150,13 +150,12 @@ async def start_game(sid, data):
     clock: str|None = data.get('clock')
     if clock is None or not clock in chess_clocks:
         clock = chess_clocks[0]
-    limit, bonus = [int(x) for x in clock.split('|')]
     if data.get('game_mode') == 'online':
         if len(hc.WAITING_ROOM) != 0:
             for opponent in hc.WAITING_ROOM:
                 if opponent.choosen_clock == clock:
                     hc.WAITING_ROOM.remove(opponent)
-                    room = hc.add_player_room(client, opponent, limit, bonus)
+                    room = hc.add_player_room(client, opponent, clock)
                     await set_pvp_room(room)
                     return
         client.set_chosen_clock(clock)
@@ -166,7 +165,7 @@ async def start_game(sid, data):
     elif data.get('game_mode') == 'engine':
         if data.get('level') is None:
             data['level'] = 10
-        room = hc.add_engine_room(client, data['level'], limit, bonus)
+        room = hc.add_engine_room(client, data['level'], clock)
         await set_engine_room(room)
     else:
         return False
@@ -307,3 +306,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    

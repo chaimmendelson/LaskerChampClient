@@ -46,7 +46,15 @@ def upon_close_pvp_room(clock: str):
     update_counter(PVP_ROOMS, -1)
     update_counter(GAMES_PLAYED_TODAY)
     update_counter(PVP_PLAYED)
+
+
+def upon_close_pve_room():
+    update_counter(GAMES_PLAYED_TODAY)
     
+
+def upon_open_pvp_room():
+    update_counter(PVP_ROOMS)
+       
        
 def update_counter(key: str, value: int=1):
     update_stat(key, get_stats()[key] + value)

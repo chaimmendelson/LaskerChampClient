@@ -14,14 +14,15 @@ NEPO_L_PATH: str = r'./src/engines/NepoChessTests'
 START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 WHITE = 0
 BLACK = 1
-
+DEAFULT_CLOCK = '5|0'
 
 class ChessClock(object):
     """
     A chess clock that can be started and stopped and keeps track of time left.
     """
 
-    def __init__(self, time_limit: float = 10, addition: float = 0) -> None:
+    def __init__(self, clock: str) -> None:
+        time_limit, addition = [int(x) for x in clock.split('|')]
         self.time_left: float = time_limit * 60
         self.start_time: float | None = None
         self.addition: float = addition
@@ -66,11 +67,12 @@ class ChessRoom:
     has all the information about a single chess game.
     """
 
-    def __init__(self, player1: str, player2: str, time_limit: int = 10, bonus_time: int = 0):
+    def __init__(self, player1: str, player2: str, clock: str) -> None:
         self.players: list[str] = [player1, player2]
+        self.clock = clock
         self.clocks: list[ChessClock] = [
-            ChessClock(time_limit, bonus_time),
-            ChessClock(time_limit, bonus_time)
+            ChessClock(clock),
+            ChessClock(clock)
         ]
         shuffle(self.players)
         self.board: chess.Board = chess.Board(START_FEN)
@@ -193,8 +195,8 @@ class EngineRoom(ChessRoom):
     a chess room with a stockfish engine against a player
     """
 
-    def __init__(self, player1: str, level: int = 10, time_limit: int = 10, bonus_time: int = 0):
-        super().__init__(player1, 'stockfish', time_limit, bonus_time)
+    def __init__(self, player1: str, level: int = 10, clock: str=DEAFULT_CLOCK):
+        super().__init__(player1, 'stockfish', clock)
         self.stockfish = Stockfish(STOCKFISH_W_PATH if platform.system() == 'Windows' else STOCKFISH_L_PATH)
         self.stockfish.set_skill_level(level)
 
@@ -215,6 +217,5 @@ class PlayerRoom(ChessRoom):
     a chess room with two players
     """
 
-    def __init__(self, player1: str, player2: str, time_limit: int = 10, bonus_time: int = 0):
-        super().__init__(player1, player2, time_limit, bonus_time)
-        self.time_limit = time_limit
+    def __init__(self, player1: str, player2: str, clock: str=DEAFULT_CLOCK):
+        super().__init__(player1, player2, clock)

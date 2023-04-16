@@ -1,7 +1,7 @@
 """
 handle the connected users.
 """
-from chess_rooms import PlayerRoom, EngineRoom
+from chess_rooms import *
 import accounts_db as hd
 import stats
 CHESS_ROOMS: list[PlayerRoom | EngineRoom] = []
@@ -121,11 +121,10 @@ def close_room(client: Client) -> None:
     if client.room is not None:
         if not is_engine_room(client.room):
             get_oppoent(client).exit_room()
-            stats.update_counter(stats.PVP_ROOMS, -1)
+            stats.upon_close_pvp_room(client.room.clock)
         CHESS_ROOMS.remove(client.room)
         client.exit_room()
         
-
 
 def is_engine_room(room: EngineRoom | PlayerRoom) -> bool:
     """
@@ -134,29 +133,27 @@ def is_engine_room(room: EngineRoom | PlayerRoom) -> bool:
     return isinstance(room, EngineRoom)
 
 
-def add_engine_room(player: Client, level: int = 10, limit: int = 10, bonus: int = 0) -> EngineRoom:
+def add_engine_room(player: Client, level: int = 10, clock: str=DEAFULT_CLOCK) -> EngineRoom:
     """
     add a new engine room to the CHESS_ROOMS list.
     """
-    room = EngineRoom(player.username, level, limit, bonus)
+    room = EngineRoom(player.username, level, clock)
     CHESS_ROOMS.append(room)
     player.enter_room(room)
     return room
 
 
-def add_player_room(player1: Client, player2: Client, limit: int = 10, bonus:int = 0) -> PlayerRoom:
+def add_player_room(player1: Client, player2: Client, clock: str = DEAFULT_CLOCK) -> PlayerRoom:
     """
     add a player room to the CHESS_ROOMS list.
     """
-    room = PlayerRoom(player1.username, player2.username,
-                      limit, bonus)
+    room = PlayerRoom(player1.username, player2.username, clock)
     CHESS_ROOMS.append(room)
     player1.update_games_played()
     player2.update_games_played()
     player1.enter_room(room)
     player2.enter_room(room)
-    stats.update_counter(stats.PVP_ROOMS)
-    stats.update_counter(stats.PVP_PLAYED)
+    stats.upon_open_pvp_room()
     return room
 
 
