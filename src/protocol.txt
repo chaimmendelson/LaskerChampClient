@@ -1,0 +1,136 @@
+http protocol:
+    register:
+        request: http post request to /sign_up
+            json containing {username: "username", password: "password", email: "email"}
+
+        response: http response
+            json containing {status: num}
+                num: 
+                    200: success
+                    481: username already exists
+                    482: email already exists
+                    471: invalid username
+                    472: invalid email
+                    473: invalid password
+
+    login:
+        request: http post request to /login_validation
+            json containing {username: "username", password: "password"}
+        
+        response: http response
+            json containing {status: num}
+                num:
+                    200: success
+                    491: user logged in
+                    492: invalid credentials
+            
+            if success:
+                a set-cookie header with the unique user cookie and exp. date set for 10 years
+
+socketio protocol client:
+
+    connect:
+        request: connect
+            auth:
+                token: unique user token
+    
+        response:
+            if success:
+                - server protocol: connected
+
+            if failure: 
+                no connection is established
+    
+    disconnect:
+        request: disconnect
+
+    ping:
+        request: ping
+
+        response: pong
+    
+    start game:
+        request: start_game
+            data: {game_mode: "online" / "engine", clock: "min|inc", level: 0-20} (level is only for engine mode)
+        
+        response:
+            engine mode:
+                response: 
+                    - server protocol: engine game started
+            
+            online mode: 
+                response:
+                    - server protocol: online game started
+                    - server protocol: searching for opponent
+    
+    send move:
+        request: my_move
+            data: {move: "move"} (move is in uci format)
+        
+        response: 
+            - server protocol: move received
+    
+    quit game:
+        request: quit_game
+
+        response:
+            - server protocol: game quit
+
+
+socketio protocol server:
+
+    - clock: {white: sec, black: sec}
+    - color: "white" / "black"
+    - move: "e2e4" / "e7e8q" (uci format)
+    - result: -1 / 0 / 1 (loss / draw / win)
+    - elo: integer (elo rating)
+
+    connected:
+        response: connected
+            data: {username: "username", elo: elo}
+
+    engine game started:
+        response: game_started
+            data: {color: color, clock: clock}
+    
+    online game started:
+        message: game_started
+            data: {color: color, clock: clock, opponent: {username: "username", elo: elo}}
+    
+    searching for opponent:
+        response: searching
+    
+    move received:
+        response: move_received
+            data: {move: move, clock: clock}
+    
+    opponent move:
+        message: opponent_move
+            data: {move: move, clock: clock}
+    
+    game over:
+        message: game_over
+            data: {move: move, result: result, clock: clock, elo: elo}
+    
+    game quit:
+        response: game_quit
+            data: {elo: elo}
+
+    opponent quit:
+        message: opponent_quit
+            data: {elo: elo}
+        
+    opponent timeout:
+        message: opponent_timeout
+            data: {elo: elo}
+    
+    client timeout:
+        message: timeout
+            data: {elo: elo}
+
+
+
+
+
+    
+                

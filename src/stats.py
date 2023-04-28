@@ -1,6 +1,5 @@
 import json
 import accounts_db as hd
-import subprocess
 
 FILE = './src/stats.json'
 ACCOUNTS_COUNT = 'accounts count'
@@ -61,6 +60,5 @@ def update_counter(key: str, value: int=1):
 
 def reset_counter(key: str):
     update_stat(key, 0)
-    
 
-initialize()
+print('stats.py loaded')

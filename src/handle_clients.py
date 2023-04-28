@@ -57,6 +57,9 @@ class Client():
     def update_games_played(self):
         self.games_played += 1
         hd.update_games_played(self.username)
+    
+    def elo_int(self):
+        return round(self.elo)
 
 
 WAITING_ROOM: list[Client] = []
@@ -167,3 +170,15 @@ def update_elo(score_dict: dict[Client, str]):
     player1_score, player2_score = score_dict[player1], score_dict[player2]
     player1.update_elo(player2_elo, player1_score)
     player2.update_elo(player1_elo, player2_score)
+
+def clock_update(client: Client) -> dict[str, int]:
+    """
+    send the clock update to the given username.
+    """
+    room = client.room
+    if room is None:
+        return dict(white = 0, black = 0)
+    return dict(
+            white = round(room.get_time_left(room.players[0])),
+            black = round(room.get_time_left(room.players[1]))
+            )

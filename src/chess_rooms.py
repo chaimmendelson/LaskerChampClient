@@ -7,9 +7,11 @@ from time import time
 from random import shuffle
 import chess
 from stockfish import Stockfish
+from chess import engine
 
 STOCKFISH_W_PATH: str = r'./src/engines/stockfish-windows-2022-x86-64-avx2.exe'
 STOCKFISH_L_PATH: str = r'./src/engines/stockfish-ubuntu-20.04-x86-64-avx2'
+STOCKFISH_PATH: str = STOCKFISH_W_PATH if platform.system() == 'Windows' else STOCKFISH_L_PATH
 NEPO_L_PATH: str = r'./src/engines/NepoChessTests'
 START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 WHITE = 0
@@ -177,6 +179,7 @@ class ChessRoom:
         """
         return self.players[self.turn] == player
 
+        
     def fen(self) -> str:
         """
         return the fen of the current board

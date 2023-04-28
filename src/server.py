@@ -20,69 +20,50 @@ sio.attach(app)
 
 
 chess_clocks = ['5|0', '3|2', '10|5', '15|10', '30|0']
-async def send_elo(client: hc.Client):
-    """
-    send the given username's elo to the client.
-    """
-    await sio.emit('update_elo', {'elo': round(client.elo)}, to=client.sid)
+    
 
-
-async def send_clock_update(client: hc.Client):
-    """
-    send the clock update to the given username.
-    """
-    room = client.room
-    if room is None:
-        return
-    clocks = {'white': round(room.get_time_left(room.players[0])),
-              'black': round(room.get_time_left(room.players[1]))}
-    await sio.emit('clock_update', clocks, to=client.sid)
-    if not hc.is_engine_room(room):
-        await sio.emit('clock_update', clocks, to=hc.get_oppoent(client).sid)
-
-
-async def handle_game_over(client: hc.Client, move: dict[str, str]):
+async def handle_game_over(client: hc.Client):
     """
     handle the game over event.
     """
     room = client.room
-    if room is None:
-        return
+    if room is None: return
     room.stop_clock()
     resaults = room.get_game_results()
-    await sio.emit('game_over', resaults.get(client.username), to=client.sid)
+    last_move = room.last_move()
     if not hc.is_engine_room(room):
-        move['game_over'] = 'true'
         opponent = hc.get_oppoent(client)
         hc.update_elo({client: resaults[client.username], opponent: resaults[opponent.username]})
-        await sio.emit('opponent_move', move, to=opponent.sid)
-        await sio.emit('game_over', resaults.get(opponent.username), to=opponent.sid)
-        await send_elo(client)
-        await send_elo(opponent)
+        await send_game_over_msg(opponent, last_move, resaults[opponent.username])
+    await send_game_over_msg(client, last_move, resaults[client.username])
     hc.close_room(client)
 
+async def send_game_over_msg(client: hc.Client, last_move: str, resault: str):
+    data = dict(move=last_move,
+                clock=hc.clock_update(client),
+                resault=resault,
+                elo=client.elo_int())
+    await sio.emit('game_over', data, to=client.sid)
+    
 
-async def send_move_to_opponent(client: hc.Client, move_d: dict[str, str]):
+async def send_move_to_opponent(client: hc.Client):
     """
     send the given move to the given username.
     """
-    await sio.emit('opponent_move', move_d, to=client.sid)
     room = client.room
-    if room is not None:
-        room.start_clock()
-        await send_clock_update(client)
+    if room is None: return
+    await sio.emit('opponent_move', dict(move=room.last_move, clock=hc.clock_update(client)), to=client.sid)
+    room.start_clock()
 
 
 async def handle_quit(client: hc.Client) -> None:
     """
     handle the quit game event.
     """
-    
     if client.room is not None and not hc.is_engine_room(client.room):
         opponent = hc.get_oppoent(client)
         hc.update_elo({client: '0', opponent: '1'})
-        await sio.emit('opponent_quit', to=opponent.sid)
-        await send_elo(opponent)
+        await sio.emit('opponent_quit', dict(elo=opponent.elo_int()), to=opponent.sid)
     hc.close_room(client)
 
 
@@ -94,18 +75,24 @@ async def handle_timeout(room: EngineRoom | PlayerRoom) -> None:
     if username == 'stockfish':
         client = hc.get_client(username=room.opponent(username))
         if client is None: return
-        await sio.emit('opponent_timeout', to=client.sid)
+        await game_closed_msg(client, 'opponent_timeout')
     else:
         client = hc.get_client(username=username)
         if client is None or client.room is None: return
-        await sio.emit('timeout', to=client.sid)
         if not hc.is_engine_room(client.room):
             opponent = hc.get_oppoent(client)
             hc.update_elo({client: '0', opponent: '1'})
-            await sio.emit('opponent_timeout', to=opponent.sid)
+            await game_closed_msg(opponent, 'opponent_timeout')
+        await game_closed_msg(client, 'timeout')
     hc.close_room(client)
 
-
+async def game_closed_msg(client: hc.Client, msg: str):
+    """
+    send the game_closed message to the given client.
+    """
+    await sio.emit(msg, dict(elo=client.elo_int()), to=client.sid)
+    
+    
 def check_for_timeout(stop_event: bool):
     """
     run endless loop to check for timeout.
@@ -130,14 +117,14 @@ async def connect(sid, environ, auth):
                 username = hd.get_username_by_cookie(token)
                 hc.add_client(username, sid)
                 data_d = {'username': username,
-                          'elo': round(hc.get_client(username=username).elo)}
-                await sio.emit('user_data', data_d, to=sid)
+                          'elo': hc.get_client(username=username).elo_int()}
+                await sio.emit('connected', data_d, to=sid)
                 hd.update_entry(username)
                 return True
     return False
 
 @sio.event
-async def start_game(sid, data):
+async def start_game(sid, data: dict):
     """
     opens a new chess room for the given sids username,
     if the data stockfish key is True, the opponent will be stockfish.
@@ -173,17 +160,17 @@ async def start_game(sid, data):
 
 async def set_pvp_room(room: PlayerRoom):
     white, black = [hc.get_client(username=username) for username in room.players]
-    white_data = dict(color='white', username=black.username, elo=black.elo)
-    black_data = dict(color='black', username=white.username, elo=white.elo)
+    clock = hc.clock_update(white)
+    white_data = dict(color='white', opponent=dict(username=black.username, elo=black.elo), clock=clock)
+    black_data = dict(color='black', opponent=dict(username=white.username, elo=white.elo), clock=clock)
     await sio.emit('game_started', white_data, to=white.sid)
     await sio.emit('game_started', black_data, to=black.sid)
     room.start_clock()
-    await send_clock_update(white)
     
 
 async def set_engine_room(room: EngineRoom):
     client = hc.get_client(username=room.opponent('stockfish'))
-    data = dict(color='black', username='stockfish', elo=0)
+    data = dict(color='black', opponent=dict(username='stockfish', elo=0), clock=hc.clock_update(client))
     if room.is_players_turn(client.username):
         data['color'] = 'white'
         await sio.emit('game_started', data, to=client.sid)
@@ -191,11 +178,9 @@ async def set_engine_room(room: EngineRoom):
     else:
         await sio.emit('game_started', data, to=client.sid)
         room.start_clock()
-        await send_clock_update(client)
         await send_stockfish_move(client)
-    await send_clock_update(client)
     
-@sio.event
+    
 async def send_stockfish_move(client: hc.Client):
     """
     send stockfish move to the given username.
@@ -203,18 +188,17 @@ async def send_stockfish_move(client: hc.Client):
     room = client.room
     if room is None or not isinstance(room, EngineRoom):
         return
-    move = room.make_stockfish_move()
-    move_d = uf.validate_move(move)
-    if not move_d:
+    move = uf.validate_move(room.make_stockfish_move())
+    if move is None:
         return
     if room in hc.CHESS_ROOMS:
-        await send_move_to_opponent(client, move_d)
+        await send_move_to_opponent(client)
         if room.is_game_over():
-            await handle_game_over(client, move_d)
+            await handle_game_over(client)
 
 
 @sio.event
-async def my_move(sid: str, data):
+async def my_move(sid: str, data: dict[str, str]):
     """
     handle the given move from the given sid.
     """
@@ -222,17 +206,16 @@ async def my_move(sid: str, data):
     if (client.room is None) or (not client.room.is_players_turn(client.username)):
         return False
     move = uf.validate_move(data.get('move'))
-    if move is None:
-        return False
-    client.room.commit_move(move['move'])
+    if move is None: return False
+    client.room.commit_move(move)
     if client.room.is_game_over():
-        await handle_game_over(client, move)
+        await handle_game_over(client)
     else:
         if hc.is_engine_room(client.room):
             await send_stockfish_move(client)
         else:
-            await send_move_to_opponent(hc.get_oppoent(client), move)
-        await send_clock_update(client)
+            await send_move_to_opponent(hc.get_oppoent(client))
+        await sio.emit('move_received', dict(move=move, clock=hc.clock_update(client)), to=sid)
 
 
 @sio.event
@@ -243,7 +226,6 @@ async def quit_game(sid):
     client = hc.get_client(sid=sid)
     if client.is_in_room():
         await handle_quit(client)
-        await send_elo(client)
     elif client in hc.WAITING_ROOM:
         hc.WAITING_ROOM.remove(client)
 
