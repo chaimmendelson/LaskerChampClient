@@ -163,8 +163,7 @@ function resetBoard(){
     $status.html('');
 }
 
-function startGame(color){
-    playerColor = color == 'white' ? WHITE : BLACK
+function startGame(){
     board = ChessBoard('myBoard', config);
     if (playerColor == BLACK) board.flip();
     game = new Chess();
@@ -174,13 +173,14 @@ function startGame(color){
     GameOver = false;
 }
 
-function clear_game(message){
+function clear_game(message, elo){
     resetBoard();
     $status.html(message);
     document.getElementById('opponent').innerHTML = '';
     document.getElementById('startBtn').style.display = 'block';
     document.getElementById('quitBtn').style.display = 'none';
     document.getElementById('startBtn').disabled = false;
+    document.getElementById('elo').innerHTML = elo;
 }
 
 // control piece movement
@@ -236,10 +236,6 @@ function validateMove(source, target, preMove=false)
     return {from: source, to: target, promotion: ''};
 }
 
-function moveColor() {
-    return game.turn() === WHITE ? 'white' : 'black';
-}
-
 
 function onDrop(source, target) {
     if (!usePreGame || (usePreGame && move_stack.length === 0 && PlayersTurn)){
@@ -276,8 +272,9 @@ function updateStatus () {
     // checkmate?
     if (GameOver) stopClock();
     // game still on
-    status = moveColor() + ' to move'
-    if (game.isCheck()) status += ', ' + moveColor() + ' is in check'
+    const moveColor = game.turn() === WHITE ? 'white' : 'black';
+    status = moveColor + ' to move'
+    if (game.isCheck()) status += ', ' + moveColor + ' is in check'
     $status.html(status)
     update_pgn();
 }

@@ -85,8 +85,8 @@ socketio protocol server:
     - result: -1 / 0 / 1 (loss / draw / win)
     - elo: integer (elo rating)
 
-    connected:
-        response: connected
+    user:
+        message: user
             data: {username: "username", elo: elo}
 
     engine game started:

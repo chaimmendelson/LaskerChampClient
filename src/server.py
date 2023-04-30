@@ -52,7 +52,7 @@ async def send_move_to_opponent(client: hc.Client):
     """
     room = client.room
     if room is None: return
-    await sio.emit('opponent_move', dict(move=room.last_move, clock=hc.clock_update(client)), to=client.sid)
+    await sio.emit('opponent_move', dict(move=room.last_move(), clock=hc.clock_update(client)), to=client.sid)
     room.start_clock()
 
 
@@ -118,8 +118,8 @@ async def connect(sid, environ, auth):
                 hc.add_client(username, sid)
                 data_d = {'username': username,
                           'elo': hc.get_client(username=username).elo_int()}
-                await sio.emit('connected', data_d, to=sid)
                 hd.update_entry(username)
+                await sio.emit('user', data_d, to=sid)
                 return True
     return False
 
@@ -188,13 +188,12 @@ async def send_stockfish_move(client: hc.Client):
     room = client.room
     if room is None or not isinstance(room, EngineRoom):
         return
-    move = uf.validate_move(room.make_stockfish_move())
-    if move is None:
-        return
+    room.make_stockfish_move()
     if room in hc.CHESS_ROOMS:
-        await send_move_to_opponent(client)
         if room.is_game_over():
             await handle_game_over(client)
+        else:
+            await send_move_to_opponent(client)
 
 
 @sio.event
@@ -228,14 +227,15 @@ async def quit_game(sid):
         await handle_quit(client)
     elif client in hc.WAITING_ROOM:
         hc.WAITING_ROOM.remove(client)
+    return dict(elo=client.elo_int())
 
 
 @sio.event
-async def ping(sid):
+async def ping(sid) -> str:
     """
     handle the ping event.
     """
-    await sio.emit('pong', to=sid)
+    return 'pong'
 
 
 @sio.event

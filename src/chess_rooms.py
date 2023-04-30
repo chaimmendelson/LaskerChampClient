@@ -166,11 +166,10 @@ class ChessRoom:
         """
         return the game results as a dictionary
         """
-        resault = ['0.5', '0.5']
+        resault = ['0', '0']
+        resault_d = {'1': '1', '0': '-1', '1/2': '0'}
         if self.is_game_over():
-            resault = self.board.result().split('-')
-            if resault[0] == '1/2':
-                resault = ['0.5', '0.5']
+            resault = [resault_d[x] for x in self.board.result().split('-')]
         return {self.players[0]: resault[0], self.players[1]: resault[1]}
 
     def is_players_turn(self, player: str) -> bool:

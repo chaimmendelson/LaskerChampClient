@@ -29,27 +29,25 @@ let delay_time = 0;
 socket.on('connect', () => {
    console.log('Connected to server');
    start = Date.now();
-   socket.emit('ping')
+   socket.emit('ping', (data) => {
+         delay_time = Math.round((Date.now() - start) / 1000);
+         console.log('ping: ' + delay_time);
+    });
 });
 
-socket.on('pong', () => {
-    delay_time = Math.round((Date.now() - start) / 1000);
-    console.log('ping: ' + delay_time);
-});
 
-
-socket.on('clock_update', (data) => {
+function update_clocks(clocks){
     // the format is {white: seconds, black: seconds}
     // change the clocks to reflect the new time
     if (playerColor === WHITE) {
-        player1TimeRemaining = data['white'];
-        player2TimeRemaining = data['black'];
+        player1TimeRemaining = clocks['white'];
+        player2TimeRemaining = clocks['black'];
     }
     else {
-        player1TimeRemaining = data['black'];
-        player2TimeRemaining = data['white'];
+        player1TimeRemaining = clocks['black'];
+        player2TimeRemaining = clocks['white'];
     }
-});
+};
 
 socket.on('connect_error', (error) => {
    console.log('Connection error: ' + error);
@@ -63,54 +61,72 @@ socket.on('login_error', (data) => {
    console.log('login error: ' + data);
 });
 
-socket.on('update_elo', (data) => {
-    document.getElementById('elo').innerHTML = data['elo'];
-});
 
-
-socket.on('user_data', (data) => {
-    console.log(data);
+socket.on('user', (data) => {
     document.getElementById('username').innerHTML = data['username'];
     document.getElementById('elo').innerHTML = data['elo'];
 });
 
 socket.on('opponent_move', (data) => {
-    let move = {from: data['src'], to: data['dst']};
-    moveToHighlight = move;
-    if (data['promotion']){
-        move['promotion'] = data['promotion']
-    }
-    game.move(move);
+    commit_opponent_move(data['move']);
+    update_clocks(data['clock']);
     nextPlayer();
     updateTurn();
     resetPosition();
     if (usePreGame) try_pre_move();
 })
 
+
+function commit_opponent_move(move){
+    let move_d = {from: move.slice(0, 2), to: move.slice(2, 4)};
+    moveToHighlight = move_d;
+    if (move.length == 5){
+        move_d['promotion'] = move[4];
+    }
+    game.move(move_d);
+}
+
 socket.on('game_started', (data) => {
+    console.log(data);
     playerNum = data.color == 'white' ? 0 : 1;
+    playerColor = data.color == 'white' ? WHITE : BLACK;
     currentPlayer = 0;
     document.getElementById('startBtn').style.display = 'none';
     document.getElementById('quitBtn').style.display = 'block';
-    startGame(data);
+    console.log('game started');
+    update_clocks(data['clock']);
+    startGame();
+
     let element = playerColor === WHITE ? 'player1-clock' : 'player2-clock';
     document.getElementById(element).style.backgroundColor = 'white';
-    document.getElementById('opponent').innerHTML = `${data.username} (${data.elo})`;
+
+    let opponent = data.opponent;
+    document.getElementById('opponent').innerHTML = `${opponent.username} (${opponent.elo})`;
+
     startClock();
 })
 
-socket.on('timeout', () => clear_game('you have run out of time'));
+socket.on('timeout', (data) => clear_game('you have run out of time', data['elo']));
 
-socket.on('game_over', (resault) => clear_game({0: 'you have lost', 0.5: 'its a tie', 1: 'you have won'}[resault]));
+socket.on('game_over', (data) => {
+    commit_opponent_move(data['move']);
+    update_clocks(data['clock']);
+    clear_game({'-1': 'you have lost', '0': 'its a tie', '1': 'you have won'}[data['result']], data['elo'])
+});
 
-socket.on('opponent_quit', () => clear_game('your opponent quit the match'));
+socket.on('opponent_quit', (data) => clear_game('your opponent quit the match', data['elo']));
 
-socket.on('opponent_timeout', () => clear_game('your opponent ran out of time'));
+socket.on('opponent_timeout', (data) => clear_game('your opponent ran out of time', data['elo']));
 
+
+socket.on('move_received', (data) => {
+    update_clocks(data['clock']);
+});
 
 async function quit_game(){
-    await socket.emit('quit_game');
-    clear_game('you lost');
+    await socket.emit('quit_game', (data) => {
+        clear_game('you have quit the match', data['elo']);
+    });
 }
 
 // Initial time for each player (in seconds)
