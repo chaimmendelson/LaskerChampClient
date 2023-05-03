@@ -26,7 +26,7 @@ class Client():
     def set_chosen_clock(self, clock: str):
         self.choosen_clock = clock
 
-    def update_elo(self, opponent_elo, player_score):
+    def update_elo(self, opponent_elo: float, player_score: int):
         """
         calculate the new elo of the player.
         """
@@ -160,14 +160,19 @@ def add_player_room(player1: Client, player2: Client, clock: str = DEAFULT_CLOCK
     return room
 
 
-def update_elo(score_dict: dict[Client, str]):
+def update_elo(score_dict: dict[Client, int]):
     """
     RatA + K * (score - (1 / (1 + 10**((RatB - RatA)/400))))
     K = 400 / games_played + 16
     """
     player1, player2 = tuple(score_dict.keys())
-    player1_elo, player2_elo = player1.elo, player2.elo
     player1_score, player2_score = score_dict[player1], score_dict[player2]
+    
+    if player1_score == DRAW: return
+    player1_score = 1 if player1_score == WON else 0
+    player2_score = 1 - player1_score
+    
+    player1_elo, player2_elo = player1.elo, player2.elo
     player1.update_elo(player2_elo, player1_score)
     player2.update_elo(player1_elo, player2_score)
 
@@ -177,8 +182,8 @@ def clock_update(client: Client) -> dict[str, int]:
     """
     room = client.room
     if room is None:
-        return dict(white = 0, black = 0)
+        return dict(w = 0, b = 0)
     return dict(
-            white = round(room.get_time_left(room.players[0])),
-            black = round(room.get_time_left(room.players[1]))
+            w = round(room.get_time_left(room.players[0])),
+            b = round(room.get_time_left(room.players[1]))
             )

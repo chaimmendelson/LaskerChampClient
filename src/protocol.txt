@@ -79,8 +79,8 @@ socketio protocol client:
 
 socketio protocol server:
 
-    - clock: {white: sec, black: sec}
-    - color: "white" / "black"
+    - clock: {w: sec, b: sec}
+    - color: "w" / "b"
     - move: "e2e4" / "e7e8q" (uci format)
     - result: -1 / 0 / 1 (loss / draw / win)
     - elo: integer (elo rating)

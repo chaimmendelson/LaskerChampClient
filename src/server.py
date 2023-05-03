@@ -8,11 +8,12 @@ from time import sleep
 import socketio
 import re
 from aiohttp import web
-from chess_rooms import EngineRoom, PlayerRoom
+from chess_rooms import EngineRoom, PlayerRoom, WON, LOST, DRAW
 import accounts_db as hd
 import handle_clients as hc
 import app_routs as routs
 import useful_func as uf
+import stats
 #os.chmod(STOCKFISH_L_PATH, stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 sio = socketio.AsyncServer()
 app = web.Application()
@@ -38,7 +39,7 @@ async def handle_game_over(client: hc.Client):
     await send_game_over_msg(client, last_move, resaults[client.username])
     hc.close_room(client)
 
-async def send_game_over_msg(client: hc.Client, last_move: str, resault: str):
+async def send_game_over_msg(client: hc.Client, last_move: str, resault: int):
     data = dict(move=last_move,
                 clock=hc.clock_update(client),
                 resault=resault,
@@ -62,7 +63,7 @@ async def handle_quit(client: hc.Client) -> None:
     """
     if client.room is not None and not hc.is_engine_room(client.room):
         opponent = hc.get_oppoent(client)
-        hc.update_elo({client: '0', opponent: '1'})
+        hc.update_elo({client: -1, opponent: 1})
         await sio.emit('opponent_quit', dict(elo=opponent.elo_int()), to=opponent.sid)
     hc.close_room(client)
 
@@ -81,7 +82,7 @@ async def handle_timeout(room: EngineRoom | PlayerRoom) -> None:
         if client is None or client.room is None: return
         if not hc.is_engine_room(client.room):
             opponent = hc.get_oppoent(client)
-            hc.update_elo({client: '0', opponent: '1'})
+            hc.update_elo({client: LOST, opponent: WON})
             await game_closed_msg(opponent, 'opponent_timeout')
         await game_closed_msg(client, 'timeout')
     hc.close_room(client)
@@ -161,8 +162,8 @@ async def start_game(sid, data: dict):
 async def set_pvp_room(room: PlayerRoom):
     white, black = [hc.get_client(username=username) for username in room.players]
     clock = hc.clock_update(white)
-    white_data = dict(color='white', opponent=dict(username=black.username, elo=black.elo), clock=clock)
-    black_data = dict(color='black', opponent=dict(username=white.username, elo=white.elo), clock=clock)
+    white_data = dict(color='w', opponent=dict(username=black.username, elo=black.elo), clock=clock)
+    black_data = dict(color='b', opponent=dict(username=white.username, elo=white.elo), clock=clock)
     await sio.emit('game_started', white_data, to=white.sid)
     await sio.emit('game_started', black_data, to=black.sid)
     room.start_clock()
@@ -170,9 +171,9 @@ async def set_pvp_room(room: PlayerRoom):
 
 async def set_engine_room(room: EngineRoom):
     client = hc.get_client(username=room.opponent('stockfish'))
-    data = dict(color='black', opponent=dict(username='stockfish', elo=0), clock=hc.clock_update(client))
+    data = dict(color='b', opponent=dict(username='stockfish', elo=0), clock=hc.clock_update(client))
     if room.is_players_turn(client.username):
-        data['color'] = 'white'
+        data['color'] = 'w'
         await sio.emit('game_started', data, to=client.sid)
         room.start_clock()
     else:
@@ -244,13 +245,13 @@ async def disconnect(sid):
     handle the disconnect event.
     """
     client = hc.get_client(sid=sid)
-    hc.remove_client(sid)
     if client in hc.WAITING_ROOM:
         hc.WAITING_ROOM.remove(client)
     if client.is_in_room():
         await handle_quit(client)
-
-
+    hc.remove_client(sid)
+    
+    
 app.add_routes([
     web.get('/', routs.game_page),
     web.get('/login', routs.login),
@@ -283,6 +284,7 @@ def main():
         pass
     stop_thread = True
     thread.join()
+    stats.reset_counter(stats.ONLINE_PLAYERS)
     print('The server has been shut down')
 
 

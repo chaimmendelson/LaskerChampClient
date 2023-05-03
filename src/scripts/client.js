@@ -1,3 +1,7 @@
+const USERNAME = 'username';
+const ELO = 'elo';
+const CLOCKS = 'clock';
+
 //Game control btns
 document.getElementById('startBtn').addEventListener('click', async function() {
     resetClock();
@@ -27,26 +31,19 @@ const socket = io({
 let start = null;
 let delay_time = 0;
 socket.on('connect', () => {
-   console.log('Connected to server');
-   start = Date.now();
-   socket.emit('ping', (data) => {
-         delay_time = Math.round((Date.now() - start) / 1000);
-         console.log('ping: ' + delay_time);
-    });
+    console.log('Connected to server');
+    start = Date.now();
+    socket.emit('ping', (data) => {
+        delay_time = Math.round((Date.now() - start) / 1000);
+    }); 
 });
 
 
 function update_clocks(clocks){
     // the format is {white: seconds, black: seconds}
     // change the clocks to reflect the new time
-    if (playerColor === WHITE) {
-        player1TimeRemaining = clocks['white'];
-        player2TimeRemaining = clocks['black'];
-    }
-    else {
-        player1TimeRemaining = clocks['black'];
-        player2TimeRemaining = clocks['white'];
-    }
+    player1TimeRemaining = playerColor === WHITE ? clocks[WHITE] : clocks[BLACK];
+    player2TimeRemaining = playerColor === WHITE ? clocks[BLACK] : clocks[WHITE];
 };
 
 socket.on('connect_error', (error) => {
@@ -63,13 +60,13 @@ socket.on('login_error', (data) => {
 
 
 socket.on('user', (data) => {
-    document.getElementById('username').innerHTML = data['username'];
-    document.getElementById('elo').innerHTML = data['elo'];
+    document.getElementById(USERNAME).innerHTML = data[USERNAME];
+    document.getElementById(ELO).innerHTML = data[ELO];
 });
 
 socket.on('opponent_move', (data) => {
     commit_opponent_move(data['move']);
-    update_clocks(data['clock']);
+    update_clocks(data[CLOCKS]);
     nextPlayer();
     updateTurn();
     resetPosition();
@@ -87,13 +84,11 @@ function commit_opponent_move(move){
 }
 
 socket.on('game_started', (data) => {
-    console.log(data);
-    playerNum = data.color == 'white' ? 0 : 1;
-    playerColor = data.color == 'white' ? WHITE : BLACK;
+    playerNum = data.color == WHITE ? 0 : 1;
+    playerColor = data.color
     currentPlayer = 0;
     document.getElementById('startBtn').style.display = 'none';
     document.getElementById('quitBtn').style.display = 'block';
-    console.log('game started');
     update_clocks(data['clock']);
     startGame();
 
@@ -111,7 +106,8 @@ socket.on('timeout', (data) => clear_game('you have run out of time', data['elo'
 socket.on('game_over', (data) => {
     commit_opponent_move(data['move']);
     update_clocks(data['clock']);
-    clear_game({'-1': 'you have lost', '0': 'its a tie', '1': 'you have won'}[data['result']], data['elo'])
+    let msg = {'-1': 'you have lost', '0': 'its a tie', '1': 'you have won'}[data['resault']];
+    clear_game(msg, data['elo'])
 });
 
 socket.on('opponent_quit', (data) => clear_game('your opponent quit the match', data['elo']));
@@ -230,7 +226,6 @@ function resizeBoard(){
         let screen_height = screen.height - 100;
         let screen_width = screen.width;
         let board_size = (Math.min(screen_height, screen_width)) / screen_width * 100 - 5;
-        console.log(board_size);
         document.getElementById('game_container').style.width = board_size + '%';
     }
     board.resize();

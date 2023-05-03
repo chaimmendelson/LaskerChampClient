@@ -94,11 +94,15 @@ function resetSquareColor(){
 }
 
 function resetPosition(){
-    if (usePreGame){
+    if (usePreGame)
+    {
         board.position(game.fen(), false);
         board.position(makeMovesOnBoard(move_stack), false);
     }
-    else board.position(game.fen());
+    else
+    {
+        board.position(game.fen());
+    }
     resetSquareColor();
 }
 

@@ -18,6 +18,10 @@ WHITE = 0
 BLACK = 1
 DEAFULT_CLOCK = '5|0'
 
+WON: int = 1
+LOST: int = -1
+DRAW: int = 0
+
 class ChessClock(object):
     """
     A chess clock that can be started and stopped and keeps track of time left.
@@ -162,12 +166,12 @@ class ChessRoom:
         """
         return self.board.result() != '*'
 
-    def get_game_results(self) -> dict[str, str]:
+    def get_game_results(self) -> dict[str, int]:
         """
         return the game results as a dictionary
         """
-        resault = ['0', '0']
-        resault_d = {'1': '1', '0': '-1', '1/2': '0'}
+        resault = [DRAW, DRAW]
+        resault_d = {'1': WON, '0': LOST, '1/2': DRAW}
         if self.is_game_over():
             resault = [resault_d[x] for x in self.board.result().split('-')]
         return {self.players[0]: resault[0], self.players[1]: resault[1]}
