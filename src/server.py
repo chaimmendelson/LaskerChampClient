@@ -4,7 +4,7 @@ This file contains the server code for the chess game.
 import os
 import threading
 import asyncio
-from time import sleep
+from time import sleep, time
 import socketio
 import re
 from aiohttp import web
@@ -21,6 +21,7 @@ sio.attach(app)
 
 
 chess_clocks = ['5|0', '3|2', '10|5', '15|10', '30|0']
+OPPONENT_ELO_RANGE = 100
     
 
 async def handle_game_over(client: hc.Client):
@@ -93,18 +94,7 @@ async def game_closed_msg(client: hc.Client, msg: str):
     """
     await sio.emit(msg, dict(elo=client.elo_int()), to=client.sid)
     
-    
-def check_for_timeout(stop_event: bool):
-    """
-    run endless loop to check for timeout.
-    """
-    while not stop_event:
-        sleep(0.1) # type: ignore
-        for room in hc.CHESS_ROOMS:
-            if room.is_timeout():
-                asyncio.run(handle_timeout(room))
-
-
+            
 @sio.event
 async def connect(sid, environ, auth):
     """
@@ -139,15 +129,15 @@ async def start_game(sid, data: dict):
     if clock is None or not clock in chess_clocks:
         clock = chess_clocks[0]
     if data.get('game_mode') == 'online':
-        if len(hc.WAITING_ROOM) != 0:
-            for opponent in hc.WAITING_ROOM:
-                if opponent.choosen_clock == clock:
-                    hc.WAITING_ROOM.remove(opponent)
+        if len(hc.WAITING_ROOM[clock]) != 0:
+            for opponent in hc.WAITING_ROOM[clock]:
+                if hc.get_client_clock(opponent) == clock and\
+                    opponent.elo_int() in range(client.elo_int() - OPPONENT_ELO_RANGE,
+                                                client.elo_int() + OPPONENT_ELO_RANGE):
                     room = hc.add_player_room(client, opponent, clock)
                     await set_pvp_room(room)
                     return
-        client.set_chosen_clock(clock)
-        hc.WAITING_ROOM.append(client)
+        hc.add_to_waiting_room(client, clock)
         await sio.emit('searching', to=sid)
         return
     elif data.get('game_mode') == 'engine':
@@ -162,8 +152,8 @@ async def start_game(sid, data: dict):
 async def set_pvp_room(room: PlayerRoom):
     white, black = [hc.get_client(username=username) for username in room.players]
     clock = hc.clock_update(white)
-    white_data = dict(color='w', opponent=dict(username=black.username, elo=black.elo), clock=clock)
-    black_data = dict(color='b', opponent=dict(username=white.username, elo=white.elo), clock=clock)
+    white_data = dict(color='w', opponent=dict(username=black.username, elo=black.elo_int()), clock=clock)
+    black_data = dict(color='b', opponent=dict(username=white.username, elo=white.elo_int()), clock=clock)
     await sio.emit('game_started', white_data, to=white.sid)
     await sio.emit('game_started', black_data, to=black.sid)
     room.start_clock()
@@ -171,14 +161,12 @@ async def set_pvp_room(room: PlayerRoom):
 
 async def set_engine_room(room: EngineRoom):
     client = hc.get_client(username=room.opponent('stockfish'))
-    data = dict(color='b', opponent=dict(username='stockfish', elo=0), clock=hc.clock_update(client))
+    data: dict[str, dict|str] = dict(opponent=dict(username='stockfish', elo=0), clock=hc.clock_update(client))
+    data['color'] = 'w' if room.is_players_turn(client.username) else 'b'
+    await sio.emit('game_started', data, to=client.sid)
+    print(data['color'])
+    room.start_clock()
     if room.is_players_turn(client.username):
-        data['color'] = 'w'
-        await sio.emit('game_started', data, to=client.sid)
-        room.start_clock()
-    else:
-        await sio.emit('game_started', data, to=client.sid)
-        room.start_clock()
         await send_stockfish_move(client)
     
     
@@ -226,8 +214,6 @@ async def quit_game(sid):
     client = hc.get_client(sid=sid)
     if client.is_in_room():
         await handle_quit(client)
-    elif client in hc.WAITING_ROOM:
-        hc.WAITING_ROOM.remove(client)
     return dict(elo=client.elo_int())
 
 
@@ -240,18 +226,83 @@ async def ping(sid) -> str:
 
 
 @sio.event
+async def quit_waiting(sid):
+    """
+    handle the quit waiting event.
+    """
+    client = hc.get_client(sid=sid)
+    if hc.is_in_waiting_room(client):
+        hc.remove_from_waiting_room(client)
+        return dict(success=True)
+    if client.is_in_room():
+        return dict(success=False)
+    return dict(success=True)
+
+
+@sio.event
 async def disconnect(sid):
     """
     handle the disconnect event.
     """
     client = hc.get_client(sid=sid)
-    if client in hc.WAITING_ROOM:
-        hc.WAITING_ROOM.remove(client)
+    if hc.is_in_waiting_room(client):
+        hc.remove_from_waiting_room(client)
     if client.is_in_room():
         await handle_quit(client)
     hc.remove_client(sid)
     
-    
+
+class KillableThread(threading.Thread):
+    def __init__(self, function, sleep_interval: int|float=1):
+        super().__init__()
+        self._kill = threading.Event()
+        self._interval = sleep_interval
+        self._function = function
+
+    def run(self):
+        while True:
+            self._function()
+            # If no kill signal is set, sleep for the interval,
+            # If kill signal comes in while sleeping, immediately
+            #  wake up and handle
+            is_killed = self._kill.wait(self._interval)
+            if is_killed:
+                break
+
+        print("Killing Thread")
+
+    def kill(self):
+        self._kill.set()
+        
+        
+def check_for_timeout():
+    """
+    run endless loop to check for timeout.
+    """
+    for room in hc.CHESS_ROOMS:
+        if room.is_timeout():
+            asyncio.run(handle_timeout(room))
+            break
+
+
+def check_waiting_room():
+    """
+    run endless loop to check for waiting room.
+    """
+    for client, entry in hc.WAITING_ENTRE_TIME.items():
+        if time() - entry > 10:
+            clock = hc.get_client_clock(client)
+            if len(hc.WAITING_ROOM[clock]) == 1:
+                continue
+            # find the player with the closest elo to the client
+            client_elo = client.elo_int()
+            # find the closest elo to the client
+            opponent = min(hc.WAITING_ROOM[clock], key=lambda x: abs(x.elo_int() - client_elo) if x != client else 100000)
+            room = hc.add_player_room(client, opponent, clock)
+            asyncio.run(set_pvp_room(room))
+            break
+            
+            
 app.add_routes([
     web.get('/', routs.game_page),
     web.get('/login', routs.login),
@@ -274,17 +325,20 @@ def main():
     # import stat
     # from chess_rooms import STOCKFISH_L_PATH
     # os.chmod(STOCKFISH_L_PATH, stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-    stop_thread = False
-    thread = threading.Thread(target=check_for_timeout,
-                              args=(lambda: stop_thread,))
+    
+    stats.reset_counter(stats.ONLINE_PLAYERS)
+    threads: list[KillableThread] = []
+    threads.append(KillableThread(check_for_timeout, 0.1))
+    threads.append(KillableThread(check_waiting_room, 0.1))
     try:
-        thread.start()
+        for thread in threads:
+            thread.start()
         web.run_app(app, port=os.getenv('PORT', '5678')) # type: ignore
     except KeyboardInterrupt:
-        pass
-    stop_thread = True
-    thread.join()
-    stats.reset_counter(stats.ONLINE_PLAYERS)
+        print('KeyboardInterrupt')
+    print('Shutting down the server...')
+    for thread in threads:
+        thread.kill()
     print('The server has been shut down')
 
 

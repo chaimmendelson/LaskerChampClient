@@ -16,8 +16,19 @@ document.getElementById('startBtn').addEventListener('click', async function() {
     await socket.emit('start_game', {game_mode: game_mode, level: level, clock: clock_time});
 }); // start
 
-document.getElementById('quitBtn').addEventListener('click', function(){ 
-    quit_game()
+document.getElementById('quitBtn').addEventListener('click', function(){
+    if (game != null){
+        quit_game()
+    }
+    else{
+        socket.emit('quit_waiting', (data) => {
+            if (data['success']){
+                document.getElementById('quitBtn').style.display = 'none';
+                document.getElementById('startBtn').style.display = 'block';
+                document.getElementById('startBtn').disabled = false;
+            }
+        });
+    }
 }); // quit
 
 // variables for the information on the board and of the board
@@ -62,6 +73,11 @@ socket.on('login_error', (data) => {
 socket.on('user', (data) => {
     document.getElementById(USERNAME).innerHTML = data[USERNAME];
     document.getElementById(ELO).innerHTML = data[ELO];
+});
+
+socket.on('searching', () => {
+    document.getElementById('startBtn').style.display = 'none';
+    document.getElementById('quitBtn').style.display = 'block';
 });
 
 socket.on('opponent_move', (data) => {

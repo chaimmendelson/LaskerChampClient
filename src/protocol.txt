@@ -75,6 +75,12 @@ socketio protocol client:
 
         response:
             - server protocol: game quit
+    
+    quit waiting:
+        request: quit_waiting
+
+        response:
+            - server protocol: waiting room quit
 
 
 socketio protocol server:
@@ -98,7 +104,7 @@ socketio protocol server:
             data: {color: color, clock: clock, opponent: {username: "username", elo: elo}}
     
     searching for opponent:
-        response: searching
+        message: searching
     
     move received:
         response: move_received
@@ -127,7 +133,9 @@ socketio protocol server:
     client timeout:
         message: timeout
             data: {elo: elo}
-
+    
+    waiting room quit:
+        response: {success: true/false}
 
 
 

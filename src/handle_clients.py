@@ -4,8 +4,9 @@ handle the connected users.
 from chess_rooms import *
 import accounts_db as hd
 import stats
+import time
 CHESS_ROOMS: list[PlayerRoom | EngineRoom] = []
-
+chess_clocks = ['5|0', '3|2', '10|5', '15|10', '30|0']
 
 class Client():
     """
@@ -21,10 +22,6 @@ class Client():
         self.elo: float = user_data[hd.ELO] # type: ignore
         self.games_played: int = user_data[hd.GAMES_PLAYED] # type: ignore
         self.roll: str = user_data[hd.ROLL] # type: ignore
-        self.choosen_clock: str = ''
-        
-    def set_chosen_clock(self, clock: str):
-        self.choosen_clock = clock
 
     def update_elo(self, opponent_elo: float, player_score: int):
         """
@@ -62,7 +59,8 @@ class Client():
         return round(self.elo)
 
 
-WAITING_ROOM: list[Client] = []
+WAITING_ROOM: dict[str, list[Client]] = {chess_clocks[i]: [] for i in range(len(chess_clocks))}
+WAITING_ENTRE_TIME: dict[Client, float] = {}
 CLIENTS: list[Client] = []
 
 
@@ -129,6 +127,36 @@ def close_room(client: Client) -> None:
         client.exit_room()
         
 
+def add_to_waiting_room(client: Client, clock: str) -> None:
+    WAITING_ROOM[clock].append(client)
+    WAITING_ENTRE_TIME[client] = time.time()
+
+
+def get_client_clock(client: Client) -> str:
+    """
+    return the clock of the given client.
+    """
+    for clock, clients in WAITING_ROOM.items():
+        if client in clients:
+            return clock
+    return ''
+
+def is_in_waiting_room(client: Client) -> bool:
+    """
+    return True if the given client is in the waiting room.
+    """
+    return get_client_clock(client) != ''
+
+def remove_from_waiting_room(client: Client, clock: str|None=None) -> None:
+    """
+    remove the given client from the waiting room.
+    """
+    if is_in_waiting_room(client):
+        clock = clock if clock is not None else get_client_clock(client)
+        WAITING_ROOM[clock].remove(client)
+        WAITING_ENTRE_TIME.pop(client)
+        
+        
 def is_engine_room(room: EngineRoom | PlayerRoom) -> bool:
     """
     return True if room is a engine room.
@@ -150,6 +178,8 @@ def add_player_room(player1: Client, player2: Client, clock: str = DEAFULT_CLOCK
     """
     add a player room to the CHESS_ROOMS list.
     """
+    remove_from_waiting_room(player1, clock)
+    remove_from_waiting_room(player2, clock)
     room = PlayerRoom(player1.username, player2.username, clock)
     CHESS_ROOMS.append(room)
     player1.update_games_played()

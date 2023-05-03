@@ -23,7 +23,6 @@ async def admin(request: web.Request) -> web.Response:
     if cookie is None:
         return web.Response(status=302, headers={'Location': '/'})
     roll = hd.get_value(hd.get_username_by_cookie(cookie), hd.ROLL)
-    print(roll)
     if roll != hd.ADMIN:
         return web.Response(status=302, headers={'Location': '/'})
     with open('src/pages/admin.html', encoding='utf-8') as admin_page:
