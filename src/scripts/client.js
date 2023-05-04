@@ -59,6 +59,7 @@ function update_clocks(clocks){
 
 socket.on('connect_error', (error) => {
    console.log('Connection error: ' + error);
+   window.location.href = '/login';
 });
 
 socket.on('disconnect', () => {

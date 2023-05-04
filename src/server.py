@@ -335,8 +335,7 @@ def main():
             thread.start()
         web.run_app(app, port=os.getenv('PORT', '5678')) # type: ignore
     except KeyboardInterrupt:
-        print('KeyboardInterrupt')
-    print('Shutting down the server...')
+        pass
     for thread in threads:
         thread.kill()
     print('The server has been shut down')
