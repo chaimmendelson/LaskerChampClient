@@ -325,8 +325,6 @@ def main():
     # import stat
     # from chess_rooms import STOCKFISH_L_PATH
     # os.chmod(STOCKFISH_L_PATH, stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-    
-    stats.reset_counter(stats.ONLINE_PLAYERS)
     threads: list[KillableThread] = []
     threads.append(KillableThread(check_for_timeout, 0.1))
     threads.append(KillableThread(check_waiting_room, 0.1))

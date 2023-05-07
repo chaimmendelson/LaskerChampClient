@@ -225,3 +225,6 @@ class PlayerRoom(ChessRoom):
 
     def __init__(self, player1: str, player2: str, clock: str=DEAFULT_CLOCK):
         super().__init__(player1, player2, clock)
+
+
+CHESS_ROOMS: list[PlayerRoom | EngineRoom] = []

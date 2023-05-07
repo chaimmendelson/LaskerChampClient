@@ -268,7 +268,7 @@ def parse_values(data: dict) -> dict[str, str|int|float|datetime]:
     return parsed_data
             
 
-def get_user_count() -> int:
+def get_accounts_count() -> int:
     """
     get the number of users in the database
     """

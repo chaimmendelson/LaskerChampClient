@@ -1,64 +1,65 @@
 import json
 import accounts_db as hd
+from datetime import datetime
+from chess_rooms import *
+from client_class import CLIENTS
+DAILY_FILE = 'src/daily_stats.json'
 
-FILE = './src/stats.json'
-ACCOUNTS_COUNT = 'accounts count'
-PVP_PLAYED = 'pvp games played'
-PVP_ROOMS = 'current pvp rooms'
-CLOCKS = 'most used clock'
-GAMES_PLAYED_TODAY = 'games played today'
-ONLINE_PLAYERS = 'online players'
+PVP_PLAYED = 'online'
+ENGINE_PLAYED = 'engine'
+NEW_ACCOUNTS = 'new'
+STATS = [PVP_PLAYED, ENGINE_PLAYED, NEW_ACCOUNTS]
 
 chess_clocks = ['5|0', '3|2', '10|5', '15|10', '30|0']
-def initialize():
+
+def now() -> str:
+    return datetime.now().strftime('%Y-%m-%d')
+
+def initialize_day() -> None:
     stats = {
-        ACCOUNTS_COUNT: hd.get_user_count(),
         PVP_PLAYED: 0,
-        PVP_ROOMS: 0,
-        CLOCKS: dict(zip(chess_clocks, [0] * len(chess_clocks))),
-        GAMES_PLAYED_TODAY: 0,
-        ONLINE_PLAYERS: 0,
+        ENGINE_PLAYED: 0,
+        NEW_ACCOUNTS: 0,
     }
-    with open(FILE, 'w') as stats_file:
-        json.dump(stats, stats_file, indent=4)
+    file_data = get_stats()
+    file_data[now()] = stats
+    with open(DAILY_FILE, 'w') as daily_file:
+        json.dump(file_data, daily_file, indent=4)
         
-def get_stats():
-    with open(FILE, 'r') as stats_file:
+def get_stats() -> dict[str, dict[str, int]]:
+    with open(DAILY_FILE, 'r') as stats_file:
         stats = json.load(stats_file)
     return stats
 
 
-def update_stat(key: str, value):
+def get_today_stats() -> dict[str, dict[str, int]]:
     stats = get_stats()
-    with open(FILE, 'w') as stats_file:
-        stats[key] = value
+    today = stats.get(now(), {PVP_PLAYED: 0, ENGINE_PLAYED: 0, NEW_ACCOUNTS: 0})
+    current = get_current_statues()
+    return dict(today=today, current=current)
+
+
+def get_overall_stats() -> dict[str, dict[str, int] | dict[str, dict[str, int]]]:
+    stats = get_stats()
+    current = get_current_statues()
+    return dict(overall=stats, current=current)
+
+def get_current_statues() -> dict[str, int]:
+    return dict(
+        online = len([room for room in CHESS_ROOMS if isinstance(room, PlayerRoom)]),
+        engine = len([room for room in CHESS_ROOMS if isinstance(room, EngineRoom)]),
+        accounts = len(CLIENTS),
+        count = hd.get_accounts_count()
+    )
+    
+    
+    
+def update_stat(key: str) -> None:
+    if key not in STATS: return
+    stats = get_stats()
+    if stats.get(now()) is None:
+        initialize_day()
+        stats = get_stats()
+    with open(DAILY_FILE, 'w') as stats_file:
+        stats[now()][key] += 1
         json.dump(stats, stats_file, indent=4)
-        
-
-def update_clock(clock: str):
-    clocks = dict(get_stats()[CLOCKS])
-    clocks[clock] += 1
-    update_stat(CLOCKS, clocks)
-    
-        
-def upon_close_pvp_room(clock: str):
-    update_counter(PVP_ROOMS, -1)
-    update_counter(GAMES_PLAYED_TODAY)
-    update_counter(PVP_PLAYED)
-
-
-def upon_close_pve_room():
-    update_counter(GAMES_PLAYED_TODAY)
-    
-
-def upon_open_pvp_room():
-    update_counter(PVP_ROOMS)
-       
-       
-def update_counter(key: str, value: int=1):
-    update_stat(key, get_stats()[key] + value)
-
-def reset_counter(key: str):
-    update_stat(key, 0)
-
-print('stats.py loaded')

@@ -14,7 +14,7 @@ USER_lOGGED_IN: int = 490
 INVALID_CREDENTIALS: int = 491
 
 async def get_stats(request: web.Request) -> web.Response:
-    return web.json_response(dict(stats=stats.get_stats()))
+    return web.json_response(dict(stats=stats.get_overall_stats()))
 
 
 async def admin(request: web.Request) -> web.Response:
@@ -97,7 +97,7 @@ async def sign_up(request: web.Request):
             code = hd.validate_credentials(username, password, email)
             if code == 200:
                 hd.create_new_user(username, password, email)
-                stats.update_counter(stats.ACCOUNTS_COUNT)
+                stats.update_stat(stats.NEW_ACCOUNTS)
     return web.json_response({'status': code})
 
 

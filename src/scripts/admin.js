@@ -12,7 +12,7 @@ async function getStats() {
 
 getStats().then(stats => {
     table = '<tr><th>Stat</th><th>Value</th></tr>';
-    for (const [key, value] of Object.entries(stats)) {
+    for (const [key, value] of Object.entries(stats['current'])) {
         table += `<tr><td>${key}</td><td>${value}</td></tr>`;
     }
     document.getElementById('stats').innerHTML = table;
