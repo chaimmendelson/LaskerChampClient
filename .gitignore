@@ -1,1 +1,3 @@
 *.pyc
+src/
+src/daily_stats.json
