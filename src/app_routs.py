@@ -92,8 +92,8 @@ async def sign_up(request: web.Request):
     code = 400
     if request.body_exists:
         data = await request.json()
-        if 'username' in data and 'password' in data and 'email' in data:
-            username, password, email = data.get('username'), data.get('password'), data.get('email')
+        username, password, email = data.get('username'), data.get('password'), data.get('email')
+        if username is not None and password is not None and email is not None:
             code = hd.validate_credentials(username, password, email)
             if code == 200:
                 hd.create_new_user(username, password, email)

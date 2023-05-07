@@ -33,7 +33,7 @@ async def handle_game_over(client: hc.Client):
     room.stop_clock()
     resaults = room.get_game_results()
     last_move = room.last_move()
-    if not hc.is_engine_room(room):
+    if not isinstance(room, EngineRoom):
         opponent = hc.get_oppoent(client)
         hc.update_elo({client: resaults[client.username], opponent: resaults[opponent.username]})
         await send_game_over_msg(opponent, last_move, resaults[opponent.username])
@@ -62,7 +62,7 @@ async def handle_quit(client: hc.Client) -> None:
     """
     handle the quit game event.
     """
-    if client.room is not None and not hc.is_engine_room(client.room):
+    if client.room is not None and not isinstance(client.room, EngineRoom):
         opponent = hc.get_oppoent(client)
         hc.update_elo({client: -1, opponent: 1})
         await sio.emit('opponent_quit', dict(elo=opponent.elo_int()), to=opponent.sid)
@@ -81,7 +81,7 @@ async def handle_timeout(room: EngineRoom | PlayerRoom) -> None:
     else:
         client = hc.get_client(username=username)
         if client is None or client.room is None: return
-        if not hc.is_engine_room(client.room):
+        if not isinstance(client.room, EngineRoom):
             opponent = hc.get_oppoent(client)
             hc.update_elo({client: LOST, opponent: WON})
             await game_closed_msg(opponent, 'opponent_timeout')
@@ -164,9 +164,8 @@ async def set_engine_room(room: EngineRoom):
     data: dict[str, dict|str] = dict(opponent=dict(username='stockfish', elo=0), clock=hc.clock_update(client))
     data['color'] = 'w' if room.is_players_turn(client.username) else 'b'
     await sio.emit('game_started', data, to=client.sid)
-    print(data['color'])
     room.start_clock()
-    if room.is_players_turn(client.username):
+    if not room.is_players_turn(client.username):
         await send_stockfish_move(client)
     
     
@@ -199,7 +198,7 @@ async def my_move(sid: str, data: dict[str, str]):
     if client.room.is_game_over():
         await handle_game_over(client)
     else:
-        if hc.is_engine_room(client.room):
+        if isinstance(client.room, EngineRoom):
             await send_stockfish_move(client)
         else:
             await send_move_to_opponent(hc.get_oppoent(client))

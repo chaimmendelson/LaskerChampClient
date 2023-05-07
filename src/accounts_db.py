@@ -328,11 +328,11 @@ def test():
     delete_user(username)
     assert does_exist(USERNAME, username) == False
     
+    create_new_user(username, password, email)
     # if we got here, all tests passed
     print('all tests passed')
 
 def main():
-    reset_table()
     test()
     test_validation()
 

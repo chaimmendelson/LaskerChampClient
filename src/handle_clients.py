@@ -50,6 +50,8 @@ class Client():
         set the room of the user.
         """
         self.room = room
+        if isinstance(room, PlayerRoom):
+            self.update_games_played()
         
     def update_games_played(self):
         self.games_played += 1
@@ -120,7 +122,7 @@ def close_room(client: Client) -> None:
     this function removes the room of the given player from the CHESS_ROOMS list.
     """
     if client.room is not None:
-        if not is_engine_room(client.room):
+        if not isinstance(client.room, EngineRoom):
             get_oppoent(client).exit_room()
             stats.upon_close_pvp_room(client.room.clock)
         CHESS_ROOMS.remove(client.room)
@@ -155,13 +157,6 @@ def remove_from_waiting_room(client: Client, clock: str|None=None) -> None:
         clock = clock if clock is not None else get_client_clock(client)
         WAITING_ROOM[clock].remove(client)
         WAITING_ENTRE_TIME.pop(client)
-        
-        
-def is_engine_room(room: EngineRoom | PlayerRoom) -> bool:
-    """
-    return True if room is a engine room.
-    """
-    return isinstance(room, EngineRoom)
 
 
 def add_engine_room(player: Client, level: int = 10, clock: str=DEAFULT_CLOCK) -> EngineRoom:
