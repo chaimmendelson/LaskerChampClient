@@ -314,6 +314,7 @@ app.add_routes([
     web.static('/scripts', 'src/scripts'),
     web.static('/styles', 'src/styles'),
     web.static('/images', 'src/images'),
+    web.static('/packages', 'src/packages'),
 ])
 
 
@@ -331,12 +332,11 @@ def main():
     threads.append(KillableThread(check_waiting_room, 0.1))
     try:
         for thread in threads:
+            thread.daemon = True
             thread.start()
         web.run_app(app, port=os.getenv('PORT', '5678')) # type: ignore
     except KeyboardInterrupt:
         pass
-    for thread in threads:
-        thread.kill()
     print('The server has been shut down')
 
 
