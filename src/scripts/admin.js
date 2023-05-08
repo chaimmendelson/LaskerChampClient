@@ -46,7 +46,6 @@ function getDataForPeriod(days, key) {
     let periodData = {};
     const today = new Date().toISOString().slice(0, 10);
     const date = new Date(today);
-    console.log(today, data);
     for (let i = 0; i < days; i++) {
         date.setDate(date.getDate() - i);
         const dateString = date.toISOString().slice(0, 10);
