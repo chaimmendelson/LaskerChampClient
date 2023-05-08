@@ -3,11 +3,29 @@
     <head>
         <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
         <link rel="stylesheet" href="styles/admin.css">
-        <script src="scripts/admin.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
     </head>
     <body>
+        <button id="relode" onclick="set_stats()">Relode</button>
         <!-- create a table -->
-        <table id="stats">
-        </table>
+        <div id="charts">
+            <div class="chart">
+                <table id="stats">
+                </table>
+            </div>
+            <div class="chart">
+                <h3>Number Of New Accounts</h3>
+                <canvas id="accountsChart" class="dChart"></canvas>
+            </div>
+            <div class="chart">
+                <h3>Engine Games Played</h3>
+                <canvas id="engineChart" class="dChart"></canvas>
+            </div>
+            <div class="chart">
+                <h3>Online Gmaes Played</h3>
+                <canvas id="onlineChart" class="dChart"></canvas>
+            </div>
+        </div>
     </body>
+    <script src="scripts/admin.js"></script>
 </html>

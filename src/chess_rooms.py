@@ -227,4 +227,4 @@ class PlayerRoom(ChessRoom):
         super().__init__(player1, player2, clock)
 
 
-CHESS_ROOMS: list[PlayerRoom | EngineRoom] = []
+CHESS_ROOMS: set[PlayerRoom | EngineRoom] = set()

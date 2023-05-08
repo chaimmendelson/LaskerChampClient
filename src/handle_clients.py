@@ -6,7 +6,7 @@ import accounts_db as hd
 from client_class import *
 import stats
 import time
-chess_clocks = ['5|0', '3|2', '10|5', '15|10', '30|0']
+chess_clocks: list[str] = ['5|0', '3|2', '10|5', '15|10', '30|0']
 
 
 WAITING_ROOM: dict[str, list[Client]] = {chess_clocks[i]: [] for i in range(len(chess_clocks))}
@@ -17,7 +17,7 @@ def add_client(username: str, sid: str) -> None:
     """
     add a new client to the CLIENTS list.
     """ 
-    CLIENTS.append(Client(username, sid))
+    CLIENTS.add(Client(username, sid))
 
 def remove_client(sid: str) -> None:
     """
@@ -108,7 +108,7 @@ def add_engine_room(player: Client, level: int = 10, clock: str=DEAFULT_CLOCK) -
     add a new engine room to the CHESS_ROOMS list.
     """
     room = EngineRoom(player.username, level, clock)
-    CHESS_ROOMS.append(room)
+    CHESS_ROOMS.add(room)
     player.enter_room(room)
     stats.update_stat(stats.ENGINE_PLAYED)
     return room
@@ -121,7 +121,7 @@ def add_player_room(player1: Client, player2: Client, clock: str = DEAFULT_CLOCK
     remove_from_waiting_room(player1, clock)
     remove_from_waiting_room(player2, clock)
     room = PlayerRoom(player1.username, player2.username, clock)
-    CHESS_ROOMS.append(room)
+    CHESS_ROOMS.add(room)
     player1.update_games_played()
     player2.update_games_played()
     player1.enter_room(room)

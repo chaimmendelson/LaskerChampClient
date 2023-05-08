@@ -54,4 +54,4 @@ class Client():
         return round(self.elo)
     
 
-CLIENTS: list[Client] = []
+CLIENTS: set[Client] = set()
