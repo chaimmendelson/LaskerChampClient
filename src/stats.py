@@ -3,7 +3,7 @@ import accounts_db as hd
 from datetime import datetime
 from chess_rooms import *
 from client_class import CLIENTS
-DAILY_FILE = 'src/daily_stats.json'
+DAILY_FILE = 'src/daily_stat.json'
 
 PVP_PLAYED = 'online'
 ENGINE_PLAYED = 'engine'
