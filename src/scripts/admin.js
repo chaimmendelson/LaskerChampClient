@@ -47,11 +47,11 @@ function getDataForPeriod(days, key) {
     const today = new Date().toISOString().slice(0, 10);
     const date = new Date(today);
     for (let i = 0; i < days; i++) {
-        date.setDate(date.getDate() - i);
         const dateString = date.toISOString().slice(0, 10);
         if (dateString in data) {
             periodData[dateString] = data[dateString][key];
         }
+        date.setDate(date.getDate() - 1);
     }
     return periodData;
 }
@@ -66,12 +66,12 @@ Array.prototype.min = function() {
 
 
 function set_chart_data(data, id) {
-    const xValues = Object.keys(data);
-    const yValues = Object.values(data);
+    const xValues = Object.keys(data).reverse();
+    const yValues = Object.values(data).reverse();
     let max = yValues.max() + 1;
     max = Math.ceil(max / 10) * 10;
     new Chart(id, {
-        type: "line",
+        type: "bar",
         data: {
             labels: xValues,
             datasets: [{

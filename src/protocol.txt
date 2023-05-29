@@ -129,16 +129,11 @@ socketio protocol server:
     opponent timeout:
         message: opponent_timeout
             data: {elo: elo}
-    
+
     client timeout:
         message: timeout
             data: {elo: elo}
-    
+
     waiting room quit:
         response: {success: true/false}
-
-
-
-
-    
                 

@@ -63,3 +63,5 @@ def update_stat(key: str) -> None:
     with open(DAILY_FILE, 'w') as stats_file:
         stats[now()][key] += 1
         json.dump(stats, stats_file, indent=4)
+        
+print(now())
