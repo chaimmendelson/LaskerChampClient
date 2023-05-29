@@ -14,20 +14,3 @@ def validate_move(move: str|None) -> str | None:
     if not re.fullmatch(regex, move):
         return None
     return move
-
-def print(line: str):
-    """
-    write the given line to the file 'output.txt'.
-    """
-    # pylint: disable=redefined-builtin
-    # add the line to the file 'output.txt'
-    with open('src/output.txt', 'a', encoding='utf-8') as output_file:
-        output_file.write(str(line) + '\n')
-
-
-def clear_file():
-    """
-    clear the file 'output.txt'.
-    """
-    with open('src/output.txt', 'w', encoding='utf-8') as output_file:
-        output_file.write('')
