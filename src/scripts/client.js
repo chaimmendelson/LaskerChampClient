@@ -82,6 +82,7 @@ socket.on('searching', () => {
 });
 
 socket.on('opponent_move', (data) => {
+    /* when the opponent makes a move, update the board and the clocks */
     commit_opponent_move(data['move']);
     update_clocks(data[CLOCKS]);
     nextPlayer();
@@ -92,6 +93,7 @@ socket.on('opponent_move', (data) => {
 
 
 function commit_opponent_move(move){
+    /* commit the move made by the opponent to the board */
     let move_d = {from: move.slice(0, 2), to: move.slice(2, 4)};
     moveToHighlight = move_d;
     if (move.length == 5){
@@ -101,6 +103,7 @@ function commit_opponent_move(move){
 }
 
 socket.on('game_started', (data) => {
+    /* when the game starts, update the clocks and the board and all the other information */
     playerNum = data.color == WHITE ? 0 : 1;
     playerColor = data.color
     currentPlayer = 0;
@@ -121,6 +124,7 @@ socket.on('game_started', (data) => {
 socket.on('timeout', (data) => clear_game('you have run out of time', data['elo']));
 
 socket.on('game_over', (data) => {
+    /* call the clear_game function with the appropriate message */
     commit_opponent_move(data['move']);
     update_clocks(data['clock']);
     let msg = {'-1': 'you have lost', '0': 'its a tie', '1': 'you have won'}[data['resault']];
@@ -271,6 +275,7 @@ document.getElementById('autoQueen').addEventListener('change', function() {
 const clock_options_list = ['5|0', '3|2', '10|5', '15|10', '30|0']
 
 function addClockOptions(){
+    /* add the clock options to the select element */
     let clock_options = document.getElementById('clock_options');
     let clock_options_html = '';
     for (let i = 0; i < clock_options_list.length; i++){

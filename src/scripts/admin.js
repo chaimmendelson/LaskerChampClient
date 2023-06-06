@@ -9,6 +9,7 @@ const accountsChart = 'accountsChart';
 let stats = null;
 
 async function getStats() {
+    /* get stats from server */
     const response = await fetch('/stats', {
         method: 'POST',
         headers: {
@@ -21,10 +22,12 @@ async function getStats() {
 }
 
 async function reloadStats() {
+    /* reload stats from server */
     stats = await getStats();
 }
 
 function setCurrentStats() {
+    /* create a tabkle in order to display the current stats */
     const key_d = {
         'online': 'Online Games',
         'engine': 'Engine Games',
@@ -42,6 +45,7 @@ function setCurrentStats() {
 // Assume the data is stored in an object with date keys and daily game play values
 
 function getDataForPeriod(days, key) {
+    /* get the data for the last days from the stats sent by the server*/
     const data = stats['overall'];
     let periodData = {};
     const today = new Date().toISOString().slice(0, 10);
@@ -66,6 +70,7 @@ Array.prototype.min = function() {
 
 
 function set_chart_data(data, id) {
+    /* set the data passed as the argument to the chart with the id passed as the argument */
     const xValues = Object.keys(data).reverse();
     const yValues = Object.values(data).reverse();
     let max = yValues.max() + 1;
@@ -92,6 +97,7 @@ function set_chart_data(data, id) {
 }
 
 async function set_stats(){
+    /* set the stats display */
     await reloadStats();
     setCurrentStats();
     set_chart_data(getDataForPeriod(7, engine), engineChart);
