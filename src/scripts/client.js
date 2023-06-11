@@ -26,9 +26,10 @@ document.getElementById('startBtn').addEventListener('click', async function() {
     game = null;
     data = {game_mode: game_mode}
 
-    if (game_type === 'online'){
+    if (game_mode === 'online'){
         data['clock'] = choosen_clock;
     }
+
     else{
         data['level'] = document.getElementById('level_display').value;
     }
