@@ -73,13 +73,8 @@ class ChessRoom:
     has all the information about a single chess game.
     """
 
-    def __init__(self, player1: str, player2: str, clock: str) -> None:
+    def __init__(self, player1: str, player2: str) -> None:
         self.players: list[str] = [player1, player2]
-        self.clock = clock
-        self.clocks: list[ChessClock] = [
-            ChessClock(clock),
-            ChessClock(clock)
-        ]
         shuffle(self.players)
         self.board: chess.Board = chess.Board(START_FEN)
         self.turn: int = 0
@@ -98,7 +93,6 @@ class ChessRoom:
         """
         flip turn from 1 to 0 or 0 to 1
         """
-        self.stop_clock()
         self.turn = 1 - self.turn
 
     def opponent(self, player: str) -> str:
@@ -117,36 +111,6 @@ class ChessRoom:
         self.board.push(move)
         self.update_turn()
         return True
-
-    def stop_clock(self) -> None:
-        """
-        stop the clock of the current player
-        """
-        self.clocks[self.turn].stop()
-
-    def start_clock(self) -> None:
-        """
-        start the clock of the current player
-        """
-        self.clocks[self.turn].start()
-
-    def is_timeout(self) -> bool:
-        """
-        true if the current player is out of time
-        """
-        return self.clocks[self.turn].is_timeout()
-
-    def timeout_player(self) -> str:
-        """
-        return the player that is out of time
-        """
-        return self.players[self.turn]
-
-    def get_time_left(self, player: str) -> float:
-        """
-        return the time left for the given player
-        """
-        return self.clocks[self.players.index(player)].get_time_left()
 
     def last_move(self) -> str:
         """
@@ -201,8 +165,8 @@ class EngineRoom(ChessRoom):
     a chess room with a stockfish engine against a player
     """
 
-    def __init__(self, player1: str, level: int = 10, clock: str=DEAFULT_CLOCK):
-        super().__init__(player1, 'stockfish', clock)
+    def __init__(self, player1: str, level: int = 10):
+        super().__init__(player1, 'stockfish')
         self.stockfish = Stockfish(STOCKFISH_W_PATH if platform.system() == 'Windows' else STOCKFISH_L_PATH)
         self.stockfish.set_skill_level(level)
 
@@ -210,7 +174,6 @@ class EngineRoom(ChessRoom):
         """
         calculate the best move for the stockfish engine and commit it to the board.
         """
-        self.start_clock()
         self.stockfish.set_fen_position(self.fen())
         move = self.stockfish.get_best_move()
         self.commit_move(move) # type: ignore
@@ -224,7 +187,46 @@ class PlayerRoom(ChessRoom):
     """
 
     def __init__(self, player1: str, player2: str, clock: str=DEAFULT_CLOCK):
-        super().__init__(player1, player2, clock)
+        super().__init__(player1, player2)
+        self.clock = clock
+        self.clocks: list[ChessClock] = [
+            ChessClock(clock),
+            ChessClock(clock)
+        ]
+        
+    def stop_clock(self) -> None:
+        """
+        stop the clock of the current player
+        """
+        self.clocks[self.turn].stop()
+
+    def start_clock(self) -> None:
+        """
+        start the clock of the current player
+        """
+        self.clocks[self.turn].start()
+
+    def is_timeout(self) -> bool:
+        """
+        true if the current player is out of time
+        """
+        return self.clocks[self.turn].is_timeout()
+
+    def timeout_player(self) -> str:
+        """
+        return the player that is out of time
+        """
+        return self.players[self.turn]
+
+    def get_time_left(self, player: str) -> float:
+        """
+        return the time left for the given player
+        """
+        return self.clocks[self.players.index(player)].get_time_left()
+    
+    def update_turn(self) -> None:
+        self.stop_clock()
+        super().update_turn()
 
 
 CHESS_ROOMS: set[PlayerRoom | EngineRoom] = set()

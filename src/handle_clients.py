@@ -6,7 +6,7 @@ import accounts_db as hd
 from client_class import *
 import stats
 import time
-chess_clocks: list[str] = ['5|0', '3|2', '10|5', '15|10', '30|0']
+chess_clocks = ['1|0', '1|1', '2|1', '3|0', '3|2', '5|0', '10|5', '15|10', '30|0']
 
 
 WAITING_ROOM: dict[str, list[Client]] = {chess_clocks[i]: [] for i in range(len(chess_clocks))}
@@ -93,6 +93,7 @@ def is_in_waiting_room(client: Client) -> bool:
     """
     return get_client_clock(client) != ''
 
+
 def remove_from_waiting_room(client: Client, clock: str|None=None) -> None:
     """
     remove the given client from the waiting room.
@@ -103,11 +104,11 @@ def remove_from_waiting_room(client: Client, clock: str|None=None) -> None:
         WAITING_ENTRE_TIME.pop(client)
 
 
-def add_engine_room(player: Client, level: int = 10, clock: str=DEAFULT_CLOCK) -> EngineRoom:
+def add_engine_room(player: Client, level: int = 10) -> EngineRoom:
     """
     add a new engine room to the CHESS_ROOMS list.
     """
-    room = EngineRoom(player.username, level, clock)
+    room = EngineRoom(player.username, level)
     CHESS_ROOMS.add(room)
     player.enter_room(room)
     stats.update_stat(stats.ENGINE_PLAYED)
@@ -151,7 +152,7 @@ def clock_update(client: Client) -> dict[str, int]:
     send the clock update to the given username.
     """
     room = client.room
-    if room is None:
+    if room is None or isinstance(room, EngineRoom):
         return dict(w = 0, b = 0)
     return dict(
             w = round(room.get_time_left(room.players[0])),

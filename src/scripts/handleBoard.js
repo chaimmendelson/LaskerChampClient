@@ -1,6 +1,6 @@
 let $board = $('#myBoard')
-let $status = $('#status')
 let $pgn = $('#pgnText')
+let $status = $('#status')
 
 let board = ChessBoard('myBoard', 'start')
 let game = null
@@ -8,8 +8,8 @@ let usePreGame = true;
 let clickToMove = true;
 let autoQueen = true;
 
-let playerColor = null
-let PlayersTurn = false;
+let clientColor = null
+let clientTurn = false;
 let GameOver = true;
 let waitingForCrowning = false;
 
@@ -46,7 +46,7 @@ function isWhiteSquare(square){
 }
 
 function isPlyersPiece(piece){
-    return (piece[0] === playerColor);
+    return (piece[0] === clientColor);
 }
 
 function highlightSquare(square){
@@ -120,9 +120,9 @@ function showCrowningOptions(){
     delete position[crowningMove.from]
     let pieces = ['Q', 'R', 'B', 'N'];
     for (const piece of pieces){
-        position[square] = playerColor + piece;
+        position[square] = clientColor + piece;
         $board.find(specificSquareClass(square)).css('background', 'white');
-        move = playerColor === WHITE ? -1 : 1;
+        move = clientColor === WHITE ? -1 : 1;
         square = moveSquaresOnBoard(square, move, 0);
     }
     board.position(position, false);
@@ -155,7 +155,7 @@ function makeMovesOnBoard(moves_l){
 }
 
 function updateTurn(){
-    PlayersTurn = game.turn() === playerColor;
+    clientTurn = game.turn() === clientColor;
     updateStatus();
 }
 
@@ -169,7 +169,7 @@ function resetBoard(){
 
 function startGame(){
     board = ChessBoard('myBoard', config);
-    if (playerColor == BLACK) board.flip();
+    if (clientColor == BLACK) board.flip();
     game = new Chess();
     moveToHighlight = null;
     updateTurn();
@@ -180,11 +180,9 @@ function startGame(){
 function clear_game(message, elo){
     resetBoard();
     $status.html(message);
-    document.getElementById('opponent').innerHTML = '';
-    document.getElementById('startBtn').style.display = 'block';
-    document.getElementById('quitBtn').style.display = 'none';
-    document.getElementById('startBtn').disabled = false;
-    document.getElementById('elo').innerHTML = elo;
+    clientElo = elo
+    setInfo();
+    game = null;
 }
 
 // control piece movement
@@ -194,7 +192,7 @@ function onDragStart (source, piece, position, orientation) {
         crowning(piece[1].toLowerCase());
         return false;
     }
-    if (!usePreGame && !PlayersTurn) return false;
+    if (!usePreGame && !clientTurn) return false;
     return true;
 }
 
@@ -203,7 +201,7 @@ function crowning(piece){
     if (!usePreGame) commit_move(crowningMove);
     else
     {
-        if(move_stack.length === 0 && PlayersTurn) commit_move(crowningMove);
+        if(move_stack.length === 0 && clientTurn) commit_move(crowningMove);
         else move_stack.push(crowningMove);
     }
     waitingForCrowning = false;
@@ -242,7 +240,7 @@ function validateMove(source, target, preMove=false)
 
 
 function onDrop(source, target) {
-    if (!usePreGame || (usePreGame && move_stack.length === 0 && PlayersTurn)){
+    if (!usePreGame || (usePreGame && move_stack.length === 0 && clientTurn)){
         const move = validateMove(source, target);
         if (!move) return 'snapback';
         commit_move(move);
@@ -320,7 +318,7 @@ function update_pgn(){
         else line += lines[i].padEnd(8);
     }
     pgn_lines.push(line);
-    $pgn.html(pgn_lines.join('\n'));
+    $pgn.html(`<pre>${pgn_lines.join('\n')}<pre>`);
 }
 
 // check legal moves and highlight legal moves
@@ -328,7 +326,7 @@ function onMouseoverSquare (square, piece) {
 // get list of possible moves for this square
     let moves = null;
     if(!isPlyersPiece(piece) || GameOver || waitingForCrowning) return;
-    if (!PlayersTurn && usePreGame) 
+    if (!clientTurn && usePreGame) 
         moves = get_all_moves(square);
     else 
         moves = game.moves({square: square, verbose: true});
@@ -362,9 +360,9 @@ let config = {
 
 // copying logged info to clipboard
 //PGN
-document.getElementById('pgnBtn').addEventListener('click', function() {
-    if (game) navigator.clipboard.writeText(game.pgn());
-});
+// document.getElementById('pgnBtn').addEventListener('click', function() {
+//     if (game) navigator.clipboard.writeText(game.pgn());
+// });
 
 function get_all_moves(square){
     // get all the moves a the piece on the square could have done if the board was empty
@@ -404,7 +402,7 @@ function getCastlingPreMoves(){
     let moves = [];
     let castling_rights = game.fen().split(' ')[2];
     if (castling_rights === '-') return moves;
-    if (playerColor === 'white'){
+    if (clientColor === 'white'){
         for (const move of move_stack){
             if (move.from === 'e1') return moves;
             if (move.from === 'a1') castling_rights = castling_rights.replace('Q', '');
@@ -425,7 +423,4 @@ function getCastlingPreMoves(){
     }
     return moves;
 }
-
-document.getElementById('flipBtn').addEventListener('click', function() {
-    board.flip();
-});
+  

@@ -14,13 +14,12 @@ import handle_clients as hc
 import app_routs as routs
 import useful_func as uf
 import stats
+from handle_clients import chess_clocks
 #os.chmod(STOCKFISH_L_PATH, stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 sio = socketio.AsyncServer()
 app = web.Application()
 sio.attach(app)
 
-
-chess_clocks = ['5|0', '3|2', '10|5', '15|10', '30|0']
 OPPONENT_ELO_RANGE = 100
     
 
@@ -30,10 +29,10 @@ async def handle_game_over(client: hc.Client):
     """
     room = client.room
     if room is None: return
-    room.stop_clock()
     resaults = room.get_game_results()
     last_move = room.last_move()
-    if not isinstance(room, EngineRoom):
+    if isinstance(room, PlayerRoom):
+        room.stop_clock()
         opponent = hc.get_oppoent(client)
         hc.update_elo({client: resaults[client.username], opponent: resaults[opponent.username]})
         await send_game_over_msg(opponent, last_move, resaults[opponent.username])
@@ -55,7 +54,9 @@ async def send_move_to_opponent(client: hc.Client):
     room = client.room
     if room is None: return
     await sio.emit('opponent_move', dict(move=room.last_move(), clock=hc.clock_update(client)), to=client.sid)
-    room.start_clock()
+    if isinstance(room, PlayerRoom):
+        room.start_clock()
+    
 
 
 async def handle_quit(client: hc.Client) -> None:
@@ -65,34 +66,28 @@ async def handle_quit(client: hc.Client) -> None:
     if client.room is not None and not isinstance(client.room, EngineRoom):
         opponent = hc.get_oppoent(client)
         hc.update_elo({client: -1, opponent: 1})
-        await sio.emit('opponent_quit', dict(elo=opponent.elo_int()), to=opponent.sid)
+        await sio.emit('opponent_quit', dict(elo=opponent.elo_int(), clock=hc.clock_update(opponent)), to=opponent.sid)
     hc.close_room(client)
 
 
-async def handle_timeout(room: EngineRoom | PlayerRoom) -> None:
+async def handle_timeout(room: PlayerRoom) -> None:
     """
     handle the timeout event.
     """
     username = room.timeout_player()
-    if username == 'stockfish':
-        client = hc.get_client(username=room.opponent(username))
-        if client is None: return
-        await game_closed_msg(client, 'opponent_timeout')
-    else:
-        client = hc.get_client(username=username)
-        if client is None or client.room is None: return
-        if not isinstance(client.room, EngineRoom):
-            opponent = hc.get_oppoent(client)
-            hc.update_elo({client: LOST, opponent: WON})
-            await game_closed_msg(opponent, 'opponent_timeout')
-        await game_closed_msg(client, 'timeout')
+    client = hc.get_client(username=username)
+    if client is None or client.room is None: return
+    opponent = hc.get_oppoent(client)
+    hc.update_elo({client: LOST, opponent: WON})
+    await game_closed_msg(opponent, 'opponent_timeout')
+    await game_closed_msg(client, 'timeout')
     hc.close_room(client)
 
 async def game_closed_msg(client: hc.Client, msg: str):
     """
     send the game_closed message to the given client.
     """
-    await sio.emit(msg, dict(elo=client.elo_int()), to=client.sid)
+    await sio.emit(msg, dict(elo=client.elo_int(), clock=hc.clock_update(client)), to=client.sid)
     
             
 @sio.event
@@ -126,9 +121,11 @@ async def start_game(sid, data: dict):
     if client.is_in_room() or client in hc.WAITING_ROOM or not data.get('game_mode'):
         return False
     clock: str|None = data.get('clock')
-    if clock is None or not clock in chess_clocks:
-        clock = chess_clocks[0]
     if data.get('game_mode') == 'online':
+        if clock is None or not clock in chess_clocks:
+            clock = chess_clocks[0]
+        if hc.is_in_waiting_room(client):
+            return {'status': 0}
         if len(hc.WAITING_ROOM[clock]) != 0:
             for opponent in hc.WAITING_ROOM[clock]:
                 if hc.get_client_clock(opponent) == clock and\
@@ -136,17 +133,17 @@ async def start_game(sid, data: dict):
                                                 client.elo_int() + OPPONENT_ELO_RANGE):
                     room = hc.add_player_room(client, opponent, clock)
                     await set_pvp_room(room)
-                    return
+                    return {'status': 1}
         hc.add_to_waiting_room(client, clock)
-        await sio.emit('searching', to=sid)
-        return
+        return {'status': 2}
     elif data.get('game_mode') == 'engine':
         if data.get('level') is None:
             data['level'] = 10
-        room = hc.add_engine_room(client, data['level'], clock)
+        room = hc.add_engine_room(client, data['level'])
         await set_engine_room(room)
+        return {'status': 1}
     else:
-        return False
+        return {'status': 0}
 
 
 async def set_pvp_room(room: PlayerRoom):
@@ -164,7 +161,6 @@ async def set_engine_room(room: EngineRoom):
     data: dict[str, dict|str] = dict(opponent=dict(username='stockfish', elo=0), clock=hc.clock_update(client))
     data['color'] = 'w' if room.is_players_turn(client.username) else 'b'
     await sio.emit('game_started', data, to=client.sid)
-    room.start_clock()
     if not room.is_players_turn(client.username):
         await send_stockfish_move(client)
     
@@ -278,10 +274,10 @@ def check_for_timeout():
     """
     run endless loop to check for timeout.
     """
-    for room in hc.CHESS_ROOMS:
+    rooms = [room for room in hc.CHESS_ROOMS if isinstance(room, PlayerRoom)]
+    for room in rooms:
         if room.is_timeout():
             asyncio.run(handle_timeout(room))
-            break
 
 
 def check_waiting_room():
