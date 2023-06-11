@@ -210,7 +210,6 @@ function resizeBoard(){
     let screen_width = window.innerWidth;
     let size = Math.min(screen_height, screen_width) - 25;
     let con_width, con_height;
-    console.log(size, screen_width);
     if ((size + 300) < screen_width){
         document.getElementById('container').style.flexDirection = 'row';
         con_width = Math.min(screen_width - screen_height, 500);
@@ -275,20 +274,20 @@ document.getElementById('flipBtn').addEventListener('click', function() {
 
 function addSettingRow(name) {
     const tableBody = document.querySelector("#settings_t tbody");
-    
+  
     const newRow = document.createElement("tr");
     newRow.innerHTML = `
       <td><span class="settings-name">${name}</span></td>
       <td>
         <label class="switch">
-          <input type="checkbox" checked>
-          <span class="settingsSlider round" id=${name}></span>
+          <input type="checkbox" id="${name}-slider" checked>
+          <span class="settingsSlider round"></span>
         </label>
       </td>
     `;
-    
+  
     tableBody.appendChild(newRow);
-  }
+  }  
 
 
 function toggleSet(name) {
@@ -341,7 +340,7 @@ function add_clock_option(){
     document.getElementById('1|0').style.backgroundColor = 'darkslategrey';
 }
 
-window.onload = (e) => {
+window.onload = (event) => {
     resetClocks();
     resetSquareColor();
     add_clock_option();
@@ -349,15 +348,19 @@ window.onload = (e) => {
     addSettingRow('Auto-Queen');
     document.body.style.display = 'block';
     on_resize();
+  
+    document.getElementById('Premove-slider').addEventListener('change', (event) => {
+      usePreGame = event.currentTarget.checked;
+      if (!usePreGame) reset_pre_moves();
+    });
+  
+    document.getElementById('Auto-Queen-slider').addEventListener('change', (event) => {
+      autoQueen = event.currentTarget.checked;
+      if (waitingForCrowning) crowning('q');
+    });
+  };
+  
+  
+  
 
-    document.getElementById('Premove').addEventListener('change', function() {
-        usePreGame = this.checked;
-        if (!usePreGame) reset_pre_moves();
-    });
-    
-    document.getElementById('Auto-Queen').addEventListener('change', function() {
-        autoQueen = this.checked;
-        if (waitingForCrowning) crowning('q');
-    });
-};
 
