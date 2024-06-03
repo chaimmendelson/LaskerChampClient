@@ -42,8 +42,6 @@ async function handleResponse(response) {
     document.body.style.pointerEvents = 'auto';
 }
 
-
-
 function displayError(box) {
     document.getElementById(box).style.border = '3px solid red';
 }

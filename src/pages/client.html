@@ -37,9 +37,9 @@
       <div id="con">
 
         <div id="toggles">
-          <div id="game" onclick="toggleSet('game')" class="toggle">game</div>
-          <div id="new_game" onclick="toggleSet('new_game')" class="toggle">new game</div>
-          <div id="settings" onclick="toggleSet('settings')" class="toggle">settings</div>
+          <div id="game" onclick="menuSwitch('game')" class="toggle">game</div>
+          <div id="new_game" onclick="menuSwitch('new_game')" class="toggle">new game</div>
+          <div id="settings" onclick="menuSwitch('settings')" class="toggle">settings</div>
         </div>
 
         <div id="toggles_content">
@@ -57,8 +57,8 @@
           <div id="new_game_toggle_content" class="toggle_content">
               <button id="startBtn" class="gameBtn">Start</button>
               <div id="game_type">
-                <div id="Online" class="game_type_btn" onclick="game_type('online')" style="background-color: darkslategray;">Online</div>
-                <div id="Engine" class="game_type_btn" onclick="game_type('engine')">Engine</div>
+                <div id="Online" class="game_type_btn" onclick="gameTypeSwitch('online')" style="background-color: darkslategray;">Online</div>
+                <div id="Engine" class="game_type_btn" onclick="gameTypeSwitch('engine')">Engine</div>
               </div>
               <div id="online_display" class="game_type_display">
                 <div id="clocks">
@@ -90,9 +90,18 @@
         </div>
       </div>
     </div>
-    <script src="scripts/chess.js"></script>
-    <script src="scripts/client.js"></script>
-    <script src="scripts/handleBoard.js"></script>
-    <script src="scripts/client-clocks.js"></script>
+    <script src="scripts/gamePage/onLoad.js"></script>
+    <script src="scripts/gamePage/generalData.js"></script>
+    <script src="scripts/gamePage/generalDisplay.js"></script>
+    <script src="scripts/gamePage/chess.js"></script>
+    <script src="scripts/gamePage/boardColors.js"></script>
+    <script src="scripts/gamePage/boardPositionFunctions.js"></script>
+    <script src="scripts/gamePage/gameManegment.js"></script>
+    <script src="scripts/gamePage/handleBoard.js"></script>
+    <script src="scripts/gamePage/moveControl.js"></script>
+    <script src="scripts/gamePage/preMove.js"></script>
+    <script src="scripts/gamePage/client-clocks.js"></script>
+    <script src="scripts/gamePage/client.js"></script>
+    
   </body>
 </html>

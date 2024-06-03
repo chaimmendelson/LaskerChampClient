@@ -144,19 +144,6 @@ def is_email_valid(email: str) -> bool:
     if not re.fullmatch(email_regex, email):
         return False
     return True
-    # make a do while loop.
-    while True:
-        response = requests.get(
-            url="https://isitarealemail.com/api/email/validate",
-            params={'email': email},
-            timeout=5,
-        )
-        if response.status_code == 429:
-            time.sleep(1)
-            continue
-        if response.status_code == 403:
-            return True
-        return response.json().get('status') == "valid"
 
 
 def is_cookie_valid(cookie: str) -> bool:
