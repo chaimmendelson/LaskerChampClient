@@ -1,7 +1,7 @@
 """
 handle the connected users.
 """
-from .client_class import *
+from src.models.client import *
 from .stats import *
 import time
 chess_clocks = ['1|0', '1|1', '2|1', '3|0', '3|2', '5|0', '10|5', '15|10', '30|0']

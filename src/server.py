@@ -4,15 +4,13 @@ This file contains the server code for the chess game.
 import os
 import threading
 import asyncio
-from time import time
 import socketio
 
-from .chess_rooms import EngineRoom, PlayerRoom, WON, LOST, CHESS_ROOMS
-from .accounts_db import does_exist, COOKIE, get_username_by_cookie, update_entry, reset_table
+from src.repositories.accounts import update_entry, reset_table
 from .handle_clients import Client, add_client, get_client, WAITING_ROOM, is_in_waiting_room, get_client_clock, \
     add_player_room, add_to_waiting_room, add_engine_room, clock_update, get_oppoent, update_elo, close_room, \
     remove_from_waiting_room, remove_client, WAITING_ENTRE_TIME, chess_clocks
-from .app_routs import *
+from src.controllers.app_routs import *
 from .useful_func import validate_move
 #os.chmod(STOCKFISH_L_PATH, stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 sio = socketio.AsyncServer()

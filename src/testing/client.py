@@ -1,13 +1,11 @@
 import requests
 import asyncio
-from aiohttp import web
 import socketio
-import chess
 import os
 import stat
 import chess
 import chess.engine
-from ..chess_rooms import NEPO_L_PATH, STOCKFISH_L_PATH
+from src.models.chess_room import NEPO_L_PATH
 
 os.chmod(NEPO_L_PATH, stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
      

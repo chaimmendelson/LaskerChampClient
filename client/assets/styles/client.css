@@ -1,0 +1,365 @@
+button{
+    width:fit-content;
+    background-color: lightslategray;
+}
+button:hover{
+    cursor:grab;
+}
+button:active{
+    cursor: grabbing;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 15px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey;
+    border-radius: 50px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: darkslategray;
+    border-radius: 50px;
+}
+
+
+
+.crownBtn{
+    width: fit-content;
+    float: left;
+}
+.unselectable {
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.gameBtn{
+    width: 80%;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 10%;
+    font-size: x-large;
+}
+
+#startBtn{
+    background-color: green;
+    color: white;
+}
+#msg_box{
+    position: absolute;
+    z-index: 10;
+    /* opacity: 0.5; */
+    font-size: xx-large;
+    text-align: center;
+    width: 100%;
+    display: none;
+}
+.clearfix{
+    clear: both;
+}
+
+body{
+    background-color: darkslategray;
+    display: none;
+}
+
+#clock_options{
+    margin: 10px auto;
+    background-color: rgb(124, 124, 153);
+    padding: 5px;
+    border-radius: 20px;
+    font-family: cursive;
+}
+
+#container{
+    width: fit-content;
+    margin: 0 auto;
+    background-color: darkslategray;
+    padding: 5px;
+    display: flex;
+    justify-content: space-around;
+    flex-direction: row;
+    margin-top: 10px;
+}
+
+#game_type{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin-top: 2vh;
+}
+
+.game_type_btn{
+    width: 25%;
+    background-color: slategray;
+    padding: 5px;
+    font-size: x-large;
+    text-align: center;
+}
+
+#game_container{
+    position: relative;
+    width: 300px;
+    margin-right: 30px;
+}
+
+#game_controls{
+    width: 15%;
+    min-width: 200px;
+    border-radius: 20px;
+    padding: 10px;
+}
+
+#preMoveOpt{
+    width: fit-content;
+    margin: 10px auto;
+}
+#myBoard{
+    width: 100%;
+    height: auto;
+    background-color: brown;
+    border: 5px brown solid;
+}
+
+#user_info{
+    padding: 5px;
+    border: 1px solid black;
+    background-color: palevioletred;
+    text-align: start;
+}
+
+#chess-clock{
+    width: 100%;    
+}
+
+#pgnBtn{
+    position: relative;
+    float: right;
+    display: None;
+}
+#pgnDisplay{
+    color: cornsilk;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: large;
+}
+
+#status{
+    width: 100%;
+    height: 30px;
+    border: 1px solid black;
+    text-align: center;
+    font-size: large;
+    color: white;
+    font-family: cursive;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: large;
+}
+
+.clock_type{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin: 1vh auto;
+}
+
+.clock_time{
+    text-align: center;
+    padding: 10px;
+    width: 25%;
+    background-color: slategrey;
+}
+
+#clocks{
+    width: 100%;
+    min-width: 100%;
+}
+
+.game_type_display{
+    margin-top: 20px;
+}
+
+#con{
+    width: 30%;
+    background-color: #272922;
+    margin-right: 10px;
+    overflow-y: scroll;
+}
+
+#toggles{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.toggle{
+    color: white;
+    width: 33%;
+    border: 1px solid white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0px;
+}
+
+#toggles_content{
+    background-color: #272922;
+    color: azure;
+    padding: 5px;
+}
+
+.toggle_content{
+    padding: 20px;
+}
+
+#copyBtns{
+    margin-bottom: 10px;
+}
+
+.copy_btn{
+    width: fit-content;
+    border: 2px solid black;
+}
+
+#clocks{
+    width: fit-content;
+    margin: 2px auto;
+}
+
+.clock{
+    width: fit-content;
+    padding: 2px;
+    border: 1px black solid;
+    background-color: gray;
+    font-family: cursive;
+    font-size: large;
+    display: inline;
+    float: right;
+    height: 20px;
+    text-align: center;
+    margin: 5px;
+}
+
+.playerInfo{
+    float: left;
+    height: 10px;
+    width: fit-content;
+    padding: 5px;
+    font-size: large;
+    color: antiquewhite;
+}
+
+#box{
+    text-align: center;
+    border:1px black solid;
+    background-color: white;
+    padding: 5px;
+}
+
+#engine_box{
+    width: 20%;
+    min-width: 100px;
+    background-color: gray;
+    border-radius: 20px;
+    padding: 10px;
+    margin-left: 5%;
+    float: left;
+}
+
+#engine_level{
+    width: 100%;
+    margin-top: 10px;
+}
+
+#level_display{
+    margin-top: 20px;
+    width: fit-content;
+    font-size: xx-large;
+    margin: auto;
+}
+
+
+#settings_t{
+    margin: 10px auto;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+/* The switch - the box around the settingsSlider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 100px;
+    height: 50px;
+  }
+  
+  /* Hide default HTML checkbox */
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  /* The settingsSlider */
+  .settingsSlider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  .settingsSlider:before {
+    position: absolute;
+    content: "";
+    height: 45px;
+    width: 45px;
+    left: 3px;
+    top: 3px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  input:checked + .settingsSlider {
+    background-color: #2196F3;
+  }
+  
+  input:focus + .settingsSlider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+  
+  input:checked + .settingsSlider:before {
+    left: calc(100% - 48px); /* Updated value */
+  }
+  
+  /* Rounded settingsSlider */
+  .settingsSlider.round {
+    border-radius: 34px;
+  }
+  
+  .settingsSlider.round:before {
+    border-radius: 50%;
+  }
+  
+.data_item{
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.settings-name{
+    padding: 5px;
+    font-size: larger;
+}

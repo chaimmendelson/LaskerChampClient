@@ -1,8 +1,8 @@
 import json
-from .accounts_db import get_accounts_count
+from src.repositories.accounts import get_accounts_count
 from datetime import datetime
-from .chess_rooms import *
-from .client_class import CLIENTS
+from src.models.chess_room import *
+from src.models.client import CLIENTS
 DAILY_FILE = 'src/daily_stat.json'
 
 PVP_PLAYED = 'online'
