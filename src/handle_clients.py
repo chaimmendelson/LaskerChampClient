@@ -1,10 +1,8 @@
 """
 handle the connected users.
 """
-from chess_rooms import *
-import accounts_db as hd
-from client_class import *
-import stats
+from .client_class import *
+from .stats import *
 import time
 chess_clocks = ['1|0', '1|1', '2|1', '3|0', '3|2', '5|0', '10|5', '15|10', '30|0']
 
@@ -111,7 +109,7 @@ def add_engine_room(player: Client, level: int = 10) -> EngineRoom:
     room = EngineRoom(player.username, level)
     CHESS_ROOMS.add(room)
     player.enter_room(room)
-    stats.update_stat(stats.ENGINE_PLAYED)
+    update_stat(ENGINE_PLAYED)
     return room
 
 
@@ -127,7 +125,7 @@ def add_player_room(player1: Client, player2: Client, clock: str = DEAFULT_CLOCK
     player2.update_games_played()
     player1.enter_room(room)
     player2.enter_room(room)
-    stats.update_stat(stats.PVP_PLAYED)
+    update_stat(PVP_PLAYED)
     return room
 
 

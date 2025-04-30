@@ -2,19 +2,22 @@
 function to handle the routes of the app
 """
 import sys
+
+from src.accounts_db import is_cookie_valid, does_exist, COOKIE, get_username_by_cookie, get_value, ROLL, ADMIN, \
+    is_username_valid, is_password_valid, USERNAME, check_password, validate_credentials, create_new_user
+from src.handle_clients import is_client_connected
+
 sys.path.append('./')
 from datetime import datetime, timedelta
 from aiohttp import web
-import accounts_db as hd
-import handle_clients as hc
-import stats
+from .stats import *
 COOKIE_NAME: str = 'chess-cookie'
 
 USER_lOGGED_IN: int = 490
 INVALID_CREDENTIALS: int = 491
 
 async def get_stats(request: web.Request) -> web.Response:
-    return web.json_response(dict(stats=stats.get_overall_stats()))
+    return web.json_response(dict(stats=get_overall_stats()))
 
 
 async def admin(request: web.Request) -> web.Response:
@@ -22,8 +25,8 @@ async def admin(request: web.Request) -> web.Response:
     cookie = request.cookies.get(COOKIE_NAME)
     if cookie is None:
         return web.Response(status=302, headers={'Location': '/'})
-    roll = hd.get_value(hd.get_username_by_cookie(cookie), hd.ROLL)
-    if roll != hd.ADMIN:
+    roll = get_value(get_username_by_cookie(cookie), ROLL)
+    if roll != ADMIN:
         return web.Response(status=302, headers={'Location': '/'})
     with open('src/pages/admin.html', encoding='utf-8') as admin_page:
         return web.Response(text=admin_page.read(), content_type='text/html')
@@ -36,8 +39,8 @@ async def game_page(request: web.Request):
     cookies = request.cookies
     if COOKIE_NAME in cookies:
         cookie = cookies[COOKIE_NAME]
-        if hd.is_cookie_valid(cookie) and hd.does_exist(hd.COOKIE, cookie):
-            if not hc.is_client_connected(username=hd.get_username_by_cookie(cookie)):
+        if is_cookie_valid(cookie) and does_exist(COOKIE, cookie):
+            if not is_client_connected(username=get_username_by_cookie(cookie)):
                 with open('src/pages/client.html', encoding='utf-8') as main_page:
                     return web.Response(text=main_page.read(), content_type='text/html')
     return web.Response(status=302, headers={'Location': '/login'})
@@ -70,16 +73,16 @@ async def login_validation(request: web.Request):
     if not ('username' in data and 'password' in data):
         return web.json_response({'status': 400})
     username, password = data.get('username'), data.get('password')
-    if not (hd.is_username_valid(username) and hd.is_password_valid(password)):
+    if not (is_username_valid(username) and is_password_valid(password)):
         return web.json_response({'status': 400})
-    if hd.does_exist(hd.USERNAME, username):
-        if hd.check_password(username, password):
-            if not hc.is_client_connected(username):
+    if does_exist(USERNAME, username):
+        if check_password(username, password):
+            if not is_client_connected(username):
                 response = web.json_response({'status': 200})
                 expires = datetime.now() + timedelta(days=365*10)
                 expires = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
                 response.set_cookie(
-                    COOKIE_NAME, str(hd.get_value(username, hd.COOKIE)), expires=expires)
+                    COOKIE_NAME, str(get_value(username, COOKIE)), expires=expires)
                 return response
             return web.json_response({'status': USER_lOGGED_IN})
     return web.json_response({'status': INVALID_CREDENTIALS})
@@ -94,10 +97,10 @@ async def sign_up(request: web.Request):
         data = await request.json()
         username, password, email = data.get('username'), data.get('password'), data.get('email')
         if username is not None and password is not None and email is not None:
-            code = hd.validate_credentials(username, password, email)
+            code = validate_credentials(username, password, email)
             if code == 200:
-                hd.create_new_user(username, password, email)
-                stats.update_stat(stats.NEW_ACCOUNTS)
+                create_new_user(username, password, email)
+                update_stat(NEW_ACCOUNTS)
     return web.json_response({'status': code})
 
 

@@ -1,8 +1,8 @@
 import json
-import accounts_db as hd
+from .accounts_db import get_accounts_count
 from datetime import datetime
-from chess_rooms import *
-from client_class import CLIENTS
+from .chess_rooms import *
+from .client_class import CLIENTS
 DAILY_FILE = 'src/daily_stat.json'
 
 PVP_PLAYED = 'online'
@@ -49,7 +49,7 @@ def get_current_statues() -> dict[str, int]:
         online = len([room for room in CHESS_ROOMS if isinstance(room, PlayerRoom)]),
         engine = len([room for room in CHESS_ROOMS if isinstance(room, EngineRoom)]),
         accounts = len(CLIENTS),
-        count = hd.get_accounts_count()
+        count = get_accounts_count()
     )
     
     

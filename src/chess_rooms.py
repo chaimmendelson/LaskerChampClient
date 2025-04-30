@@ -7,7 +7,6 @@ from time import time
 from random import shuffle
 import chess
 from stockfish import Stockfish
-from chess import engine
 
 STOCKFISH_W_PATH: str = r'./src/engines/stockfish-windows-2022-x86-64-avx2.exe'
 STOCKFISH_L_PATH: str = r'./src/engines/stockfish-ubuntu-20.04-x86-64-avx2'

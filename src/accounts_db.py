@@ -5,9 +5,8 @@ import hashlib
 import secrets
 from datetime import datetime
 import re
-import time
-import requests
-import execute_sql as db
+from .execute_sql import does_exist as db_does_exist, select_values, update_value as db_update_value, insert_row, \
+    delete_row, row_count, reset_table as db_reset_table
 
 # the name of the table.
 TABLE_NAME = 'accounts'
@@ -75,21 +74,21 @@ def update_value(username: str, column: str, value) -> None:
     """
     change the value of the given column for the given username.
     """
-    db.update_value(TABLE_NAME, column, value, USERNAME, username)
+    db_update_value(TABLE_NAME, column, value, USERNAME, username)
 
 
 def get_value(username: str, column: str) -> str|int|float|datetime:
     """
     get the value of the given column for the given username.
     """
-    return parse_values({column: db.select_values(TABLE_NAME, USERNAME, username, (column,))[0]})[column]
+    return parse_values({column: select_values(TABLE_NAME, USERNAME, username, (column,))[0]})[column]
 
 
 def does_exist(column: str, value: str) -> bool:
     """
     true if the given value exists in the given column.
     """
-    return db.does_exist(TABLE_NAME, column, value)
+    return db_does_exist(TABLE_NAME, column, value)
 
 
 def hash_pass(password: str) -> str:
@@ -174,7 +173,7 @@ def create_new_user(username: str, password: str, email: str, elo: int=1200, rol
     add a new user to the database after verifying the username and password
     (the email will be verfied later).
     """
-    db.insert_row(TABLE_NAME, {
+    insert_row(TABLE_NAME, {
         USERNAME: username,
         PASSWORD: hash_pass(password),
         EMAIL: email,
@@ -188,14 +187,14 @@ def get_user_data(column: str, value, columns) -> dict[str, str|int|float|dateti
     """
     get the data of the user with the given value in the given column.
     """
-    return parse_values(dict(zip(columns, db.select_values(TABLE_NAME, column, value, columns))))
+    return parse_values(dict(zip(columns, select_values(TABLE_NAME, column, value, columns))))
 
 
 def delete_user(username: str) -> None:
     """
     calls delete_user to delete the user from the database
     """
-    db.delete_row(TABLE_NAME, USERNAME, username)
+    delete_row(TABLE_NAME, USERNAME, username)
 
 
 def check_password(username: str, password: str) -> bool:
@@ -223,7 +222,7 @@ def get_username_by_cookie(cookie: str) -> str:
     """
     get the username from the database by his cookie
     """
-    return db.select_values(TABLE_NAME, COOKIE, cookie, (USERNAME,))[0]
+    return select_values(TABLE_NAME, COOKIE, cookie, (USERNAME,))[0]
 
 
 def reset_password(username: str) -> None:
@@ -237,7 +236,7 @@ def reset_table():
     """
     reset the table and insert default users
     """
-    db.reset_table(TABLE_NAME, STRUCTURE)
+    db_reset_table(TABLE_NAME, STRUCTURE)
     create_new_user('chaim', 'test1234', 'chaimke2005@gmail.com', 1200, ADMIN)
 
 
@@ -259,7 +258,7 @@ def get_accounts_count() -> int:
     """
     get the number of users in the database
     """
-    return db.row_count(TABLE_NAME)
+    return row_count(TABLE_NAME)
 
 
 def test_validation():

@@ -1,5 +1,5 @@
-from chess_rooms import *
-import accounts_db as hd
+from .chess_rooms import *
+from .accounts_db import *
 
 class Client():
     """
@@ -11,10 +11,10 @@ class Client():
         self.sid: str = sid
         # the room that the user is in.
         self.room: EngineRoom | PlayerRoom | None = None
-        user_data = hd.get_user_data(hd.USERNAME, username, (hd.ELO, hd.GAMES_PLAYED, hd.ROLL))
-        self.elo: float = user_data[hd.ELO] # type: ignore
-        self.games_played: int = user_data[hd.GAMES_PLAYED] # type: ignore
-        self.roll: str = user_data[hd.ROLL] # type: ignore
+        user_data = get_user_data(USERNAME, username, (ELO, GAMES_PLAYED, ROLL))
+        self.elo: float = user_data[ELO] # type: ignore
+        self.games_played: int = user_data[GAMES_PLAYED] # type: ignore
+        self.roll: str = user_data[ROLL] # type: ignore
 
     def update_elo(self, opponent_elo: float, player_score: int):
         """
@@ -24,7 +24,7 @@ class Client():
         elo_gain = k_val * \
             (player_score - (1 / (1 + 10 ** ((opponent_elo - self.elo) / 400))))
         self.elo += elo_gain
-        hd.update_value(self.username, hd.ELO, self.elo)
+        update_value(self.username, ELO, self.elo)
 
     def is_in_room(self) -> bool:
         """
@@ -48,7 +48,7 @@ class Client():
         
     def update_games_played(self):
         self.games_played += 1
-        hd.update_games_played(self.username)
+        update_games_played(self.username)
     
     def elo_int(self):
         return round(self.elo)

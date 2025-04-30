@@ -9,11 +9,7 @@ def execute_query(query: sql.Composed, *args: str|tuple) -> psycopg.Cursor:
     """
     Execute a SQL query on the database and return the cursor object.
     """
-    if platform.system() == 'Windows':
-        conn_str = "dbname=laskerchamp user=postgres password=132005"
-    else:
-        conn_str = "host=rogue.db.elephantsql.com dbname=cqscdcwf\
-        user=cqscdcwf password=5lgP45vTxWWrFN5d1nWiH98vnfaWgZ95"
+    conn_str = "dbname=laskerchamp user=postgres password=postgres"
     conn: psycopg.Connection = psycopg.connect(conn_str, autocommit=True)
     args = args[0] if len(args) == 1 and isinstance(args[0], tuple) else args
     cursor = conn.execute(query, args)
