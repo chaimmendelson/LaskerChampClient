@@ -40,6 +40,7 @@
           <div id="game" onclick="menuSwitch('game')" class="toggle">game</div>
           <div id="new_game" onclick="menuSwitch('new_game')" class="toggle">new game</div>
           <div id="settings" onclick="menuSwitch('settings')" class="toggle">settings</div>
+          <div id="chat" onclick="menuSwitch('chat')" class="toggle">chat</div>
         </div>
 
         <div id="toggles_content">
@@ -51,6 +52,15 @@
             <button id="quitBtn" class="gameBtn">Quit</button>
             <div id="pgnDisplay">PGN:
               <span id="pgnText"></span>
+            </div>
+          </div>
+
+          <div id="chat_toggle_content" class="toggle_content" style="display: none;">
+            <div id="chat-box"></div>
+
+            <div id="input-container">
+              <input type="text" id="chat-input" placeholder="Type a message..." />
+              <button id="send-btn">Send</button>
             </div>
           </div>
 
@@ -102,6 +112,7 @@
     <script src="scripts/gamePage/preMove.js"></script>
     <script src="scripts/gamePage/client-clocks.js"></script>
     <script src="scripts/gamePage/client.js"></script>
+    <script src="scripts/gamePage/messages.js"></script>
     
   </body>
 </html>

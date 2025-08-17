@@ -148,5 +148,15 @@
         "online": 1,
         "engine": 2,
         "new": 3
+    },
+    "2025-05-01": {
+        "online": 5,
+        "engine": 2,
+        "new": 2
+    },
+    "2025-08-04": {
+        "online": 0,
+        "engine": 0,
+        "new": 1
     }
 }

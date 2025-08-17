@@ -4,6 +4,11 @@ const socket = io({
     }
 });
 
+socket.on('message', (data) => {
+    console.log(data);
+    addMessage(data, false)
+});
+
 socket.on('connect', () => {
     console.log('Connected to server');
     start = Date.now();

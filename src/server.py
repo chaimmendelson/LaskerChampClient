@@ -179,6 +179,21 @@ async def send_stockfish_move(client: Client):
 
 
 @sio.event
+async def message(sid: str, message: str):
+    """
+    handle the message event.
+    """
+    client = get_client(sid=sid)
+    if client.room is None: return
+
+    print("message from", client.username, ":", message)
+    await sio.emit(
+        'message',
+        message,
+        to=get_client(username=client.room.opponent(client.username)).sid
+    )
+
+@sio.event
 async def my_move(sid: str, data: dict[str, str]):
     """
     handle the given move from the given sid.

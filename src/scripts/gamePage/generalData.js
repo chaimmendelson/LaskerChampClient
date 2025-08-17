@@ -39,7 +39,8 @@ const blackSquareClass = 'black-3c85d'
 const gameTab = 'game'
 const newGameTab = 'new_game'
 const settingsTab = 'settings'
-const tabs = [gameTab, newGameTab, settingsTab]
+const chatTab = 'chat'
+const tabs = [gameTab, newGameTab, settingsTab, chatTab];
 
 const squareColors = {
     white: { background: 'mintcream', grey: 'grey', preMove: 'tomato', highlight: 'yellow', srcHighlight: 'lightblue' },

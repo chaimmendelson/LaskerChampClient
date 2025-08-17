@@ -4,6 +4,7 @@ function updateTurn(){
 }
 
 function startGame(){
+    clearChat()
     board = ChessBoard('myBoard', config);
     if (clientColor == BLACK) board.flip();
     game = new Chess();
