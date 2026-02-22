@@ -18,3 +18,10 @@ on the front end its codded with css html and js using:
 * chessboard.js
 * chess.js
 * socketio
+
+Run the application using the following command
+
+```
+chmod +x run.sh
+./run.sh
+```
