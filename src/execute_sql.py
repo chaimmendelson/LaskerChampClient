@@ -5,16 +5,25 @@ import psycopg
 from psycopg import sql
 import platform
 
-def execute_query(query: sql.Composed, *args: str|tuple) -> psycopg.Cursor:
+import psycopg
+from psycopg import sql
+
+def execute_query(query: sql.Composed, *args: str | tuple) -> psycopg.Cursor:
     """
     Execute a SQL query on the database and return the cursor object.
     """
-    conn_str = "dbname=laskerchamp user=postgres password=postgres"
+    # Docker Compose connection string
+    conn_str = "dbname=laskerchamp user=postgres password=postgres host=localhost port=5432"
+
+    # For local testing, you could also do:
+    # conn_str = "dbname=mydatabase user=myuser password=mypassword host=localhost port=5432"
+
     conn: psycopg.Connection = psycopg.connect(conn_str, autocommit=True)
     args = args[0] if len(args) == 1 and isinstance(args[0], tuple) else args
     cursor = conn.execute(query, args)
     conn.close()
     return cursor
+
 
 
 def create_table(table_name: str, columns: list[str]) -> None:

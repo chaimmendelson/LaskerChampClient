@@ -30,8 +30,8 @@ async def admin(request: web.Request) -> web.Response:
         return web.Response(status=302, headers={'Location': '/'})
     with open('src/pages/admin.html', encoding='utf-8') as admin_page:
         return web.Response(text=admin_page.read(), content_type='text/html')
-    
-    
+
+
 async def game_page(request: web.Request):
     """
     Serve the client-side application.
@@ -82,7 +82,7 @@ async def login_validation(request: web.Request):
                 expires = datetime.now() + timedelta(days=365*10)
                 expires = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
                 response.set_cookie(
-                    COOKIE_NAME, str(get_value(username, COOKIE)), expires=expires, httponly=True, secure=True)
+                    COOKIE_NAME, str(get_value(username, COOKIE)), expires=expires, httponly=False, secure=False)
                 return response
             return web.json_response({'status': USER_lOGGED_IN})
     return web.json_response({'status': INVALID_CREDENTIALS})
